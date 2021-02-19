@@ -1,4 +1,4 @@
-function ParentGui(Gui)
+local function ParentUi(Gui)
 	Gui.Name = game:GetService("HttpService"):GenerateGUID(false):gsub('-', ''):sub(1, math.random(25, 30))
 	if CoreGui:FindFirstChild("RobloxGui") then
 		Gui.Parent = CoreGui["RobloxGui"]
@@ -7,7 +7,7 @@ function ParentGui(Gui)
 	end
 end
 local Dex = game:GetObjects("rbxassetid://3567096419")[1]
-ParentGui(Dex)
+ParentUi(Dex)
 	local function Load(Obj, Url)
 		local function GiveOwnGlobals(Func, Script)
 			local Fenv = {}
