@@ -22,6 +22,7 @@ local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local Notification = GUI.Notification
 local CommandsGui = GUI.CMDS
+local CmdSu = GUI.Main.cmdsu
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -803,6 +804,36 @@ function autoComplete(str,curText)
 	Cmdbar.CursorPosition = #Cmdbar.Text+1
 end
 
+function updateCmdsu(str,curText)
+	if str == nil then
+		-- do nothing
+	else
+		local endingChar = {"[", "/", "(", " "}
+		local stop = 0
+		for i=1,#str do
+			local c = str:sub(i,i)
+			if table.find(endingChar, c) then
+				stop = i
+				break
+			end
+		end
+		curText = curText or Cmdbar.Text
+		local subPos = 0
+		local pos = 1
+		local findRes = string.find(curText,"\\",pos)
+		while findRes do
+			subPos = findRes
+			pos = findRes+1
+			findRes = string.find(curText,"\\",pos)
+			wait(0.02)
+		end
+		if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
+		CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
+		wait()
+		CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
+	end
+end
+
 function Match(name,str)
 	str = str:gsub("%W", "%%%1")
 	return name:lower():find(str:lower()) and true
@@ -847,11 +878,16 @@ end
 
 local tabComplete = nil
 Cmdbar.FocusLost:Connect(function(enterPressed)
+	CmdSu.Text = ""
 	if tabComplete then tabComplete:Disconnect() end
 	wait()
 	if not Cmdbar:IsFocused() then
 		IndexContents('')
 	end
+end)
+
+Cmdbar.Changed:Connect(function()
+	updateCmdsu(topCommand)
 end)
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1920,6 +1956,18 @@ end)
 newCmd("grabknife", {}, "grabknife", "Use on claimed users", function(args, speaker)
 	notify("", "Loaded Grab Knife", 2)
 	Import("knif.lua")
+end)
+
+newCmd("control", {"control"}, "control [plr]", "Control someone lol", function(args, speaker)
+    local users = getPlayer(args[1], speaker)
+    for i,Target in pairs(users) do
+        if Target and Target.Character and Target.Character:FindFirstChild("-Claimed") then
+            Target.Character.HumanoidRootPart.Parent = game.Players.LocalPlayer.Character
+            game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+		else
+			notify("", "Couldn't Control Player")
+        end
+    end
 end)
 
 newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't get kicked for being AFK", function(args, speaker)
