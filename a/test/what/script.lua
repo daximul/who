@@ -20,7 +20,7 @@ local GUI = Import("interface.lua")
 local Main = GUI.Main
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
-local Notification = GUI.Notification
+local NotificationTemplate = GUI.NotificationTemplate
 local CommandsGui = GUI.CMDS
 local CmdSu = GUI.Main.cmdsu
 
@@ -184,43 +184,49 @@ function CmdBarStatus(bool)
 	end
 end
 
-function notifications(title, desc, length)
-	local Top = nil
-	local Bottom = nil
-	local Time = nil
-	local Notif_Pos = {
-		Shown = UDim2.new(0.079, -75, 1.029, -105),
-		Hidden = UDim2.new(-1, -75, 1.029, -105),
-	}
-	if title == "" then
-		Top = "Notification"
-	else
-		Top = title
-	end
-	if desc == "" then
-		Bottom = "Description"
-	else
-		Bottom = desc
-	end
-	if length ~= nil then
-		Time = length
-	else
-		Time = 5
-	end
-	wait()
-	Notification.Title.Text = Top
-	Notification.Border.Frame.Description.Text = Bottom
-	Notification:TweenPosition(Notif_Pos.Shown, "InOut", "Sine", 0.4, true, nil)
-	wait(Time)
-	Notification:TweenPosition(Notif_Pos.Hidden, "InOut", "Sine", 0.4, true, nil)
-end
-
-function notify(a, b, c)
+MaxNotifications = 5
+NotificationName = nil
+NotificationDuration = nil
+function notify(NotifName, NotifDesc, NotifDuration)
 	spawn(function()
-		if c ~= nil then
-			notifications(a, b, c)
+		if NotifDuration ~= nil then
+			NotificationDuration = NotifDuration
 		else
-			notifications(a, b)
+			NotificationDuration = 5
+		end
+		if NotifName ~= "" then
+			NotificationName = NotifName
+		else
+			NotificationName = "Notification"
+		end
+		local Notifications = GUI.Notifications:GetChildren()
+		if #Notifications >= MaxNotifications then
+			Notifications[1]:TweenPosition(UDim2.new(-1, -75, Notifications[1].Position.Y.Scale, -105),"InOut","Linear",0.2,true);wait(0.2)
+			Notifications[1]:Destroy()
+			for i,v in pairs(Notifications) do if v ~= nil then
+					v:TweenPosition(UDim2.new(0.079, -75, v.Position.Y.Scale - 0.12, -105),"InOut","Linear",0.2,true)
+				end
+			end
+			local NewNotification = NotificationTemplate:Clone()
+			NewNotification.Name = tostring(#Notifications+1)
+			NewNotification.Parent = GUI.Notifications
+			NewNotification.Title.Text = NotificationName
+			NewNotification.Border.Frame.Description.Text = NotifDesc
+			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
+		else
+			for i,v in pairs(Notifications) do
+				v:TweenPosition(UDim2.new(0.079, -75, v.Position.Y.Scale - 0.12, -105),"InOut","Linear",0.2,true)
+			end
+			local NewNotification = NotificationTemplate:Clone()
+			NewNotification.Name = tostring(#Notifications+1)
+			NewNotification.Parent = GUI.Notifications
+			NewNotification.Title.Text = NotificationName
+			NewNotification.Border.Frame.Description.Text = NotifDesc
+			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
+			delay(NotificationDuration,function()
+				NewNotification:TweenPosition(UDim2.new(-1, -75, NewNotification.Position.Y.Scale, -105),"InOut","Linear",0.2,true);wait(0.2)
+				NewNotification:Destroy()
+			end)
 		end
 	end)
 end
