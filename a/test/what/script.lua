@@ -106,7 +106,7 @@ end)
 
 function Startup()
 	Main.Position = UDim2.new(0.5, -75, 1.5, -105)
-	Notification.Position = UDim2.new(-1, -75, 1.029, -105)
+	NotificationTemplate.Position = UDim2.new(-1, -75, 1.029, -105)
 	CommandsGui.Position = UDim2.new(0.694, -75, 10, -105)
 	Cmdbar.Text = ""
 	DAMouse.Move:Connect(checkTT)
