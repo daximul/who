@@ -1634,9 +1634,17 @@ newCmd("printnets", {}, "printnets", "Print who is using network ownership", fun
     end
 end)
 
-newCmd("walkspeed", {"ws"}, "walkspeed / ws [string]", "speed gamer", function(args, speaker)
-	if args[1] and tonumber(args[1]) then
-		speaker.Character.Humanoid.WalkSpeed = tonumber(args[1])
+newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "speed gamer", function(args, speaker)
+	local wspeed = args[1]
+	if wspeed and isNumber(wspeed) then
+		speaker.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = wspeed
+	end
+end)
+
+newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "jump power gamer", function(args, speaker)
+	local jpower = args[1]
+	if jpower and isNumber(jpower) then
+		speaker.Character:FindFirstChildOfClass("Humanoid").JumpPower = jpower
 	end
 end)
 
