@@ -1,3 +1,10 @@
+if DA_ISLOADED then
+	warn("[da]: Already Running!")
+	return
+end
+
+pcall(function() getgenv().DA_ISLOADED = true end)
+
 local function Import(Asset)
 	if (type(Asset) == "number") then
 		return game:GetObjects("rbxassetid://" .. Asset)[1]
@@ -71,6 +78,27 @@ QEfly = true
 invisRunning = false
 
 --// End of Command Variables
+
+local SU_SomeCheckPlace = {
+	Attachment = "HairAttachment";
+}
+local SU_Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
+if SU_Check1 then
+	local SU_Check2 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
+	if SU_Check2 then
+		SU_Check2:Destroy()
+	end
+end
+Players.LocalPlayer.CharacterAdded:Connect(function()
+	wait(1)
+	local SU_Check3 = Players.LocalPlayer.Character:FindFirstChild("Head")
+	if SU_Check3 then
+		local SU_Check4 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
+		if SU_Check4 then
+			SU_Check4:Destroy()
+		end
+	end
+end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
 	Floating = false
@@ -2557,6 +2585,21 @@ newCmd("breakvelocity", {}, "breakvelocity", "Break your Velocity", function(arg
 			end
 		end
 		wait()
+	end
+end)
+
+newCmd("scriptusers", {}, "scriptusers", "See who else is using DA", function(args, speaker)
+	for i,v in pairs(Players:GetPlayers()) do
+		local su_che1 = v.Character:FindFirstChild("Head")
+		if su_che1 then
+			local su_che2 = su_che1:FindFirstChild(SU_SomeCheckPlace.Attachment)
+			if not su_che2 then
+				local FoundUsersList = {}
+				table.insert(FoundUsersList, v.Name)
+				local CommasList = table.concat(FoundUsersList, ", ")
+				notify("Users Using DA", CommasList)
+			end
+		end
 	end
 end)
 
