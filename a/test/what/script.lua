@@ -5,6 +5,12 @@ end
 
 pcall(function() getgenv().DA_ISLOADED = true end)
 
+if isfolder and makefolder and isfile and writefile then
+	if not isfolder("Dark Admin Plugins") then
+		makefolder("Dark Admin Plugins")
+	end
+end
+
 local function Import(Asset)
 	if (type(Asset) == "number") then
 		return game:GetObjects("rbxassetid://" .. Asset)[1]
@@ -1092,10 +1098,10 @@ function addPlugin(name)
 		local file
 		local fileName
 		if name:sub(-3) == '.da' then
-			pcall(function() file = readfile(name) end)
+			pcall(function() file = readfile("Dark Admin Plugins/" .. name) end)
 			fileName = name
 		else
-			pcall(function() file = readfile(name..'.da') end)
+			pcall(function() file = readfile("Dark Admin Plugins/".. name .. ".da") end)
 			fileName = name..'.da'
 		end
 		if file then
@@ -1106,7 +1112,7 @@ function addPlugin(name)
 				notify('Plugin Error','This plugin is already added')
 			end
 		else
-			notify('Plugin Error','Cannot locate file "'..fileName..'". Is the file in the correct folder?')
+			notify('Plugin Error','Cannot locate file "'..fileName..'".')
 		end
 	end
 end
