@@ -36,6 +36,7 @@ local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local NotificationTemplate = GUI.NotificationTemplate
 local CommandsGui = GUI.CMDS
 local CmdSu = GUI.Main.cmdsu
+local PluginBrowser = GUI.PluginBrowser
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -142,6 +143,7 @@ function Startup()
 	Main.Position = UDim2.new(0.5, -75, 1.5, -105)
 	NotificationTemplate.Position = UDim2.new(-1, -75, 1.029, -105)
 	CommandsGui.Position = UDim2.new(0.694, -75, 10, -105)
+	PluginBrowser.Position = UDim2.new(0.42, -75, 2, -105)
 	Cmdbar.Text = ""
 	DAMouse.Move:Connect(checkTT)
 end
@@ -215,6 +217,18 @@ function CmdBarStatus(bool)
 		Main:TweenPosition(GuiPositions.Shown, "InOut", "Sine", 0.4, true, nil)
 	else
 		Main:TweenPosition(GuiPositions.Hidden, "InOut", "Sine", 0.4, true, nil)
+	end
+end
+
+function PlugBrowseStatus(bool)
+	local GuiPos = {
+		Shown = UDim2.new(0.42, -75, 0.512, -105),
+		Hidden = UDim2.new(0.42, -75, 2, -105),
+	}
+	if bool == true then
+		PluginBrowser:TweenPosition(GuiPos.Shown, "InOut", "Sine", 0.3, true, nil)
+	else
+		PluginBrowser:TweenPosition(GuiPos.Hidden, "InOut", "Sine", 0.5, true, nil)
 	end
 end
 
@@ -1528,6 +1542,36 @@ function bring(speaker,target,fast)
 	end
 end
 
+local function BrowserBtn(name, plugname, plugdesc, source)
+	local PlugAreaTemplate = Assets.PlugAreaTemplate:Clone()
+	local BrowserLabel = Assets.BrowserLabel:Clone()
+	local OldFileName = string.lower(name)
+	local NewFileName = string.gsub(name, " ", "")
+	PlugAreaTemplate.Parent = PluginBrowser.Container
+	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
+	BrowserLabel.Visible = true
+	PlugAreaTemplate.PlugName.Text = ("Plugin Name: " .. name)
+	PlugAreaTemplate.PlugDesc.Text = ("Plugin Description:\n" .. plugdesc)
+	BrowserLabel.Label.Text = name
+	BrowserLabel.MouseButton1Down:Connect(function()
+		for idk,okay in pairs(PluginBrowser.Container:GetChildren()) do
+			okay.Visible = false
+			PluginBrowser.Area.Visible = false
+			PlugAreaTemplate.Visible = true
+		end
+	end)
+	PlugAreaTemplate.PlugAdd.MouseButton1Down:Connect(function()
+		writefile("Dark Admin Plugins/" .. NewFileName, source)
+		wait(0.2)
+		addPlugin(NewFileName .. ".da")
+	end)
+	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
+		removePlugin(NewFileName .. ".da")
+		wait(0.2)
+		delfile("Dark Admin Plugins/" .. NewFileName)
+	end)
+end
+
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
 		IndexContents(Cmdbar.Text)
@@ -1581,14 +1625,37 @@ local newCmd = function(name, aliases, title, description, func)
 	})
 end
 
---// Setup Admin
+--// Setup Admin & Plugin Browser
 pcall(function()
 	Startup()
 	ParentGui(GUI)
 	SmoothDrag(CommandsGui)
+	SmoothDrag(PluginBrowser)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
 		CmdListStatus(false)
 	end)
+	PluginBrowser.Close.MouseButton1Down:Connect(function()
+		PlugBrowseStatus(false)
+	end)
+	PluginBrowser.GoBack.MouseButton1Down:Connect(function()
+		for idk2,okay2 in pairs(PluginBrowser.Container:GetChildren()) do
+			okay2.Visible = false
+			PluginBrowser.GoBack.Visible = false
+			PluginBrowser.Area.Visible = true
+		end
+	end)
+	spawn(function()
+		while wait(0.05) do
+			if PluginBrowser.Area.Visible == false then
+				PluginBrowser.GoBack.Visible = true
+			else
+				PluginBrowser.GoBack.Visible = false
+			end
+		end
+	end)
+end)
+spawn(function()
+	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/ZinityDrops/OwlHubLink/master/OwlHubBack.lua'))();")
 end)
 --// End of Setup
 
@@ -1599,6 +1666,10 @@ end)
 
 newCmd("commands", {"cmds"}, "commands / cmds", "List of Commands", function(args, speaker)
 	CmdListStatus(true)
+end)
+
+newCmd('browser', {}, "browser", "Plugin Browser", function(args, speaker)
+	PlugBrowseStatus(true)
 end)
 
 newCmd("prefix", {}, "prefix [string]", "Change the prefix", function(args, speaker)
