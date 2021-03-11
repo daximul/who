@@ -1657,6 +1657,7 @@ pcall(function()
 end)
 spawn(function()
 	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
+	BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\nControls\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
 end)
 --// End of Setup
 
