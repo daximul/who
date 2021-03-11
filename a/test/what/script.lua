@@ -1160,7 +1160,7 @@ function LoadPlugin(val,startup)
 	local plugin
 
 	function CatchedPluginLoad()
-		plugin = loadfile(val)()
+		plugin = loadfile("Dark Admin Plugins/" .. val)()
 	end
 
 	function handlePluginError(plerror)
@@ -1547,6 +1547,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 	local BrowserLabel = Assets.BrowserLabel:Clone()
 	local OldFileName = string.lower(name)
 	local NewFileName = string.gsub(OldFileName, " ", "")
+	local ExtensionFile = ("Dark Admin Plugins/" .. NewFileName .. ".da")
 	PlugAreaTemplate.Parent = PluginBrowser.Container
 	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
 	BrowserLabel.Visible = true
@@ -1561,14 +1562,14 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 		end
 	end)
 	PlugAreaTemplate.PlugAdd.MouseButton1Down:Connect(function()
-		writefile("Dark Admin Plugins/" .. NewFileName .. ".da", source)
+		writefile(ExtensionFile, source)
 		wait(0.2)
-		addPlugin(NewFileName .. ".da")
+		addPlugin(NewFileName)
 	end)
 	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
-		removePlugin(NewFileName .. ".da")
+		removePlugin(NewFileName)
 		wait(0.2)
-		delfile("Dark Admin Plugins/" .. NewFileName .. ".da")
+		delfile(ExtensionFile)
 	end)
 end
 
