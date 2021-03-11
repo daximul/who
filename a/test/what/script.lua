@@ -58,7 +58,6 @@ local CMDs = {}
 local cmds = {}
 local customAlias = {}
 local DEBUG = false
-local Old_Net_Method = false
 local Original_User_Id = Players.LocalPlayer.UserId
 
 function randomString()
@@ -212,21 +211,15 @@ local function tools(plr)
 	end
 end
 
+-- net is patched fix this idiot : snipdoa
 function SetSimulationRadius()
-	if Old_Net_Method == true then
-		workspace.FallenPartsDestroyHeight = 0/1/0
-		game:GetService("RunService").RenderStepped:Connect(function()
-			settings().Physics.AllowSleep = false
-			setsimulation(math.huge*math.huge,math.huge*math.huge)
-		end)
-	else
-		workspace.FallenPartsDestroyHeight = 0/1/0
-		game:GetService("RunService").RenderStepped:Connect(function()
-			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
-			settings().Physics.AllowSleep = false
-			setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-		end)
-	end
+	workspace.FallenPartsDestroyHeight = 0/1/0
+	game:GetService("RunService").RenderStepped:Connect(function()
+		settings().Physics.ThrottleAdjustTime = math.huge-math.huge
+		settings().Physics.AllowSleep = false
+		setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+		Players.LocalPlayer.SimulationRadius = math.huge
+	end)
 end
 
 function CmdListStatus(bool)
