@@ -83,6 +83,7 @@ local currentGripPos = ""
 floatName = randomString()
 QEfly = true
 invisRunning = false
+LastDeathPos = nil
 
 --// End of Command Variables
 
@@ -105,6 +106,14 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 			SU_Check4:Destroy()
 		end
 	end
+end)
+
+Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+	spawn(function()
+		if getRoot(Players.LocalPlayer.Character) then
+			LastDeathPos = getRoot(Players.LocalPlayer.Character)
+		end
+	end)
 end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
@@ -2680,6 +2689,16 @@ newCmd("scriptusers", {}, "scriptusers", "See who else is using DA", function(ar
 			end
 		end
 	end
+end)
+
+newCmd("flashback", {}, "flashback", "Go back to where you last died", function(args, speaker)
+	spawn(function()
+		if LastDeathPos ~= nil then
+			speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+			wait(0.01)
+			getRoot(speaker.Character).CFrame = LastDeathPos
+		end
+	end)
 end)
 
 
