@@ -1548,7 +1548,6 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 	local OldFileName = string.lower(name)
 	local NewFileName = string.gsub(OldFileName, " ", "")
 	local ExtensionFile = ("Dark Admin Plugins/" .. NewFileName .. ".da")
-	local FileWithExtension = (NewFileName .. ".da")
 	PlugAreaTemplate.Parent = PluginBrowser.Container
 	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
 	BrowserLabel.Visible = true
@@ -1568,7 +1567,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 		addPlugin(NewFileName)
 	end)
 	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
-		deletePlugin(FileWithExtension)
+		deletePlugin(NewFileName)
 		wait(0.2)
 		delfile(ExtensionFile)
 	end)
