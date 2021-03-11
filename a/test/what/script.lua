@@ -2835,4 +2835,4 @@ end
 wait()
 SetSimulationRadius()
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
---// Dark Admin;
+--// Dark Admin
