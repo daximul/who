@@ -111,7 +111,7 @@ end)
 Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
 	spawn(function()
 		if getRoot(Players.LocalPlayer.Character) then
-			LastDeathPos = getRoot(Players.LocalPlayer.Character)
+			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
 	end)
 end)
@@ -157,8 +157,32 @@ function Startup()
 	DAMouse.Move:Connect(checkTT)
 end
 
-function SmoothDrag(object)
-	local a=game:GetService("UserInputService")function drag(b)dragToggle=nil dragSpeed=0.23 dragInput=nil dragStart=nil dragPos=nil function updateInput(a)Delta=a.Position-dragStart Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+Delta.X,startPos.Y.Scale,startPos.Y.Offset+Delta.Y)game:GetService("TweenService"):Create(b,TweenInfo.new(0.25),{Position=Position}):Play()end b.InputBegan:Connect(function(c)if(c.UserInputType==Enum.UserInputType.MouseButton1 or c.UserInputType==Enum.UserInputType.Touch)and a:GetFocusedTextBox()==nil then dragToggle=true dragStart=c.Position startPos=b.Position c.Changed:Connect(function()if c.UserInputState==Enum.UserInputState.End then dragToggle=false end end)end end)b.InputChanged:Connect(function(a)if a.UserInputType==Enum.UserInputType.MouseMovement or a.UserInputType==Enum.UserInputType.Touch then dragInput=a end end)game:GetService("UserInputService").InputChanged:Connect(function(a)if a==dragInput and dragToggle then updateInput(a)end end)end drag(object)
+local inputService = game:GetService("UserInputService")
+local heartbeat = game:GetService("RunService").Heartbeat
+function SmoothDrag(frame)
+	local s, event = pcall(function()
+		return frame.MouseEnter
+	end)
+	if s then
+		frame.Active = true;
+		event:connect(function()
+			local input = frame.InputBegan:connect(function(key)
+				if key.UserInputType == Enum.UserInputType.MouseButton1 then
+					local objectPosition = Vector2.new(DAMouse.X - frame.AbsolutePosition.X, DAMouse.Y - frame.AbsolutePosition.Y);
+					while heartbeat:wait() and inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+						pcall(function()
+							frame:TweenPosition(UDim2.new(0, DAMouse.X - objectPosition.X, 0, DAMouse.Y - objectPosition.Y), 'Out', 'Linear', 0.1, true);
+						end)
+					end
+				end
+			end)
+			local leave;
+			leave = frame.MouseLeave:connect(function()
+			input:disconnect();
+			leave:disconnect();
+		end)
+	end)
+end
 end
 
 function ParentGui(Gui)
@@ -1242,6 +1266,38 @@ function FindPlugins()
 	end
 end
 
+local function xrayobjects(bool)
+	if bool then
+		for _,i in pairs(workspace:GetDescendants()) do
+			if i:IsA("BasePart") and not i.Parent:FindFirstChild("Humanoid") and not i.Parent.Parent:FindFirstChildOfClass("Humanoid") then
+				i.LocalTransparencyModifier = 0.5
+			end
+		end
+	else
+		for _,i in pairs(workspace:GetDescendants()) do
+			if i:IsA("BasePart") and not i.Parent:FindFirstChild("Humanoid") and not i.Parent.Parent:FindFirstChildOfClass("Humanoid") then
+				i.LocalTransparencyModifier = 0
+			end
+		end
+	end
+end
+
+local function GetHandleTools(p)
+	p = p or Players.LocalPlayer
+	local r = {}
+	for _, v in ipairs(p.Character and p.Character:GetChildren() or {}) do
+		if v.IsA(v, "BackpackItem") and v.FindFirstChild(v, "Handle") then
+			r[#r + 1] = v
+		end
+	end
+	for _, v in ipairs(p.Backpack:GetChildren()) do
+		if v.IsA(v, "BackpackItem") and v.FindFirstChild(v, "Handle") then
+			r[#r + 1] = v
+		end
+	end
+	return r
+end
+
 function sFLY(vfly)
 	repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChild('Humanoid')
 	repeat wait() until DAMouse
@@ -1575,10 +1631,15 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 			writefile(ExtensionFile, source)
 			wait(0.2)
 			addPlugin(NewFileName)
+			updatesaves()
+		else
+			addPlugin(NewFileName)
+			updatesaves()
 		end
 	end)
 	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
 		deletePlugin(NewFileName)
+		updatesaves()
 	end)
 end
 
@@ -2458,6 +2519,14 @@ newCmd("unesp", {}, "unesp", "Stop Using ESP on Players", function(args, speaker
 	end
 end)
 
+newCmd("xray", {}, "xray", "Make all parts in Workspace transparent", function(args, speaker)
+	xrayobjects(true)
+end)
+
+newCmd("unxray", {}, "unxray", "Restore transparency", function(args, speaker)
+	xrayobjects(false)
+end)
+
 newCmd("enableshiftlock", {"enablesl"}, "enableshiftlock / enablesl", "Enable Shiftlock", function(args, speaker)
 	speaker.DevEnableMouseLock = true
 	notify("Shiftlock", "Shift lock is now available")
@@ -2699,6 +2768,60 @@ newCmd("flashback", {}, "flashback", "Go back to where you last died", function(
 			getRoot(speaker.Character).CFrame = LastDeathPos
 		end
 	end)
+end)
+
+newCmd("dupetools", {}, "dupetools [number]", "Duplicate tools in your inventory", function(args, speaker)
+	local LOOP_NUM = tonumber(args[1]) or 1
+	local OrigPos = speaker.Character.HumanoidRootPart.Position
+	local Tools, TempPos = {}, Vector3.new(math.random(-2e5, 2e5), 2e5, math.random(-2e5, 2e5))
+	for i = 1, LOOP_NUM do
+		local Human = speaker.Character:WaitForChild("Humanoid")
+		wait(.1, Human.Parent:MoveTo(TempPos))
+		Human.RootPart.Anchored = speaker:ClearCharacterAppearance(wait(.1)) or true
+		local t = GetHandleTools(speaker)
+		while #t > 0 do
+			for _, v in ipairs(t) do
+				coroutine.wrap(function()
+					for _ = 1, 25 do
+						v.Parent = speaker.Character
+						v.Handle.Anchored = true
+					end
+					for _ = 1, 5 do
+						v.Parent = workspace
+					end
+					table.insert(Tools, v.Handle)
+				end)()
+			end
+			t = GetHandleTools(speaker)
+		end
+		wait(.1)
+		speaker.Character = speaker.Character:Destroy()
+		speaker.CharacterAdded:Wait():WaitForChild("Humanoid").Parent:MoveTo(LOOP_NUM == i and OrigPos or TempPos, wait(.1))
+		if i == LOOP_NUM or i % 5 == 0 then
+			local HRP = speaker.Character.HumanoidRootPart
+			if type(firetouchinterest) == "function" then
+				for _, v in ipairs(Tools) do
+					v.Anchored = not firetouchinterest(v, HRP, 1, firetouchinterest(v, HRP, 0)) and false or false
+				end
+			else
+				for _, v in ipairs(Tools) do
+					coroutine.wrap(function()
+						local x = v.CanCollide
+						v.CanCollide = false
+						v.Anchored = false
+						for _ = 1, 10 do
+							v.CFrame = HRP.CFrame
+							wait()
+						end
+						v.CanCollide = x
+					end)()
+				end
+			end
+			wait(.1)
+			Tools = {}
+		end
+		TempPos = TempPos + Vector3.new(10, math.random(-5, 5), 0)
+	end
 end)
 
 
