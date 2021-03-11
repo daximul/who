@@ -1546,7 +1546,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 	local PlugAreaTemplate = Assets.PlugAreaTemplate:Clone()
 	local BrowserLabel = Assets.BrowserLabel:Clone()
 	local OldFileName = string.lower(name)
-	local NewFileName = string.gsub(name, " ", "")
+	local NewFileName = string.gsub(OldFileName, " ", "")
 	PlugAreaTemplate.Parent = PluginBrowser.Container
 	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
 	BrowserLabel.Visible = true
@@ -1561,14 +1561,14 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 		end
 	end)
 	PlugAreaTemplate.PlugAdd.MouseButton1Down:Connect(function()
-		writefile("Dark Admin Plugins/" .. NewFileName, source)
+		writefile("Dark Admin Plugins/" .. NewFileName .. ".da", source)
 		wait(0.2)
 		addPlugin(NewFileName .. ".da")
 	end)
 	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
 		removePlugin(NewFileName .. ".da")
 		wait(0.2)
-		delfile("Dark Admin Plugins/" .. NewFileName)
+		delfile("Dark Admin Plugins/" .. NewFileName .. ".da")
 	end)
 end
 
