@@ -57,6 +57,7 @@ local Cmdbar = Main.Box
 local CMDs = {}
 local cmds = {}
 local customAlias = {}
+local Old_Net_Method = false
 local DEBUG = false
 local Original_User_Id = Players.LocalPlayer.UserId
 
@@ -211,15 +212,19 @@ local function tools(plr)
 	end
 end
 
--- net is patched fix this idiot : snipdoa
+-- net is patched, both methods dont work now. fix this idiot : snipdoa
 local function SetSimulationRadius()
-	workspace.FallenPartsDestroyHeight = 0/1/0
-	game:GetService("RunService").RenderStepped:Connect(function()
-		settings().Physics.ThrottleAdjustTime = math.huge-math.huge
-		settings().Physics.AllowSleep = false
-		setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-		Players.LocalPlayer.SimulationRadius = math.huge
-	end)
+	if Old_Net_Method == true then
+		workspace.FallenPartsDestroyHeight = 0/1/0
+		game:GetService("RunService").RenderStepped:Connect(function()
+			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
+			settings().Physics.AllowSleep = false
+			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+			Players.LocalPlayer.SimulationRadius = math.huge
+		end)
+	else
+		Import("cl_net.lua")
+	end
 end
 
 function CmdListStatus(bool)
