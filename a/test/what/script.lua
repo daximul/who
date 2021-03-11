@@ -1562,14 +1562,14 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 		end
 	end)
 	PlugAreaTemplate.PlugAdd.MouseButton1Down:Connect(function()
-		writefile(ExtensionFile, source)
-		wait(0.2)
-		addPlugin(NewFileName)
+		if not isfile(ExtensionFile) then
+			writefile(ExtensionFile, source)
+			wait(0.2)
+			addPlugin(NewFileName)
+		end
 	end)
 	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
 		deletePlugin(NewFileName)
-		wait(0.2)
-		delfile(ExtensionFile)
 	end)
 end
 
