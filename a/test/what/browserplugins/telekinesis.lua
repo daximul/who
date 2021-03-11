@@ -1,6 +1,6 @@
 local Plugin = {
 	["PluginName"] = "Telekinesis",
-	["PluginDescription"] = "",
+	["PluginDescription"] = "Control Unanchored Parts",
 	["Commands"] = {
 		["telekinesis"] = {
 			["ListName"] = "telekinesis / tel",
