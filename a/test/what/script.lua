@@ -212,7 +212,7 @@ local function tools(plr)
 end
 
 -- net is patched fix this idiot : snipdoa
-function SetSimulationRadius()
+local function SetSimulationRadius()
 	workspace.FallenPartsDestroyHeight = 0/1/0
 	game:GetService("RunService").RenderStepped:Connect(function()
 		settings().Physics.ThrottleAdjustTime = math.huge-math.huge
