@@ -54,7 +54,6 @@ local Settings = {
 }
 
 local Cmdbar = Main.Box
-local CMDs = {}
 local cmds = {}
 local customAlias = {}
 local Old_Net_Method = false
@@ -890,33 +889,35 @@ function autoComplete(str,curText)
 end
 
 function updateCmdsu(str,curText)
-	if str == nil then
-		-- do nothing
-	else
-		local endingChar = {"[", "/", "(", " "}
-		local stop = 0
-		for i=1,#str do
-			local c = str:sub(i,i)
-			if table.find(endingChar, c) then
-				stop = i
-				break
+	spawn(function()
+		if str == nil then
+			-- do nothing
+		else
+			local endingChar = {"[", "/", "(", " "}
+			local stop = 0
+			for i=1,#str do
+				local c = str:sub(i,i)
+				if table.find(endingChar, c) then
+					stop = i
+					break
+				end
 			end
+			curText = curText or Cmdbar.Text
+			local subPos = 0
+			local pos = 1
+			local findRes = string.find(curText,"\\",pos)
+			while findRes do
+				subPos = findRes
+				pos = findRes+1
+				findRes = string.find(curText,"\\",pos)
+				wait(0.02)
+			end
+			if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
+			CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
+			wait()
+			CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
 		end
-		curText = curText or Cmdbar.Text
-		local subPos = 0
-		local pos = 1
-		local findRes = string.find(curText,"\\",pos)
-		while findRes do
-			subPos = findRes
-			pos = findRes+1
-			findRes = string.find(curText,"\\",pos)
-			wait(0.02)
-		end
-		if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
-		CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
-		wait()
-		CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
-	end
+	end)
 end
 
 function Match(name,str)
@@ -1678,8 +1679,6 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
-local darkadminCmds = {}
-
 local newCmd = function(name, aliases, title, description, func)
 	addcmdtext(title, name, description)
 
@@ -1690,12 +1689,6 @@ local newCmd = function(name, aliases, title, description, func)
 		ALIAS = aliases or {},
 		FUNC = func
 	}
-
-	table.insert(darkadminCmds, {
-		id = id,
-		desc = description,
-		title = title
-	})
 end
 
 --// Setup Admin & Plugin Browser
@@ -2827,6 +2820,10 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate tools in your inventory
 		end
 		TempPos = TempPos + Vector3.new(10, math.random(-5, 5), 0)
 	end
+end)
+
+newCmd("numofcmds", {}, "numofcmds", "Notify the number of commands", function(args, speaker)
+	notify("", #cmds)
 end)
 
 
