@@ -56,7 +56,7 @@ local Settings = {
 local Cmdbar = Main.Box
 local cmds = {}
 local customAlias = {}
-local Old_Net_Method = false
+local Old_Net_Method = true
 local DEBUG = false
 local Original_User_Id = Players.LocalPlayer.UserId
 
