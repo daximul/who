@@ -56,6 +56,7 @@ local Settings = {
 local Cmdbar = Main.Box
 local cmds = {}
 local customAlias = {}
+local Network_Loop = nil
 local Old_Net_Method = true
 local DEBUG = false
 local Original_User_Id = Players.LocalPlayer.UserId
@@ -214,8 +215,8 @@ end
 -- net is patched, both methods dont work now. fix this idiot : snipdoa
 local function SetSimulationRadius()
 	if Old_Net_Method == true then
-		workspace.FallenPartsDestroyHeight = 0/1/0
-		game:GetService("RunService").RenderStepped:Connect(function()
+		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+			workspace.FallenPartsDestroyHeight = 0/1/0
 			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
 			settings().Physics.AllowSleep = false
 			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
@@ -1774,6 +1775,19 @@ end)
 newCmd("fullnet", {}, "fullnet", "Full Network Ownership", function(args, speaker)
 	SetSimulationRadius()
 	notify("", "Simradius set to inf")
+end)
+
+newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", function(args, speaker)
+	Network_Loop:Disconnect()
+	wait()
+	Network_Loop = nil
+	if setsimulation then
+		setsimulation(139, 139)
+	else
+		sethidden(speaker, "MaximumSimulationRadius", 139)
+		sethidden(speaker, "SimulationRadius", 139)
+	end
+	notify("", "Simradius set to 139")
 end)
 
 newCmd("printnets", {}, "printnets", "Print who is using network ownership", function(args, speaker)
