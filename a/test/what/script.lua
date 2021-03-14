@@ -2826,6 +2826,186 @@ newCmd("numofcmds", {}, "numofcmds", "Notify the number of commands", function(a
 	notify("", #cmds)
 end)
 
+local CmdNoclipping = nil
+newCmd("noclip", {}, "noclip", "Go through objects", function(args, speaker)
+	CmdClip = false
+	wait(0.1)
+	local function NoclipLoop()
+		if CmdClip == false and speaker.Character ~= nil then
+			for _, child in pairs(speaker.Character:GetDescendants()) do
+				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+					child.CanCollide = false
+				end
+			end
+		end
+	end
+	CmdNoclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
+	if args[1] and args[1] == "nonotify" then return end
+	notify("Noclip", "Noclip Enabled")
+end)
+
+newCmd("clip", {}, "clip", "Disables noclip", function(args, speaker)
+	if CmdNoclipping then
+		CmdNoclipping:Disconnect()
+	end
+	CmdClip = true
+	if args[1] and args[1] == "nonotify" then return end
+	notify("Noclip", "Noclip Disabled")
+end)
+
+newCmd("lag", {}, "lag", "Make yourself look like you are lagging", function(args, speaker)
+	notify("Fake Lag", "Enabled")
+	FakeLagging = true
+	repeat wait()
+		speaker.Character.HumanoidRootPart.Anchored = false
+		wait(0.1)
+		speaker.Character.HumanoidRootPart.Anchored = true
+		wait(0.1)
+	until FakeLagging == false
+end)
+
+newCmd("unlag", {}, "unlag", "Stop the fake lag", function(args, speaker)
+	FakeLagging = false
+	notify("Fake Lag", "Disabled")
+	wait(0.3)
+	speaker.Character.HumanoidRootPart.Anchored = false
+end)
+
+newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speaker)
+	local spinSpeed = 20
+	if args[1] and isNumber(args[1]) then
+		spinSpeed = args[1]
+	end
+	for i,v in pairs(getRoot(speaker.Character):GetChildren()) do
+		if v.Name == "Spinning" then
+			v:Destroy()
+		end
+	end
+	local Spin = Instance.new("BodyAngularVelocity")
+	Spin.Name = "Spinning"
+	Spin.Parent = getRoot(speaker.Character)
+	Spin.MaxTorque = Vector3.new(0, math.huge, 0)
+	Spin.AngularVelocity = Vector3.new(0, spinSpeed, 0)
+end)
+
+newCmd("unspin", {}, "unspin", "Disables spin", function(args, speaker)
+	for i,v in pairs(getRoot(speaker.Character):GetChildren()) do
+		if v.Name == "Spinning" then
+			v:Destroy()
+		end
+	end
+end)
+
+cmdflinging = false
+newCmd("fling", {}, "fling", "Flings anyone you touch", function(args, speaker)
+	for _, child in pairs(speaker.Character:GetDescendants()) do
+		if child:IsA("BasePart") then
+			child.CustomPhysicalProperties = PhysicalProperties.new(2, 0.3, 0.5)
+		end
+	end
+	execCmd("noclip nonotify")
+	wait(0.1)
+	local bambam = Instance.new("BodyAngularVelocity")
+	bambam.Name = randomString()
+	bambam.Parent = getRoot(speaker.Character)
+	bambam.AngularVelocity = Vector3.new(0, 311111, 0)
+	bambam.MaxTorque = Vector3.new(0, 311111, 0)
+	bambam.P = math.huge
+	local function PauseFling()
+		if speaker.Character:FindFirstChildOfClass("Humanoid") then
+			if speaker.Character:FindFirstChildOfClass("Humanoid").FloorMaterial == Enum.Material.Air then
+				bambam.AngularVelocity = Vector3.new(0, 0, 0)
+			else
+				bambam.AngularVelocity = Vector3.new(0, 311111, 0)
+			end
+		end
+	end
+	if TouchingFloor then
+		TouchingFloor:Disconnect()
+	end
+	if TouchingFloorReset then
+		TouchingFloorReset:Disconnect()
+	end
+	TouchingFloor = speaker.Character:FindFirstChildOfClass("Humanoid"):GetPropertyChangedSignal("FloorMaterial"):Connect(PauseFling)
+	cmdflinging = true
+	local function flingDied()
+		execCmd("unfling")
+	end
+	TouchingFloorReset = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(flingDied)
+end)
+
+newCmd("unfling", {}, "unfling", "Disables the fling command", function(args, speaker)
+	execCmd("clip nonotify")
+	if TouchingFloor then
+		TouchingFloor:Disconnect()
+	end
+	if TouchingFloorReset then
+		TouchingFloorReset:Disconnect()
+	end
+	cmdflinging = false
+	wait(0.1)
+	local speakerChar = speaker.Character
+	if not speakerChar or not getRoot(speakerChar) then return end
+	for i,v in pairs(getRoot(speakerChar):GetChildren()) do
+		if v.ClassName == "BodyAngularVelocity" then
+			v:Destroy()
+		end
+	end
+	for _, child in pairs(speakerChar:GetDescendants()) do
+		if child.ClassName == "Part" or child.ClassName == "MeshPart" then
+			child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
+		end
+	end
+end)
+
+newCmd("invisfling", {}, "invisfling", "Enables invisible fling", function(args, speaker)
+	local ch = speaker.Character
+	local prt=Instance.new("Model")
+	prt.Parent = speaker.Character
+	local z1 = Instance.new("Part")
+	z1.Name="Torso"
+	z1.CanCollide = false
+	z1.Anchored = true
+	local z2 = Instance.new("Part")
+	z2.Name="Head"
+	z2.Parent = prt
+	z2.Anchored = true
+	z2.CanCollide = false
+	local z3 =Instance.new("Humanoid")
+	z3.Name="Humanoid"
+	z3.Parent = prt
+	z1.Position = Vector3.new(0,9999,0)
+	speaker.Character=prt
+	wait(3)
+	speaker.Character=ch
+	wait(3)
+	local Hum = Instance.new("Humanoid")
+	z2:Clone()
+	Hum.Parent = speaker.Character
+	local root =  getRoot(speaker.Character)
+	for i,v in pairs(speaker.Character:GetChildren()) do
+		if v ~= root and  v.Name ~= "Humanoid" then
+			v:Destroy()
+		end
+	end
+	root.Transparency = 0
+	root.Color = Color3.new(1, 1, 1)
+	local invisflingStepped
+	invisflingStepped = game:GetService('RunService').Stepped:Connect(function()
+		if speaker.Character and getRoot(speaker.Character) then
+			getRoot(speaker.Character).CanCollide = false
+		else
+			invisflingStepped:Disconnect()
+		end
+	end)
+	sFLY()
+	workspace.CurrentCamera.CameraSubject = root
+	local bambam = Instance.new("BodyThrust")
+	bambam.Parent = getRoot(speaker.Character)
+	bambam.Force = Vector3.new(99999,99999*10,99999)
+	bambam.Location = getRoot(speaker.Character).Position
+end)
+
 
 
 
