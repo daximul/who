@@ -872,7 +872,7 @@ function getPlayer(list,speaker)
 	return foundNames
 end
 
-function isClaimed(Users)
+local function isClaimed(Users)
 	for i,Target in pairs(Users) do
 		if Target.Character:FindFirstChild("-Claimed") then
 			return true
@@ -882,7 +882,7 @@ function isClaimed(Users)
 	end
 end
 
-function autoComplete(str,curText)
+local function autoComplete(str,curText)
 	local endingChar = {"[", "/", "(", " "}
 	local stop = 0
 	for i=1,#str do
@@ -908,36 +908,35 @@ function autoComplete(str,curText)
 	Cmdbar.CursorPosition = #Cmdbar.Text+1
 end
 
-function updateCmdsu(str,curText)
-	spawn(function()
-		if str == nil then
-			-- do nothing
-		else
-			local endingChar = {"[", "/", "(", " "}
-			local stop = 0
-			for i=1,#str do
-				local c = str:sub(i,i)
-				if table.find(endingChar, c) then
-					stop = i
-					break
-				end
+local function updateCmdsu(str,curText)
+	wait(0.1)
+	if str == nil then
+		-- do nothing
+	else
+		local endingChar = {"[", "/", "(", " "}
+		local stop = 0
+		for i=1,#str do
+			local c = str:sub(i,i)
+			if table.find(endingChar, c) then
+				stop = i
+				break
 			end
-			curText = curText or Cmdbar.Text
-			local subPos = 0
-			local pos = 1
-			local findRes = string.find(curText,"\\",pos)
-			while findRes do
-				subPos = findRes
-				pos = findRes+1
-				findRes = string.find(curText,"\\",pos)
-				wait(0.02)
-			end
-			if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
-			CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
-			wait()
-			CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
 		end
-	end)
+		curText = curText or Cmdbar.Text
+		local subPos = 0
+		local pos = 1
+		local findRes = string.find(curText,"\\",pos)
+		while findRes do
+			subPos = findRes
+			pos = findRes+1
+			findRes = string.find(curText,"\\",pos)
+			wait(0.02)
+		end
+		if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
+		CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
+		wait()
+		CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
+	end
 end
 
 function Match(name,str)
