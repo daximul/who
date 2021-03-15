@@ -1,3 +1,5 @@
+while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer or not game:GetService("Players").LocalPlayer.PlayerGui do wait() end
+
 if DA_ISLOADED then
 	warn("[da]: Already Running!")
 	return
@@ -50,7 +52,8 @@ local Settings = {
 	Prefix = "\\",
 	daflyspeed = 1,
 	vehicleflyspeed = 1,
-	PluginsTable = {}
+	PluginsTable = {},
+	KeepDA = false
 }
 
 local Cmdbar = Main.Box
@@ -72,14 +75,15 @@ end
 
 --// Command Variables
 
+local currentToolSize = ""
+local currentGripPos = ""
+local cmdinfjump = false
 FLYING = false
 viewing = nil
 fcRunning = false
 ESPenabled = false
 Floating = false
 swimming = false
-local currentToolSize = ""
-local currentGripPos = ""
 floatName = randomString()
 QEfly = true
 invisRunning = false
@@ -185,9 +189,24 @@ function SmoothDrag(frame)
 end
 end
 
-function ParentGui(Gui)
+local function OldParentGui(Gui)
 	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	if CoreGui:FindFirstChild("RobloxGui") then
+		Gui.Parent = CoreGui["RobloxGui"]
+	else
+		Gui.Parent = CoreGui
+	end
+end
+
+local function ParentGui(Gui)
+	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
+	if (not is_sirhurt_closure) and (syn and syn.protect_gui) then
+		syn.protect_gui(Gui)
+		Gui.Parent = CoreGui
+	elseif get_hidden_gui or gethui then
+		local HiddenUI = get_hidden_gui or gethui
+		Gui.Parent = HiddenUI()
+	elseif CoreGui:FindFirstChild("RobloxGui") then
 		Gui.Parent = CoreGui["RobloxGui"]
 	else
 		Gui.Parent = CoreGui
@@ -1092,6 +1111,7 @@ function saves()
 					if json.daflyspeed ~= nil then Settings.daflyspeed = json.daflyspeed else Settings.daflyspeed = 1 end
 					if json.vehicleflyspeed ~= nil then Settings.vehicleflyspeed = json.vehicleflyspeed else Settings.vehicleflyspeed = 1 end
 					if json.PluginsTable ~= nil then Settings.PluginsTable = json.PluginsTable else Settings.PluginsTable = {} end
+					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1116,6 +1136,7 @@ function saves()
 				Settings.daflyspeed = 1
 				Settings.vehicleflyspeed = 1
 				Settings.PluginsTable = {}
+				Settings.KeepDA = false
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
@@ -1125,6 +1146,7 @@ function saves()
 		Settings.daflyspeed = 1
 		Settings.vehicleflyspeed = 1
 		Settings.PluginsTable = {}
+		Settings.KeepDA = false
 	end
 end
 
@@ -1137,6 +1159,7 @@ function updatesaves()
 			daflyspeed = Settings.daflyspeed;
 			vehicleflyspeed = Settings.vehicleflyspeed;
 			PluginsTable = Settings.PluginsTable;
+			KeepDA = Settings.KeepDA;
 		}
 		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
 	end
@@ -1720,6 +1743,9 @@ pcall(function()
 			end
 		end
 	end)
+	if Settings.KeepDA and syn.queue_on_teleport then
+		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+	end
 end)
 spawn(function()
 	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
@@ -1790,37 +1816,20 @@ newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", func
 	notify("", "Simradius set to 139")
 end)
 
-newCmd("printnets", {}, "printnets", "Print who is using network ownership", function(args, speaker)
-	local CheckIfWorks = pcall(function()
-        gethidden(LocalPlayer, "SimulationRadius")
-    end)
-
-    local Plrs = {}
-    local Msg = ""
-
-    if CheckIfWorks then
-        for i, v in pairs(game.Players:GetPlayers()) do
-            if gethidden(v, "SimulationRadius") >= 5000 then
-                table.insert(Plrs, v.Name)
-            end
-        end
-
-        if #Plrs <= 0 then
-            Msg = "Network check ran: No players have been found using networkownership."
-        elseif #Plrs == 1 then
-            Msg = "Network check ran, the player using network: " .. Plrs[1]
-        elseif #Plrs > 1 then
-            Msg = "Network check ran, the players using network: "
-            for i, v in pairs(Plrs) do
-                Msg = Msg .. v .. ", "
-            end
-            Msg = string.sub(Msg, 1, #Msg - 2)
-        end
-
-        return print(Msg)
-    else
-        return notify("Incompatible Exploit", "Missing gethiddenproperty")
-    end
+newCmd("netcheck", {}, "netcheck", "Notify who is using Network Ownership", function(args, speaker)
+	local whoisnet = {}
+	for i,v in pairs(Players:GetPlayers()) do
+		if gethiddenproperty then	
+			if gethiddenproperty(v, "SimulationRadius") > 1000 then
+				table.insert(whoisnet, v.Name)
+			elseif set_hidden_property then
+				if get_hidden_property(v, "SimulationRadius") > 1000 then
+					table.insert(whoisnet, v.Name)
+				end
+			end
+		end
+	end
+	notify("Net Check", table.concat(whoisnet, ", "))
 end)
 
 newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "speed gamer", function(args, speaker)
@@ -3018,6 +3027,36 @@ newCmd("invisfling", {}, "invisfling", "Enables invisible fling", function(args,
 	bambam.Parent = getRoot(speaker.Character)
 	bambam.Force = Vector3.new(99999,99999*10,99999)
 	bambam.Location = getRoot(speaker.Character).Position
+end)
+
+newCmd("infinitejump", {"infjump"}, "infinitejump / infjump", "Be Able to Keep Jumping", function(args, speaker)
+	notify("Infinite Jump", "Enabled")
+	cmdinfjump = true
+	game:GetService("UserInputService").JumpRequest:Connect(function()
+		if cmdinfjump == true then
+			speaker.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+		end
+	end)
+end)
+
+newCmd("uninfinitejump", {"uninfjump"}, "uninfinitejump / uninfjump", "Disable Infinite Jump", function(args, speaker)
+	notify("Infinite Jump", "Disabled")
+	cmdinfjump = false
+end)
+
+newCmd("keepda", {}, "keepda", "Auto Load DA Upon Rejoin/Teleport", function(args, speaker)
+	notify("Auto Run", "Enabled")
+	Settings.KeepDA = true
+	if Settings.KeepDA and syn.queue_on_teleport then
+		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+	end
+	updatesaves()
+end)
+
+newCmd("unkeepda", {}, "unkeepda", "Disable Auto Load DA Upon Rejoin/Teleport", function(args, speaker)
+	notify("Auto Run", "Disabled")
+	Settings.KeepDA = false
+	updatesaves()
 end)
 
 
