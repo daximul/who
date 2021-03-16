@@ -999,7 +999,7 @@ local function autoComplete(str,curText)
 end
 
 local function updateCmdsu(str,curText)
-	wait(0.3)
+	wait(0.02)
 	if str == nil then
 		-- do nothing
 	else
