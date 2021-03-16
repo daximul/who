@@ -39,6 +39,7 @@ local NotificationTemplate = GUI.NotificationTemplate
 local CommandsGui = GUI.CMDS
 local CmdSu = GUI.Main.cmdsu
 local PluginBrowser = GUI.PluginBrowser
+local DaUi = GUI.DaUi
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -53,6 +54,8 @@ local Settings = {
 	daflyspeed = 1,
 	vehicleflyspeed = 1,
 	PluginsTable = {},
+	ChatLogs = false,
+	JoinLogs = false,
 	KeepDA = false
 }
 
@@ -126,7 +129,80 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	invisRunning = false
 end)
 
+local function Time()
+	local HOUR = math.floor((tick() % 86400) / 3600)
+	local MINUTE = math.floor((tick() % 3600) / 60)
+	local SECOND = math.floor(tick() % 60)
+	local AP = HOUR > 11 and 'PM' or 'AM'
+	HOUR = (HOUR % 12 == 0 and 12 or HOUR % 12)
+	HOUR = HOUR < 10 and '0' .. HOUR or HOUR
+	MINUTE = MINUTE < 10 and '0' .. MINUTE or MINUTE
+	SECOND = SECOND < 10 and '0' .. SECOND or SECOND
+	return HOUR .. ':' .. MINUTE .. ':' .. SECOND .. ' ' .. AP
+end
+
+local function LogChat(plr)
+	plr.Chatted:Connect(function(Message)
+		if Settings.ChatLogs == true then
+			if #DaUi.ChatLogsArea.ScrollingFrame:GetChildren() >= 2546 then
+				for i,v in pairs(DaUi.ChatLogsArea.ScrollingFrame:GetChildren()) do
+					if v:IsA("Frame") then
+						v:remove()
+					end
+				end
+			end
+			local content, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+			local logframe = Assets.LogTemplate:Clone()
+			logframe.Profile.Image = content
+			logframe.Username.Text = plr.Name
+			logframe.Message.Text = Message
+			logframe.Parent = DaUi.ChatLogsArea.ScrollingFrame
+			logframe.Visible = true
+		end
+	end)
+end
+
+local function LogJoin(plr)
+	if Settings.JoinLogs == true then
+		if #DaUi.JoinLogsArea.ScrollingFrame:GetChildren() >= 2546 then
+			for i,v in pairs(DaUi.JoinLogsArea.ScrollingFrame:GetChildren()) do
+				if v:IsA("Frame") then
+					v:remove()
+				end
+			end
+		end
+		local content, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+		local logframe = Assets.LogTemplate:Clone()
+		logframe.Profile.Image = content
+		logframe.Username.Text = plr.Name
+		logframe.Message.Text = "Joined Server: " .. Time()
+		logframe.Parent = DaUi.JoinLogsArea.ScrollingFrame
+		logframe.Visible = true
+	end
+end
+
+local function LogLeave(plr)
+	if Settings.JoinLogs == true then
+		if #DaUi.JoinLogsArea.ScrollingFrame:GetChildren() >= 2546 then
+			for i,v in pairs(DaUi.JoinLogsArea.ScrollingFrame:GetChildren()) do
+				if v:IsA("Frame") then
+					v:remove()
+				end
+			end
+		end
+		local content, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+		local logframe = Assets.LogTemplate:Clone()
+		logframe.Profile.Image = content
+		logframe.Username.Text = plr.Name
+		logframe.Message.Text = "Left Server: " .. Time()
+		logframe.Parent = DaUi.JoinLogsArea.ScrollingFrame
+		logframe.Visible = true
+	end
+end
+
 Players.PlayerAdded:Connect(function(player)
+	LogJoin(player)
+	LogChat(player)
 	if ESPenabled then
 		repeat wait(1) until player.Character and getRoot(player.Character)
 		ESP(player)
@@ -134,6 +210,7 @@ Players.PlayerAdded:Connect(function(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
+	LogLeave(player)
 	if ESPenabled then
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == player.Name .. "_ESP" then
@@ -157,6 +234,7 @@ function Startup()
 	NotificationTemplate.Position = UDim2.new(-1, -75, 1.029, -105)
 	CommandsGui.Position = UDim2.new(0.694, -75, 10, -105)
 	PluginBrowser.Position = UDim2.new(0.42, -75, 2, -105)
+	DaUi.Position = UDim2.new(0.42, -75, 2, -105)
 	Cmdbar.Text = ""
 	DAMouse.Move:Connect(checkTT)
 end
@@ -238,8 +316,8 @@ local function SetSimulationRadius()
 			workspace.FallenPartsDestroyHeight = 0/1/0
 			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
 			settings().Physics.AllowSleep = false
-			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-			Players.LocalPlayer.SimulationRadius = math.huge
+			setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+			setsimulation(1e308, 1/0)
 		end)
 	else
 		Import("cl_net.lua")
@@ -279,6 +357,18 @@ function PlugBrowseStatus(bool)
 		PluginBrowser:TweenPosition(GuiPos.Shown, "InOut", "Sine", 0.3, true, nil)
 	else
 		PluginBrowser:TweenPosition(GuiPos.Hidden, "InOut", "Sine", 0.5, true, nil)
+	end
+end
+
+function DaUiStatus(bool)
+	local GuiPoz = {
+		Shown = UDim2.new(0.42, -75, 0.512, -105),
+		Hidden = UDim2.new(0.42, -75, 2, -105),
+	}
+	if bool == true then
+		DaUi:TweenPosition(GuiPoz.Shown, "InOut", "Sine", 0.3, true, nil)
+	else
+		DaUi:TweenPosition(GuiPoz.Hidden, "InOut", "Sine", 0.5, true, nil)
 	end
 end
 
@@ -909,7 +999,7 @@ local function autoComplete(str,curText)
 end
 
 local function updateCmdsu(str,curText)
-	wait(0.1)
+	wait(0.3)
 	if str == nil then
 		-- do nothing
 	else
@@ -991,13 +1081,16 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
+--[[
 Cmdbar.Changed:Connect(function()
 	updateCmdsu(topCommand)
 end)
+]]--
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
 		IndexContents(Cmdbar.Text)
+		updateCmdsu(topCommand)
 	end
 end)
 
@@ -1034,6 +1127,14 @@ end)
 PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 PluginBrowser.Area.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+end)
+DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+DaUi.ChatLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+end)
+DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+DaUi.JoinLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
 
 function addcmdtext(text,name,desc,plug)
@@ -1110,6 +1211,8 @@ function saves()
 					if json.daflyspeed ~= nil then Settings.daflyspeed = json.daflyspeed else Settings.daflyspeed = 1 end
 					if json.vehicleflyspeed ~= nil then Settings.vehicleflyspeed = json.vehicleflyspeed else Settings.vehicleflyspeed = 1 end
 					if json.PluginsTable ~= nil then Settings.PluginsTable = json.PluginsTable else Settings.PluginsTable = {} end
+					if json.ChatLogs ~= nil then Settings.ChatLogs = json.ChatLogs else Settings.ChatLogs = false end
+					if json.JoinLogs ~= nil then Settings.JoinLogs = json.JoinLogs else Settings.JoinLogs = false end
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
 				end)
 				if not success then
@@ -1135,6 +1238,8 @@ function saves()
 				Settings.daflyspeed = 1
 				Settings.vehicleflyspeed = 1
 				Settings.PluginsTable = {}
+				Settings.ChatLogs = false
+				Settings.JoinLogs = false
 				Settings.KeepDA = false
 				
 				notify("", "There was a problem writing a save file to your PC")
@@ -1145,6 +1250,8 @@ function saves()
 		Settings.daflyspeed = 1
 		Settings.vehicleflyspeed = 1
 		Settings.PluginsTable = {}
+		Settings.ChatLogs = false
+		Settings.JoinLogs = false
 		Settings.KeepDA = false
 	end
 end
@@ -1158,6 +1265,8 @@ function updatesaves()
 			daflyspeed = Settings.daflyspeed;
 			vehicleflyspeed = Settings.vehicleflyspeed;
 			PluginsTable = Settings.PluginsTable;
+			ChatLogs = Settings.ChatLogs;
+			JoinLogs = Settings.JoinLogs;
 			KeepDA = Settings.KeepDA;
 		}
 		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
@@ -1702,6 +1811,19 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
+DaUi.SettingsArea.PrefixBox.Box.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		local pref = DaUi.SettingsArea.PrefixBox.Box
+		if typeof(pref.Text) == "string" and #pref.Text <= 2 then
+			Settings.Prefix = pref.Text
+			updatesaves()
+			notify("", "Prefix was succesfully changed to: " .. pref.Text)
+		elseif #prefix > 2 then
+			notify("", "Prefix cannot be longer than 2 characters.")
+		end
+	end
+end)
+
 local newCmd = function(name, aliases, title, description, func)
 	addcmdtext(title, name, description)
 
@@ -1714,12 +1836,13 @@ local newCmd = function(name, aliases, title, description, func)
 	}
 end
 
---// Setup Admin & Plugin Browser
+--// Setup Admin & Ui & Plugin Browser
 pcall(function()
 	Startup()
 	ParentGui(GUI)
 	SmoothDrag(CommandsGui)
 	SmoothDrag(PluginBrowser)
+	SmoothDrag(DaUi)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
 		CmdListStatus(false)
 	end)
@@ -1733,6 +1856,84 @@ pcall(function()
 			PluginBrowser.Area.Visible = true
 		end
 	end)
+	DaUi.Close.MouseButton1Down:Connect(function()
+		DaUiStatus(false)
+	end)
+	DaUi.SettingsBtn.MouseButton1Down:Connect(function()
+		DaUi.SettingsArea.Visible = true
+		DaUi.ChatLogsArea.Visible = false
+		DaUi.JoinLogsArea.Visible = false
+	end)
+	DaUi.ChatLogsBtn.MouseButton1Down:Connect(function()
+		DaUi.SettingsArea.Visible = false
+		DaUi.ChatLogsArea.Visible = true
+		DaUi.JoinLogsArea.Visible = false
+	end)
+	DaUi.JoinLogsBtn.MouseButton1Down:Connect(function()
+		DaUi.SettingsArea.Visible = false
+		DaUi.ChatLogsArea.Visible = false
+		DaUi.JoinLogsArea.Visible = true
+	end)
+	DaUi.SettingsArea.SaveChatLogs.MouseButton1Down:Connect(function()
+		if writefileExploit() then
+			if #DaUi.ChatLogsArea.ScrollingFrame:GetChildren() > 0 then
+				notify("Loading", "Hold on a sec")
+				local placeName = game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name
+				local writelogs = '-- Dark Admin Chat logs for "'..placeName..'"\n'
+				for _, child in pairs(DaUi.ChatLogsArea.ScrollingFrame:GetChildren()) do
+					if child:IsA("Frame") then
+						writelogs = writelogs .. "\n" .. "[" .. child.Username.Text .. "]: " .. child.Message.Text
+					end
+				end
+				local writelogsFile = tostring(writelogs)
+				local fileext = 0
+				local function nameFile()
+					local file
+					pcall(function() file = readfile(placeName..' Chat Logs ('..fileext..').txt') end)
+					if file then
+						fileext = fileext+1
+						nameFile()
+					else
+						writefileCooldown(placeName..' Chat Logs ('..fileext..').txt', writelogsFile)
+					end
+				end
+				nameFile()
+				notify("Chat Logs", "Check the Workspace Folder of your Exploit")
+			end
+		else
+			notify("writefile", "Cannot Save File")
+		end
+	end)
+	DaUi.SettingsArea.SaveJoinLogs.MouseButton1Down:Connect(function()
+		if writefileExploit() then
+			if #DaUi.JoinLogsArea.ScrollingFrame:GetChildren() > 0 then
+				notify("Loading", "Hold on a sec")
+				local placeName = game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name
+				local writelogs = '-- Dark Admin Join logs for "'..placeName..'"\n'
+				for _, child in pairs(DaUi.JoinLogsArea.ScrollingFrame:GetChildren()) do
+					if child:IsA("Frame") then
+						writelogs = writelogs .. "\n" .. "[" .. child.Username.Text .. "]: " .. child.Message.Text
+					end
+				end
+				local writelogsFile = tostring(writelogs)
+				local fileext = 0
+				local function nameFile()
+					local file
+					pcall(function() file = readfile(placeName..' Join Logs ('..fileext..').txt') end)
+					if file then
+						fileext = fileext+1
+						nameFile()
+					else
+						writefileCooldown(placeName..' Join Logs ('..fileext..').txt', writelogsFile)
+					end
+				end
+				nameFile()
+				notify("Join Logs", "Check the Workspace Folder of your Exploit")
+			end
+		else
+			notify("writefile", "Cannot Save File")
+		end
+	end)
 	spawn(function()
 		while wait(0.05) do
 			if PluginBrowser.Area.Visible == false then
@@ -1742,9 +1943,77 @@ pcall(function()
 			end
 		end
 	end)
-	if Settings.KeepDA and syn.queue_on_teleport then
-		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
-	end
+	spawn(function()
+		DaUi.SettingsArea.PrefixBox.Box.Text = Settings.Prefix
+		if Settings.KeepDA == true then
+			DaUi.SettingsArea.KeepdaToggle.Text = utf8.char(10003)
+		else
+			DaUi.SettingsArea.KeepdaToggle.Text = ""
+		end
+		if Settings.ChatLogs == true then
+			DaUi.SettingsArea.ChatlogToggle.Text = utf8.char(10003)
+		else
+			DaUi.SettingsArea.ChatlogToggle.Text = ""
+		end
+		if Settings.JoinLogs == true then
+			DaUi.SettingsArea.JoinlogToggle.Text = utf8.char(10003)
+		else
+			DaUi.SettingsArea.JoinlogToggle.Text = ""
+		end
+	end)
+	spawn(function()
+		for _, plr in pairs(Players:GetChildren()) do
+			if plr.ClassName == "Player" then
+				LogChat(plr)
+			end
+		end
+	end)
+	spawn(function()
+		DaUi.SettingsArea.KeepdaToggle.MouseButton1Down:Connect(function()
+			if Settings.KeepDA == true then
+				DaUi.SettingsArea.KeepdaToggle.Text = ""
+				Settings.KeepDA = false
+				updatesaves()
+				notify("Auto Run", "Disabled")
+			else
+				DaUi.SettingsArea.KeepdaToggle.Text = utf8.char(10003)
+				Settings.KeepDA = true
+				updatesaves()
+				notify("Auto Run", "Enabled")
+			end
+		end)
+		DaUi.SettingsArea.ChatlogToggle.MouseButton1Down:Connect(function()
+			if Settings.ChatLogs == true then
+				DaUi.SettingsArea.ChatlogToggle.Text = ""
+				Settings.ChatLogs = false
+				updatesaves()
+				notify("Chat Logs", "Disabled")
+			else
+				DaUi.SettingsArea.ChatlogToggle.Text = utf8.char(10003)
+				Settings.ChatLogs = true
+				updatesaves()
+				notify("Chat Logs", "Enabled")
+			end
+		end)
+		DaUi.SettingsArea.JoinlogToggle.MouseButton1Down:Connect(function()
+			if Settings.JoinLogs == true then
+				DaUi.SettingsArea.JoinlogToggle.Text = ""
+				Settings.JoinLogs = false
+				updatesaves()
+				notify("Join Logs", "Disabled")
+			else
+				DaUi.SettingsArea.JoinlogToggle.Text = utf8.char(10003)
+				Settings.JoinLogs = true
+				updatesaves()
+				notify("Join Logs", "Enabled")
+			end
+		end)
+	end)
+	spawn(function()
+		if Settings.KeepDA and syn.queue_on_teleport then
+			syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+		end
+	end)
 end)
 spawn(function()
 	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
@@ -1764,7 +2033,11 @@ newCmd("commands", {"cmds"}, "commands / cmds", "List of Commands", function(arg
 	CmdListStatus(true)
 end)
 
-newCmd('browser', {}, "browser", "Plugin Browser", function(args, speaker)
+newCmd("ui", {}, "ui", "Dark Admin UI", function(args, speaker)
+	DaUiStatus(true)
+end)
+
+newCmd("browser", {}, "browser", "Plugin Browser", function(args, speaker)
 	PlugBrowseStatus(true)
 end)
 
@@ -2164,7 +2437,7 @@ newCmd("reloadplugin", {}, "reloadplugin [string]", "Reload a Plugin", function(
 	addPlugin(pluginName)
 end)
 
-newCmd("grabknife", {}, "grabknife", "Use on claimed users", function(args, speaker)
+newCmd("grabknife", {"knife"}, "grabknife / knife", "Use on claimed users", function(args, speaker)
 	notify("", "Loaded Grab Knife", 2)
 	Import("knif.lua")
 end)
@@ -3046,6 +3319,7 @@ end)
 newCmd("keepda", {}, "keepda", "Auto Load DA Upon Rejoin/Teleport", function(args, speaker)
 	notify("Auto Run", "Enabled")
 	Settings.KeepDA = true
+	DaUi.SettingsArea.KeepdaToggle.Text = utf8.char(10003)
 	if Settings.KeepDA and syn.queue_on_teleport then
 		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
 	end
@@ -3055,6 +3329,7 @@ end)
 newCmd("unkeepda", {}, "unkeepda", "Disable Auto Load DA Upon Rejoin/Teleport", function(args, speaker)
 	notify("Auto Run", "Disabled")
 	Settings.KeepDA = false
+	DaUi.SettingsArea.KeepdaToggle.Text = ""
 	updatesaves()
 end)
 
