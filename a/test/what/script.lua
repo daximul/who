@@ -2088,6 +2088,11 @@ newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", func
 	notify("", "Simradius set to 139")
 end)
 
+newCmd("synnet", {}, "synnet [Unstable]", "Unstable But Good Net", function(args, speaker)
+	notify("", "Simradius set to Syn")
+	Import("cl_net.lua")
+end)
+
 newCmd("netcheck", {}, "netcheck", "Notify who is using Network Ownership", function(args, speaker)
 	local whoisnet = {}
 	for i,v in pairs(Players:GetPlayers()) do
