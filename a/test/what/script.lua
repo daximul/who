@@ -316,8 +316,8 @@ local function SetSimulationRadius()
 			workspace.FallenPartsDestroyHeight = 0/1/0
 			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
 			settings().Physics.AllowSleep = false
-			setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-			setsimulation(1e308, 1/0)
+			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+			Players.LocalPlayer.SimulationRadius = math.huge
 		end)
 	else
 		Import("cl_net.lua")
