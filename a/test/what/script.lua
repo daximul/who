@@ -2033,7 +2033,7 @@ newCmd("commands", {"cmds"}, "commands / cmds", "List of Commands", function(arg
 	CmdListStatus(true)
 end)
 
-newCmd("ui", {}, "ui", "Dark Admin UI", function(args, speaker)
+newCmd("ui", {}, "ui", "Open Dark Admin UI", function(args, speaker)
 	DaUiStatus(true)
 end)
 
