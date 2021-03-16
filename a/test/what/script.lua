@@ -3347,6 +3347,16 @@ newCmd("serverhop", {"shop"}, "serverhop / shop", "Teleports you to a different 
 	end
 end)
 
+newCmd("hipheight", {"hh"}, "hipheight / hh [number]", "Adjusts Hip Height", function(args, speaker)
+	local height = nil
+	if r15(speaker) then
+		height = args[1] or 2.1
+	else
+		height = args[1] or 0
+	end
+	speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight = height
+end)
+
 
 
 
