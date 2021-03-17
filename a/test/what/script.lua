@@ -1108,10 +1108,16 @@ Cmdbar.Focused:Connect(function()
 end)
 
 local function Search()
-	local InputText = string.upper(Cmdbar.Text)
+	local InputText = Cmdbar.Text
 	for _,button in pairs(CMDsF:GetChildren())do
-		if button:IsA("TextButton")then
-			if Match(button.Label.Text, str)
+		if button:IsA("TextButton") then
+			local chunks = {}
+			if InputText:sub(#InputText,#InputText) == "\\" then InputText = "" end
+			for w in string.gmatch(InputText, "[^\\]+") do
+				table.insert(chunks, w)
+			end
+			if #chunks > 0 then InputText = chunks[#chunks] end
+			if Match(button.Label.Text, InputText)
 			-- if InputText == "" or string.find(string.upper(button.Name), InputText) ~= nil then
 				button.Visible = true
 			else
