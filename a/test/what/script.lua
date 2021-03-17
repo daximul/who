@@ -1117,7 +1117,7 @@ local function Search()
 				table.insert(chunks, w)
 			end
 			if #chunks > 0 then InputText = chunks[#chunks] end
-			if Match(button.Label.Text, InputText)
+			if Match(button.Label.Text, InputText) then
 			-- if InputText == "" or string.find(string.upper(button.Name), InputText) ~= nil then
 				button.Visible = true
 			else
