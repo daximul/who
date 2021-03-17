@@ -1047,11 +1047,7 @@ function IndexContents(str)
 		if v:IsA("TextButton") then
 			if Match(v.Label.Text, str) then
 				if topCommand == nil then
-					-- VISIBLE & ELSE is NEW
-					v.Visible = true
 					topCommand = v.Label.Text
-				else
-					v.Visible = false
 				end
 			end
 		end
@@ -1111,12 +1107,12 @@ Cmdbar.Focused:Connect(function()
 	end)
 end)
 
---[[
-function Search()
+local function Search()
 	local InputText = string.upper(Cmdbar.Text)
 	for _,button in pairs(CMDsF:GetChildren())do
 		if button:IsA("TextButton")then
-			if InputText == "" or string.find(string.upper(button.Name), InputText) ~= nil then
+			if Match(button.Label.Text, str)
+			-- if InputText == "" or string.find(string.upper(button.Name), InputText) ~= nil then
 				button.Visible = true
 			else
 				button.Visible = false
@@ -1125,7 +1121,6 @@ function Search()
 	end
 end
 Cmdbar.Changed:Connect(Search)
-]]--
 CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
 CMDsF.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
