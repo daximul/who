@@ -66,6 +66,7 @@ local Network_Loop = nil
 local Old_Net_Method = true
 local DEBUG = false
 local Original_User_Id = Players.LocalPlayer.UserId
+local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 
 function randomString()
 	local length = math.random(10,20)
@@ -80,7 +81,11 @@ end
 
 local currentToolSize = ""
 local currentGripPos = ""
+local Clip = false
 local cmdinfjump = false
+local spawnpoint = false
+local spDelay = 0.1
+local cmdautorj = false
 FLYING = false
 viewing = nil
 fcRunning = false
@@ -127,6 +132,33 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	Floating = false
 	FLYING = false
 	invisRunning = false
+	
+	repeat wait() until getRoot(Players.LocalPlayer.Character)
+	
+	pcall(function()
+		if spawnpoint and spawnpos ~= nil then
+			wait(spDelay)
+			getRoot(Players.LocalPlayer.Character).CFrame = spawnpos
+		end
+	end)
+end)
+
+PromptOverlay.DescendantAdded:Connect(function(Overlay)
+	if cmdautorj == true then
+		if Overlay.Name == "ErrorTitle" then
+			Overlay:GetPropertyChangedSignal("Text"):Connect(function()
+				if Overlay.Text:sub(0, 12) == "Disconnected" then
+					if #Players:GetPlayers() <= 1 then
+						Players.LocalPlayer:Kick("\nRejoining...")
+						wait()
+						game:GetService("TeleportService"):Teleport(game.PlaceId, Players.LocalPlayer)
+					else
+						game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+					end
+				end
+			end)
+		end
+	end
 end)
 
 local function Time()
@@ -1081,12 +1113,6 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
---[[
-Cmdbar.Changed:Connect(function()
-	updateCmdsu(topCommand)
-end)
-]]--
-
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
 		IndexContents(Cmdbar.Text)
@@ -1118,7 +1144,6 @@ local function Search()
 			end
 			if #chunks > 0 then InputText = chunks[#chunks] end
 			if Match(button.Label.Text, InputText) then
-			-- if InputText == "" or string.find(string.upper(button.Name), InputText) ~= nil then
 				button.Visible = true
 			else
 				button.Visible = false
@@ -2300,7 +2325,7 @@ newCmd("fastbring", {}, "fastbring [plr]", "Try to bring a user fast", function(
 	end
 end)
 
-newCmd("claimbring", {"cbring"}, "claimbring / cbring [plr]", "Bring a claimed user", function(args, speaker)
+newCmd("clientbring", {"cbring"}, "clientbring / cbring [plr]", "Bring a user on your client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users)do
 		if Players[v].Character ~= nil then
@@ -3367,6 +3392,167 @@ newCmd("hipheight", {"hh"}, "hipheight / hh [number]", "Adjusts Hip Height", fun
 		height = args[1] or 0
 	end
 	speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight = height
+end)
+
+local bringT = {}
+newCmd("loopbring", {}, "loopbring [plr] [distance] [delay] (Client)", "Loop brings a player to you (useful for killing)", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players)do
+		spawn(function()
+			if Players[v].Name ~= speaker.Name and not FindInTable(bringT, Players[v].Name) then
+				table.insert(bringT, Players[v].Name)
+				local plrName = Players[v].Name
+				local pchar=Players[v].Character
+				local distance = 3
+				if args[2] and isNumber(args[2]) then
+					distance = args[2]
+				end
+				local lDelay = 0
+				if args[3] and isNumber(args[3]) then
+					lDelay = args[3]
+				end
+				repeat
+					for i,c in pairs(players) do
+						if Players:FindFirstChild(v) then
+							pchar = Players[v].Character
+							if pchar~= nil and Players[v].Character ~= nil and getRoot(pchar) and speaker.Character ~= nil and getRoot(speaker.Character) then
+								getRoot(pchar).CFrame = getRoot(speaker.Character).CFrame + Vector3.new(distance,1,0)
+							end
+							wait(lDelay)
+						else 
+							for a,b in pairs(bringT) do if b == plrName then table.remove(bringT, a) end end
+						end
+					end
+				until not FindInTable(bringT, plrName)
+			end
+		end)
+	end
+end)
+
+newCmd("unloopbring", {}, "unloopbring [plr]", "Undoes Loopbring", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players)do
+		spawn(function()
+			for a,b in pairs(bringT) do if b == Players[v].Name then table.remove(bringT, a) end end
+		end)
+	end
+end)
+
+newCmd("freeze", {"fr"}, "freeze / fr [plr] (Client)", "Freezes a Player", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	if players ~= nil then
+		for i,v in pairs(players) do
+			spawn(function()
+				for i, x in next, Players[v].Character:GetDescendants() do
+					if x:IsA("BasePart") and not x.Anchored then
+						x.Anchored = true
+					end
+				end
+			end)
+		end
+	end
+end)
+
+newCmd("thaw", {"unfr"}, "thaw / unfr [plr] (Client)", "Unfreezes a Player", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	if players ~= nil then
+		for i,v in pairs(players) do
+			spawn(function()
+				for i, x in next, Players[v].Character:GetDescendants() do
+					if x:IsA("BasePart") and x.Anchored then
+						x.Anchored = false
+					end
+				end
+			end)
+		end
+	end
+end)
+
+newCmd("spawnpoint", {}, "spawnpoint [delay]", "Sets a position where you will spawn", function(args, speaker)
+	local curpos = math.round(getRoot(speaker.Character).Position.X) .. ", " .. math.round(getRoot(speaker.Character).Position.Y) .. ", " .. math.round(getRoot(speaker.Character).Position.Z)
+	spawnpos = getRoot(speaker.Character).CFrame
+	spawnpoint = true
+	spDelay = tonumber(args[1]) or 0.1
+	notify("Spawn Point", "Created at " .. curpos)
+end)
+
+newCmd("unspawnpoint", {}, "unspawnpoint", "Removes your custom spawnpoint", function(args, speaker)
+	spawnpoint = false
+	notify("Spawn Point", "Removed Spawn Point")
+end)
+
+newCmd("naked", {}, "naked", "Removes your Clothing", function(args, speaker)
+	for i,v in pairs(speaker.Character:GetDescendants()) do
+		if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
+			v:Destroy()
+		end
+	end
+end)
+
+newCmd("noface", {}, "noface", "Removes your Face", function(args, speaker)
+	for i,v in pairs(speaker.Character:GetDescendants()) do
+		if v:IsA("Decal") and v.Name == 'face' then
+			v:Destroy()
+		end
+	end
+end)
+
+newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)", function(args, speaker)
+	if sethidden then
+		local lplr = Players.LocalPlayer
+		local char = lplr.Character
+		local rig = tostring(char.Humanoid.RigType) == "Enum.HumanoidRigType.R6" and 1 or tostring(char.Humanoid.RigType) == "Enum.HumanoidRigType.R15" and 2
+
+		local speaker = Players.LocalPlayer
+
+		sethidden(speaker, "SimulationRadius", math.huge)
+
+		local test = Instance.new("Model")
+		local hum  = Instance.new("Humanoid")
+		local animation = Instance.new("Model")
+		local humanoidanimation = Instance.new("Humanoid")
+		test.Parent = workspace
+		hum.Parent = test
+		animation.Parent = workspace
+		humanoidanimation.Parent = animation
+
+		lplr.Character = test
+		wait(2)
+		char.Humanoid.Animator.Parent = humanoidanimation
+		char.Humanoid:Destroy()
+
+		char.Head:Destroy()
+		wait(5)
+		game.Players.LocalPlayer.Character = char
+
+		local hum2 = Instance.new("Humanoid")
+		hum2.Parent = char
+		char:FindFirstChildOfClass("Humanoid").Jump = true
+
+		humanoidanimation.Animator.Parent = hum2
+		char.Animate.Disabled = true
+		wait()
+		char.Animate.Disabled = false
+		wait()
+
+		if rig == 1 then
+			hum2.HipHeight = 0
+		elseif rig == 2 then
+			hum2.HipHeight = 2.19
+		end
+	else
+		notify("Incompatible Exploit", "Missing sethiddenproperty")
+	end
+end)
+
+newCmd("autorejoin", {"autorj"}, "autorejoin / autorj", "Automatically rejoins the server if you get kicked/disconnected", function(args, speaker)
+	cmdautorj = true
+	notify("Auto Rejoin", "Enabled")
+end)
+
+newCmd("unautorejoin", {"unautorj"}, "unautorejoin / unautorj", "Disable Auto Rejoin", function(args, speaker)
+	cmdautorj = false
+	notify("Auto Rejoin", "Disabled")
 end)
 
 
