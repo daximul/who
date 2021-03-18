@@ -81,7 +81,6 @@ end
 
 local currentToolSize = ""
 local currentGripPos = ""
-local Clip = false
 local cmdinfjump = false
 local spawnpoint = false
 local spDelay = 0.1
@@ -129,11 +128,14 @@ Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(fun
 end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
+	NOFLY()
 	Floating = false
 	FLYING = false
 	invisRunning = false
 	
 	repeat wait() until getRoot(Players.LocalPlayer.Character)
+	
+	execCmd("clip nonotify")
 	
 	pcall(function()
 		if spawnpoint and spawnpos ~= nil then
