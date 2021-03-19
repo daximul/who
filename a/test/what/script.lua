@@ -2181,6 +2181,7 @@ spawn(function()
 	BrowserBtn("Freecam", "Freecam", "Control your Camera in a Smooth way", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/freecam.lua'))();")
 	BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
 	BrowserBtn("Chat Spy", "Chat Spy", "Spy on Messages in Chat", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chatspy.lua'))();")
+	BrowserBtn("System Chat", "System Chat", "Fake your Chat as System\n\n{System} Your mom has joined the game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/systemchat.lua'))();")
 end)
 --// End of Setup
 
