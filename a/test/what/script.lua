@@ -119,13 +119,20 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 end)
 
-Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+local function onDiedLastDeath()
 	spawn(function()
-		if getRoot(Players.LocalPlayer.Character) then
-			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
+		if pcall(function() Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") end) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+			Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+				if getRoot(Players.LocalPlayer.Character) then
+					LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
+				end
+			end)
+		else
+			wait(2)
+			onDiedLastDeath()
 		end
 	end)
-end)
+end
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
 	NOFLY()
@@ -143,6 +150,8 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 			getRoot(Players.LocalPlayer.Character).CFrame = spawnpos
 		end
 	end)
+	
+	onDiedLastDeath()
 end)
 
 PromptOverlay.DescendantAdded:Connect(function(Overlay)
@@ -1728,6 +1737,98 @@ function ESP(plr)
 	end)
 end
 
+function Locate(plr)
+	spawn(function()
+		for i,v in pairs(CoreGui:GetChildren()) do
+			if v.Name == plr.Name..'_LC' then
+				v:Destroy()
+			end
+		end
+		wait()
+		if plr.Character and plr.Name ~= Players.LocalPlayer.Name and not CoreGui:FindFirstChild(plr.Name..'_LC') then
+			local ESPholder = Instance.new("Folder")
+			ESPholder.Name = plr.Name..'_LC'
+			ESPholder.Parent = CoreGui
+			repeat wait(1) until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChild('Humanoid')
+			for b,n in pairs (plr.Character:GetChildren()) do
+				if (n:IsA("BasePart")) then
+					local a = Instance.new("BoxHandleAdornment")
+					a.Name = plr.Name
+					a.Parent = ESPholder
+					a.Adornee = n
+					a.AlwaysOnTop = true
+					a.ZIndex = 10
+					a.Size = n.Size
+					a.Transparency = 0.3
+					a.Color = plr.TeamColor
+				end
+			end
+			if plr.Character and plr.Character:FindFirstChild('Head') then
+				local BillboardGui = Instance.new("BillboardGui")
+				local TextLabel = Instance.new("TextLabel")
+				BillboardGui.Adornee = plr.Character.Head
+				BillboardGui.Name = plr.Name
+				BillboardGui.Parent = ESPholder
+				BillboardGui.Size = UDim2.new(0, 100, 0, 150)
+				BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
+				BillboardGui.AlwaysOnTop = true
+				TextLabel.Parent = BillboardGui
+				TextLabel.BackgroundTransparency = 1
+				TextLabel.Position = UDim2.new(0, 0, 0, -50)
+				TextLabel.Size = UDim2.new(0, 100, 0, 100)
+				TextLabel.Font = Enum.Font.SourceSansSemibold
+				TextLabel.TextSize = 20
+				TextLabel.TextColor3 = Color3.new(1, 1, 1)
+				TextLabel.TextStrokeTransparency = 0
+				TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+				TextLabel.Text = 'Name: '..plr.Name
+				TextLabel.ZIndex = 10
+				local lcLoopFunc
+				local addedFunc
+				local teamChange
+				addedFunc = plr.CharacterAdded:Connect(function()
+					if ESPholder ~= nil and ESPholder.Parent ~= nil then
+						lcLoopFunc:Disconnect()
+						teamChange:Disconnect()
+						ESPholder:Destroy()
+						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChild('Humanoid')
+						Locate(plr)
+						addedFunc:Disconnect()
+					else
+						teamChange:Disconnect()
+						addedFunc:Disconnect()
+					end
+				end)
+				teamChange = plr:GetPropertyChangedSignal("TeamColor"):Connect(function()
+					if ESPholder ~= nil and ESPholder.Parent ~= nil then
+						lcLoopFunc:Disconnect()
+						addedFunc:Disconnect()
+						ESPholder:Destroy()
+						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChild('Humanoid')
+						Locate(plr)
+						teamChange:Disconnect()
+					else
+						teamChange:Disconnect()
+					end
+				end)
+				local function lcLoop()
+					if CoreGui:FindFirstChild(plr.Name..'_LC') then
+						if plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChild('Humanoid') and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChild('Humanoid') then
+							local pos = math.floor((getRoot(Players.LocalPlayer.Character).Position - getRoot(plr.Character).Position).magnitude)
+							TextLabel.Text = 'Name: '..plr.Name..' | Health: '..round(plr.Character:FindFirstChildOfClass('Humanoid').Health, 1)..' | Studs: '..pos
+						end
+					else
+						teamChange:Disconnect()
+						addedFunc:Disconnect()
+						lcLoopFunc:Disconnect()
+					end
+				end
+				lcLoopFunc = game:GetService("RunService").RenderStepped:Connect(lcLoop)
+			end
+		end
+	end)
+end
+
 function kill(speaker,target,fast)
 	if tools(speaker) then
 		if target ~= nil then
@@ -1773,6 +1874,31 @@ function bring(speaker,target,fast)
 		end
 	else
 		notify("", "Tool Required to use this command!")
+	end
+end
+
+function teleport(speaker,target,target2,fast)
+	if tools(speaker) then
+		if target ~= nil then
+			local NormPos = getRoot(speaker.Character).CFrame
+			if not fast then
+				refresh(speaker)
+				wait()
+				repeat wait() until speaker.Character ~= nil and getRoot(speaker.Character)
+				wait(0.3)
+			end
+			local hrp = getRoot(speaker.Character)
+			local hrp2 = getRoot(target2.Character)
+			attach(speaker,target)
+			repeat
+				wait()
+				hrp.CFrame = hrp2.CFrame
+			until not getRoot(target.Character) or not getRoot(speaker.Character)
+			wait(1)
+			speaker.CharacterAdded:Wait():WaitForChild("HumanoidRootPart").CFrame = NormPos
+		end
+	else
+		notify("Tool Required", "You need to have an item in your inventory")
 	end
 end
 
@@ -2851,6 +2977,32 @@ newCmd("unesp", {}, "unesp", "Stop Using ESP on Players", function(args, speaker
 	end
 end)
 
+newCmd("locate", {}, "locate [plr]", "View a single player and their status", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		Locate(Players[v])
+	end
+end)
+
+newCmd("unlocate", {}, "unlocate [plr]", "Removes locate", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	if args[1] then
+		for i,v in pairs(players) do
+			for i,c in pairs(CoreGui:GetChildren()) do
+				if c.Name == Players[v].Name..'_LC' then
+					c:Destroy()
+				end
+			end
+		end
+	else
+		for i,c in pairs(CoreGui:GetChildren()) do
+			if string.sub(c.Name, -3) == '_LC' then
+				c:Destroy()
+			end
+		end
+	end
+end)
+
 newCmd("xray", {}, "xray", "Make all parts in Workspace transparent", function(args, speaker)
 	xrayobjects(true)
 end)
@@ -3555,6 +3707,34 @@ end)
 newCmd("unautorejoin", {"unautorj"}, "unautorejoin / unautorj", "Disable Auto Rejoin", function(args, speaker)
 	cmdautorj = false
 	notify("Auto Rejoin", "Disabled")
+end)
+
+newCmd("teleport", {"tp"}, "teleport / tp [plr] [plr] (Tool)", "Teleports a player to another player (Tool Required)", function(args, speaker)
+	local players1 = getPlayer(args[1], speaker)
+	local players2 = getPlayer(args[2], speaker)
+	for i,v in pairs(players1) do
+		if getRoot(Players[v].Character) and getRoot(Players[players2[1]].Character) then
+			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
+				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+				wait(.1)
+			end
+			teleport(speaker, Players[v], Players[players2[1]])
+		end
+	end
+end)
+
+newCmd("fastteleport", {"fasttp"}, "fastteleport / fasttp [plr] [plr] (Tool)", "Teleports a player to another player faster (Tool Required)", function(args, speaker)
+	local players1 = getPlayer(args[1], speaker)
+	local players2 = getPlayer(args[2], speaker)
+	for i,v in pairs(players1) do
+		if getRoot(Players[v].Character) and getRoot(Players[players2[1]].Character) then
+			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
+				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+				wait(.1)
+			end
+			teleport(speaker, Players[v], Players[players2[1]], true)
+		end
+	end
 end)
 
 
