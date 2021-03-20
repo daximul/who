@@ -703,7 +703,28 @@ function addcmd(name,alias,func,plgn)
 		}
 end
 
+function removecmd2(cmd)
+	if cmd ~= " " then
+		for i = #cmds,1,-1 do
+			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
+				table.remove(cmds, i)
+				for a,c in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
+					if string.find(c.Text, "^"..cmd.."$") or string.find(c.Text, "^"..cmd.." ") or string.find(c.Text, " "..cmd.."$") or string.find(c.Text, " "..cmd.." ") then
+						c.TextTransparency = 0.7
+						c.MouseButton1Click:Connect(function()
+							notify(c.Text, "Disabled by you or a plugin")
+						end)
+					end
+				end
+			end
+		end
+	end
+end
+
 function removecmd(cmd)
+	spawn(function()
+		removecmd2(cmd)
+	end)
 	if cmd ~= " " then
 		for i = #cmds,1,-1 do
 			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
@@ -1162,7 +1183,28 @@ local function Search()
 		end
 	end
 end
+local function Search2()
+	local InputText = DaUi.CmdSearch.Box.Text
+	for _,button in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren())do
+		if button:IsA("TextButton") then
+			local chunks = {}
+			if InputText:sub(#InputText,#InputText) == "\\" then InputText = "" end
+			for w in string.gmatch(InputText, "[^\\]+") do
+				table.insert(chunks, w)
+			end
+			if #chunks > 0 then InputText = chunks[#chunks] end
+			if Match(button.Label.Text, InputText) then
+				button.Visible = true
+			else
+				button.Visible = false
+			end
+		end
+	end
+end
 Cmdbar.Changed:Connect(Search)
+DaUi.CmdSearch.Box:GetPropertyChangedSignal("Text"):Connect(function()
+	Search2()
+end)
 CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
 CMDsF.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
@@ -1179,6 +1221,44 @@ DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsAr
 DaUi.JoinLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
+DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+DaUi.CmdArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+end)
+
+function addcmdareatext(name,cmdname,alias,desc,plug)
+	local nametextlabel = string.lower(name)
+	local cmdNamePicked = nil
+	if plug ~= nil then
+		cmdNamePicked = ("PLUGIN_" .. name)
+	else
+		cmdNamePicked = ("CMD_" .. name)
+	end
+	local CommandFrame = Assets.CmdFrame:Clone()
+	local NewCommand = Assets.CmdAreaLabel:Clone()
+	CommandFrame.Parent = DaUi.CmdFrames
+	NewCommand.Parent = DaUi.CmdArea.ScrollingFrame
+	CommandFrame.Name = cmdNamePicked
+	NewCommand.Name = cmdNamePicked
+	NewCommand.Visible = true
+	NewCommand.Label.Text = tostring(cmdname)
+	CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
+	CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
+	CommandFrame.Desc.Text = ("Description: " .. desc)
+	NewCommand.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
+		CommandFrame.Visible = true
+		DaUi.GoBack.Visible = true
+		DaUi.SettingsArea.Visible = false
+		DaUi.ChatLogsArea.Visible = false
+		DaUi.JoinLogsArea.Visible = false
+		DaUi.CmdArea.Visible = false
+		DaUi.CmdSearch.Visible = false
+		DaUi.searchicon.Visible = false
+	end)
+end
 
 function addcmdtext(text,name,desc,plug)
 	local newcommand = Assets.CommandTemplate:Clone()
@@ -1357,6 +1437,22 @@ function deletePlugin(name)
 			v:Destroy()
 		end
 	end
+	for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+		if v.Name == 'PLUGIN_'..name then
+			v:Destroy()
+		end
+		if v.Name == 'PLUGIN_'..pName then
+			v:Destroy()
+		end
+	end
+	for i,v in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
+		if v.Name == 'PLUGIN_'..name then
+			v:Destroy()
+		end
+		if v.Name == 'PLUGIN_'..pName then
+			v:Destroy()
+		end
+	end
 	for i,v in pairs(Settings.PluginsTable) do
 		if v == pName then
 			table.remove(Settings.PluginsTable, i)
@@ -1426,8 +1522,10 @@ function LoadPlugin(val,startup)
 					newName = newName:gsub(v,v..cmdExt)
 				end
 				addcmdtext(newName,val,v["Description"],true)
+				addcmdareatext(cmdName, newName, v["Aliases"], v["Description"], true)
 			else
 				addcmdtext(cmdName,val,v["Description"],true)
+				addcmdareatext(cmdName, cmdName, v["Aliases"], v["Description"], true)
 			end
 		end
 		IndexContents('')
@@ -1986,6 +2084,7 @@ end)
 
 local newCmd = function(name, aliases, title, description, func)
 	addcmdtext(title, name, description)
+	addcmdareatext(name, title, aliases, description)
 
 	local id = #cmds + 1
 
@@ -1999,7 +2098,7 @@ end
 --// Setup Admin & Ui & Plugin Browser
 pcall(function()
 	Startup()
-	ParentGui(GUI)
+	OldParentGui(GUI)
 	SmoothDrag(CommandsGui)
 	SmoothDrag(PluginBrowser)
 	SmoothDrag(DaUi)
@@ -2016,23 +2115,68 @@ pcall(function()
 			PluginBrowser.Area.Visible = true
 		end
 	end)
+	DaUi.GoBack.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
+		DaUi.SettingsArea.Visible = false
+		DaUi.ChatLogsArea.Visible = false
+		DaUi.JoinLogsArea.Visible = false
+		DaUi.GoBack.Visible = false
+		DaUi.CmdArea.Visible = true
+		DaUi.CmdSearch.Visible = true
+		DaUi.searchicon.Visible = true
+	end)
 	DaUi.Close.MouseButton1Down:Connect(function()
 		DaUiStatus(false)
 	end)
 	DaUi.SettingsBtn.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
 		DaUi.SettingsArea.Visible = true
+		DaUi.GoBack.Visible = false
+		DaUi.CmdArea.Visible = false
+		DaUi.CmdSearch.Visible = false
+		DaUi.searchicon.Visible = false
 		DaUi.ChatLogsArea.Visible = false
 		DaUi.JoinLogsArea.Visible = false
 	end)
 	DaUi.ChatLogsBtn.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
 		DaUi.SettingsArea.Visible = false
-		DaUi.ChatLogsArea.Visible = true
+		DaUi.GoBack.Visible = false
+		DaUi.CmdArea.Visible = false
+		DaUi.CmdSearch.Visible = false
+		DaUi.searchicon.Visible = false
 		DaUi.JoinLogsArea.Visible = false
+		DaUi.ChatLogsArea.Visible = true
 	end)
 	DaUi.JoinLogsBtn.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
 		DaUi.SettingsArea.Visible = false
+		DaUi.GoBack.Visible = false
 		DaUi.ChatLogsArea.Visible = false
+		DaUi.CmdArea.Visible = false
+		DaUi.CmdSearch.Visible = false
+		DaUi.searchicon.Visible = false
 		DaUi.JoinLogsArea.Visible = true
+	end)
+	DaUi.CmdsBtn.MouseButton1Down:Connect(function()
+		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
+			v.Visible = false
+		end
+		DaUi.SettingsArea.Visible = false
+		DaUi.GoBack.Visible = false
+		DaUi.ChatLogsArea.Visible = false
+		DaUi.JoinLogsArea.Visible = false
+		DaUi.CmdArea.Visible = true
+		DaUi.CmdSearch.Visible = true
+		DaUi.searchicon.Visible = true
 	end)
 	DaUi.SettingsArea.SaveChatLogs.MouseButton1Down:Connect(function()
 		if writefileExploit() then
