@@ -2304,6 +2304,8 @@ spawn(function()
 	BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
 	BrowserBtn("Chat Spy", "Chat Spy", "Spy on Messages in Chat", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chatspy.lua'))();")
 	BrowserBtn("System Chat", "System Chat", "Fake your Chat as System\n\n{System} Your mom has joined the game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/systemchat.lua'))();")
+	BrowserBtn("Lag Server", "Lag Server", "Lag the Server. You will lag for 6 seconds before it works.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/lagserver.lua'))();")
+	BrowserBtn("Chat Translator", "Chat Translator", "Translate Chat and Reply\n\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-1_codes\n\nYou have to look the 639-1 column to get a language", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chattranslator.lua'))();")
 end)
 --// End of Setup
 
