@@ -3372,13 +3372,13 @@ newCmd("scriptusers", {}, "scriptusers", "See who else is using DA", function(ar
 end)
 
 newCmd("flashback", {}, "flashback", "Go back to where you last died", function(args, speaker)
-	spawn(function()
-		if LastDeathPos ~= nil then
+	if LastDeathPos ~= nil then
+		if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
 			speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
-			wait(0.01)
-			getRoot(speaker.Character).CFrame = LastDeathPos
+			wait(.1)
 		end
-	end)
+		getRoot(speaker.Character).CFrame = LastDeathPos
+	end
 end)
 
 newCmd("dupetools", {}, "dupetools [number]", "Duplicate tools in your inventory", function(args, speaker)
@@ -3927,6 +3927,49 @@ newCmd("noroot", {}, "noroot", "Removes your characters HumanoidRootPart", funct
 		char.Parent = nil
 		char.HumanoidRootPart:Destroy()
 		char.Parent = workspace
+	end
+end)
+
+newCmd("boostfps", {}, "boostfps", "Lowers game quality to boost FPS", function(args, speaker)
+	workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
+	workspace:FindFirstChildOfClass("Terrain").WaterWaveSpeed = 0
+	workspace:FindFirstChildOfClass("Terrain").WaterReflectance = 0
+	workspace:FindFirstChildOfClass("Terrain").WaterTransparency = 0
+	game:GetService("Lighting").GlobalShadows = false
+	game:GetService("Lighting").FogEnd = 9e9
+	settings().Rendering.QualityLevel = 1
+	for i,v in pairs(game:GetDescendants()) do
+		if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+			v.Material = "Plastic"
+			v.Reflectance = 0
+		elseif v:IsA("Decal") then
+			v.Transparency = 1
+		elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+			v.Lifetime = NumberRange.new(0)
+		elseif v:IsA("Explosion") then
+			v.BlastPressure = 1
+			v.BlastRadius = 1
+		end
+	end
+	for i,v in pairs(game:GetService("Lighting"):GetDescendants()) do
+		if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+			v.Enabled = false
+		end
+	end
+end)
+
+newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args, speaker)
+	if setfpscap and type(setfpscap) == "function" then
+		local num = args[1] or 1e6
+		if num == 'none' then
+			return setfpscap(1e6)
+		elseif num > 0 then
+			return setfpscap(num)
+		else
+			return notify("Invalid argument", "Please provide a number above 0 or 'none'.")
+		end
+	else
+		return notify("Incompatible Exploit", "Missing setfpscap")
 	end
 end)
 
