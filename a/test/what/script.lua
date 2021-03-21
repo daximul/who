@@ -1242,14 +1242,8 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 	NewCommand.Visible = true
 	NewCommand.Label.Text = tostring(cmdname)
 	NewCommand.MouseButton1Down:Connect(function()
-		if alias == {} then
-			CommandFrame.Alias.Text = ("Aliases: (NONE)")
-		elseif alias == "" then
-			CommandFrame.Alias.Text = ("Aliases: (NONE)")
-		else
-			CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
-		end
 		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
+		CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
 		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
 		DaUi.GoBack.Visible = true
@@ -2440,6 +2434,7 @@ newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 		end
 	end
 	Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoop)
+	if args[1] and args[1] == "nonotify" then return end
 	notify("Noclip", "Noclip Enabled")
 end)
 
@@ -2448,6 +2443,7 @@ newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop noclipping", function(args
 		Noclipping:Disconnect()
 	end
 	Clip = true
+	if args[1] and args[1] == "nonotify" then return end
 	notify("Noclip", "Noclip Disabled")
 end)
 
