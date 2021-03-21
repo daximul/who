@@ -67,6 +67,7 @@ local Old_Net_Method = true
 local DEBUG = false
 local Original_User_Id = Players.LocalPlayer.UserId
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
+local origsettings = {abt = game:GetService("Lighting").Ambient, oabt = game:GetService("Lighting").OutdoorAmbient, brt = game:GetService("Lighting").Brightness, time = game:GetService("Lighting").ClockTime, fe = game:GetService("Lighting").FogEnd, fs = game:GetService("Lighting").FogStart, gs = game:GetService("Lighting").GlobalShadows}
 
 function randomString()
 	local length = math.random(10,20)
@@ -1241,8 +1242,14 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 	NewCommand.Visible = true
 	NewCommand.Label.Text = tostring(cmdname)
 	NewCommand.MouseButton1Down:Connect(function()
+		if alias == {} then
+			CommandFrame.Alias.Text = ("Aliases: (NONE)")
+		elseif alias == "" then
+			CommandFrame.Alias.Text = ("Aliases: (NONE)")
+		else
+			CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
+		end
 		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
-		CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
 		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
 		DaUi.GoBack.Visible = true
@@ -3856,6 +3863,72 @@ newCmd("fastteleport", {"fasttp"}, "fastteleport / fasttp [plr] [plr] (Tool)", "
 			end
 			teleport(speaker, Players[v], Players[players2[1]], true)
 		end
+	end
+end)
+
+newCmd("fullbright", {"fb"}, "fullbright / fb", "Makes the map brighter / more visible", function(args, speaker)
+	game:GetService("Lighting").Brightness = 2
+	game:GetService("Lighting").ClockTime = 14
+	game:GetService("Lighting").FogEnd = 100000
+	game:GetService("Lighting").GlobalShadows = false
+	game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end)
+
+newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting properties", function(args, speaker)
+	game:GetService("Lighting").Ambient = origsettings.abt
+	game:GetService("Lighting").OutdoorAmbient = origsettings.oabt
+	game:GetService("Lighting").Brightness = origsettings.brt
+	game:GetService("Lighting").ClockTime = origsettings.time
+	game:GetService("Lighting").FogEnd = origsettings.fe
+	game:GetService("Lighting").FogStart = origsettings.fs
+	game:GetService("Lighting").GlobalShadows = origsettings.gs
+end)
+
+newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for players heads (default is 1)", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		if Players[v] ~= speaker and Players[v].Character:FindFirstChild("Head") then
+			local sizeArg = tonumber(args[2])
+			local Size = Vector3.new(sizeArg, sizeArg, sizeArg)
+			local Head = Players[v].Character:FindFirstChild("Head")
+			if Head:IsA("BasePart") then
+				if not args[2] or sizeArg == 1 then
+					Head.Size = Vector3.new(2, 1, 1)
+				else
+					Head.Size = Size
+				end
+			end
+		end
+	end
+end)
+
+newCmd("god", {}, "god", "Makes your character difficult to kill in most games", function(args, speaker)
+	local Cam = workspace.CurrentCamera
+	local Pos, Char = Cam.CFrame, speaker.Character
+	local Human = Char and Char.FindFirstChildWhichIsA(Char, "Humanoid")
+	local nHuman = Human.Clone(Human)
+	nHuman.Parent, speaker.Character = Char, nil
+	nHuman.SetStateEnabled(nHuman, 15, false)
+	nHuman.SetStateEnabled(nHuman, 1, false)
+	nHuman.SetStateEnabled(nHuman, 0, false)
+	nHuman.BreakJointsOnDeath, Human = true, Human.Destroy(Human)
+	speaker.Character, Cam.CameraSubject, Cam.CFrame = Char, nHuman, wait() and Pos
+	nHuman.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	local Script = Char.FindFirstChild(Char, "Animate")
+	if Script then
+		Script.Disabled = true
+		wait()
+		Script.Disabled = false
+	end
+	nHuman.Health = nHuman.MaxHealth
+end)
+
+newCmd("noroot", {}, "noroot", "Removes your characters HumanoidRootPart", function(args, speaker)
+	if speaker.Character ~= nil then
+		local char = Players.LocalPlayer.Character
+		char.Parent = nil
+		char.HumanoidRootPart:Destroy()
+		char.Parent = workspace
 	end
 end)
 
