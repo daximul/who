@@ -1254,6 +1254,11 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 		DaUi.CmdSearch.Visible = false
 		DaUi.searchicon.Visible = false
 	end)
+	NewCommand.paste.MouseButton1Click:Connect(function()
+		CaptureCmdBar()
+		wait()
+		autoComplete(NewCommand.Label.Text)
+	end)
 end
 
 function addcmdtext(text,name,desc,plug)
