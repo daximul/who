@@ -3864,12 +3864,44 @@ newCmd("fastteleport", {"fasttp"}, "fastteleport / fasttp [plr] [plr] (Tool)", "
 	end
 end)
 
-newCmd("fullbright", {"fb"}, "fullbright / fb", "Makes the map brighter / more visible", function(args, speaker)
+newCmd("fullbright", {"fb"}, "fullbright / fb (Client)", "Makes the map brighter / more visible", function(args, speaker)
 	game:GetService("Lighting").Brightness = 2
 	game:GetService("Lighting").ClockTime = 14
 	game:GetService("Lighting").FogEnd = 100000
 	game:GetService("Lighting").GlobalShadows = false
 	game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end)
+
+newCmd("loopfullbright", {"loopfb"}, "loopfullbright / loopfb", "Makes the map brighter / more visible but looped", function(args, speaker)
+	if brightLoop then
+		brightLoop:Disconnect()
+	end
+	local function brightFunc()
+		game:GetService("Lighting").Brightness = 2
+		game:GetService("Lighting").ClockTime = 14
+		game:GetService("Lighting").FogEnd = 100000
+		game:GetService("Lighting").GlobalShadows = false
+		game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+	end
+	brightLoop = game:GetService("RunService").RenderStepped:Connect(brightFunc)
+end)
+
+newCmd("unloopfullbright", {"unfb"}, "unloopfullbright / unloopfb", "Disable Loop Full Bright", function(args, speaker)
+	if brightLoop then
+		brightLoop:Disconnect()
+	end
+end)
+
+newCmd("day", {}, "day (Client)", "Changes the time to day for the client", function(args, speaker)
+	game:GetService("Lighting").ClockTime = 14
+end)
+
+newCmd("night", {}, "night (Client)", "Changes the time to night for the client", function(args, speaker)
+	game:GetService("Lighting").ClockTime = 0
+end)
+
+newCmd("nofog", {}, "nofog (Client)", "Removes fog", function(args, speaker)
+	game:GetService("Lighting").FogEnd = 100000
 end)
 
 newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting properties", function(args, speaker)
