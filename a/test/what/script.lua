@@ -83,6 +83,7 @@ end
 local currentToolSize = ""
 local currentGripPos = ""
 local cmdinfjump = false
+local LastDeathPos = nil
 local spawnpoint = false
 local spDelay = 0.1
 local cmdautorj = false
@@ -95,7 +96,6 @@ swimming = false
 floatName = randomString()
 QEfly = true
 invisRunning = false
-LastDeathPos = nil
 
 --// End of Command Variables
 
@@ -3161,7 +3161,7 @@ newCmd("noprompts", {}, "noprompts", "Stop receiving purchase prompts", function
 	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
 end)
 
-newCmd("showprompts", {}, "showpromots", "Receive purchase prompts again", function(args, speaker)
+newCmd("showprompts", {}, "showprompts", "Receive purchase prompts again", function(args, speaker)
 	CoreGui.PurchasePromptApp.PurchasePromptUI.Visible = true
 	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
 end)
