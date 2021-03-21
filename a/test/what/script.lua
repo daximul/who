@@ -1234,21 +1234,16 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 	else
 		cmdNamePicked = ("CMD_" .. name)
 	end
-	local CommandFrame = Assets.CmdFrame:Clone()
+	local CommandFrame = DaUi.CmdFrames.CmdFrame
 	local NewCommand = Assets.CmdAreaLabel:Clone()
-	CommandFrame.Parent = DaUi.CmdFrames
 	NewCommand.Parent = DaUi.CmdArea.ScrollingFrame
-	CommandFrame.Name = cmdNamePicked
 	NewCommand.Name = cmdNamePicked
 	NewCommand.Visible = true
 	NewCommand.Label.Text = tostring(cmdname)
-	CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
-	CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
-	CommandFrame.Desc.Text = ("Description: " .. desc)
 	NewCommand.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
+		CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
+		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
 		DaUi.GoBack.Visible = true
 		DaUi.SettingsArea.Visible = false
@@ -1433,14 +1428,6 @@ function deletePlugin(name)
 		end
 	end
 	for i,v in pairs(CMDsF:GetChildren()) do
-		if v.Name == 'PLUGIN_'..pName then
-			v:Destroy()
-		end
-	end
-	for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-		if v.Name == 'PLUGIN_'..name then
-			v:Destroy()
-		end
 		if v.Name == 'PLUGIN_'..pName then
 			v:Destroy()
 		end
@@ -2116,9 +2103,7 @@ pcall(function()
 		end
 	end)
 	DaUi.GoBack.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = false
 		DaUi.ChatLogsArea.Visible = false
 		DaUi.JoinLogsArea.Visible = false
@@ -2131,9 +2116,7 @@ pcall(function()
 		DaUiStatus(false)
 	end)
 	DaUi.SettingsBtn.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = true
 		DaUi.GoBack.Visible = false
 		DaUi.CmdArea.Visible = false
@@ -2143,9 +2126,7 @@ pcall(function()
 		DaUi.JoinLogsArea.Visible = false
 	end)
 	DaUi.ChatLogsBtn.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = false
 		DaUi.GoBack.Visible = false
 		DaUi.CmdArea.Visible = false
@@ -2155,9 +2136,7 @@ pcall(function()
 		DaUi.ChatLogsArea.Visible = true
 	end)
 	DaUi.JoinLogsBtn.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = false
 		DaUi.GoBack.Visible = false
 		DaUi.ChatLogsArea.Visible = false
@@ -2167,9 +2146,7 @@ pcall(function()
 		DaUi.JoinLogsArea.Visible = true
 	end)
 	DaUi.CmdsBtn.MouseButton1Down:Connect(function()
-		for i,v in pairs(DaUi.CmdFrames:GetChildren()) do
-			v.Visible = false
-		end
+		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = false
 		DaUi.GoBack.Visible = false
 		DaUi.ChatLogsArea.Visible = false
