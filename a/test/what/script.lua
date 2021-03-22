@@ -4010,6 +4010,40 @@ newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args,
 	end
 end)
 
+newCmd("tpposition", {"tppos"}, "tpposition / tppos [X] [Y] [Z]", "Teleports you to certain coordinates", function(args, speaker)
+	if #args < 3 then return end
+	local tpX,tpY,tpZ = tonumber(args[1]),tonumber(args[2]),tonumber(args[3])
+	local char = speaker.Character
+	if char and getRoot(char) then
+		getRoot(char).CFrame = CFrame.new(tpX, tpY, tpZ)
+	end
+end)
+
+newCmd("tweentpposition", {"ttppos"}, "tweentpposition / ttppos [X] [Y] [Z]", "Tween to coordinates (bypasses some anti cheats)", function(args, speaker)
+	if #args < 3 then return end
+	local tpX,tpY,tpZ = tonumber(args[1]),tonumber(args[2]),tonumber(args[3])
+	local char = speaker.Character
+	if char and getRoot(char) then
+		game:GetService("TweenService"):Create(getRoot(speaker.Character), TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear), {CFrame = CFrame.new(tpX, tpY, tpZ)}):Play()
+	end
+end)
+
+newCmd("chat", {"say"}, "chat / say [text]", "Makes you chat a string (possible mute bypass)", function(args, speaker)
+	local cString = getstring(1)
+	game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(cString, "All")
+end)
+
+newCmd("whisper", {"pm"}, "whisper / pm [plr] [text]", "Makes you whisper a string to someone (possible mute bypass)", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		spawn(function()
+			local plrName = Players[v].Name
+			local pmstring = getstring(2)
+			game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w " .. plrName .. " " .. pmstring, "All")
+		end)
+	end
+end)
+
 
 
 
