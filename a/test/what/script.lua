@@ -84,6 +84,7 @@ local currentToolSize = ""
 local currentGripPos = ""
 local cmdinfjump = false
 local LastDeathPos = nil
+local spawnpos = nil
 local spawnpoint = false
 local spDelay = 0.1
 local cmdautorj = false
@@ -120,20 +121,11 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 end)
 
-local function onDiedLastDeath()
-	spawn(function()
-		if pcall(function() Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") end) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-			Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-				if getRoot(Players.LocalPlayer.Character) then
-					LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
-				end
-			end)
-		else
-			wait(2)
-			onDiedLastDeath()
-		end
-	end)
-end
+Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+	if getRoot(Players.LocalPlayer.Character) then
+		LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
+	end
+end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
 	NOFLY()
@@ -152,7 +144,11 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 		end
 	end)
 	
-	onDiedLastDeath()
+	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+		if getRoot(Players.LocalPlayer.Character) then
+			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
+		end
+	end)
 end)
 
 PromptOverlay.DescendantAdded:Connect(function(Overlay)
