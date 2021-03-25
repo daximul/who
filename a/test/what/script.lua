@@ -56,7 +56,8 @@ local Settings = {
 	PluginsTable = {},
 	ChatLogs = false,
 	JoinLogs = false,
-	KeepDA = false
+	KeepDA = false,
+	AutoNet = true,
 }
 
 local Cmdbar = Main.Box
@@ -1334,6 +1335,7 @@ function saves()
 					if json.ChatLogs ~= nil then Settings.ChatLogs = json.ChatLogs else Settings.ChatLogs = false end
 					if json.JoinLogs ~= nil then Settings.JoinLogs = json.JoinLogs else Settings.JoinLogs = false end
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
+					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = true end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1361,6 +1363,7 @@ function saves()
 				Settings.ChatLogs = false
 				Settings.JoinLogs = false
 				Settings.KeepDA = false
+				Settings.AutoNet = true
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
@@ -1373,6 +1376,7 @@ function saves()
 		Settings.ChatLogs = false
 		Settings.JoinLogs = false
 		Settings.KeepDA = false
+		Settings.AutoNet = true
 	end
 end
 
@@ -1388,6 +1392,7 @@ function updatesaves()
 			ChatLogs = Settings.ChatLogs;
 			JoinLogs = Settings.JoinLogs;
 			KeepDA = Settings.KeepDA;
+			AutoNet = Settings.AutoNet;
 		}
 		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
 	end
@@ -2378,6 +2383,18 @@ end)
 newCmd("synnet", {}, "synnet [Unstable]", "Unstable But Good Net", function(args, speaker)
 	notify("", "Simradius set to Syn")
 	Import("cl_net.lua")
+end)
+
+newCmd("autoloadnet", {}, "autoloadnet", "Load Full Network Ownership Upon Execute", function(args, speaker)
+	Settings.AutoNet = true
+	updatesaves()
+	notify("Auto Net", "Enabled")
+end)
+
+newCmd("unautoloadnet", {}, "unautoloadnet", "Disable Load Full Network Ownership Upon Execute", function(args, speaker)
+	Settings.AutoNet = false
+	updatesaves()
+	notify("Auto Net", "Disabled")
 end)
 
 newCmd("netcheck", {}, "netcheck", "Notify who is using Network Ownership", function(args, speaker)
@@ -4049,7 +4066,9 @@ end)
 if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
 	FindPlugins(Settings.PluginsTable)
 end
+if Settings.AutoNet then
+	SetSimulationRadius()
+end
 wait()
-SetSimulationRadius()
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
