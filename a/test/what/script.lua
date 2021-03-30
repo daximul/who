@@ -301,11 +301,11 @@ function SmoothDrag(frame)
 			end)
 			local leave;
 			leave = frame.MouseLeave:connect(function()
-			input:disconnect();
-			leave:disconnect();
+				input:disconnect();
+				leave:disconnect();
+			end)
 		end)
-	end)
-end
+	end
 end
 
 local function OldParentGui(Gui)
