@@ -1,5 +1,5 @@
 local Plugin = {
-	["PluginName"] = "Swear by ASTP",
+	["PluginName"] = "Swear",
 	["PluginDescription"] = "",
 	["Commands"] = {
 		["swear"] = {
