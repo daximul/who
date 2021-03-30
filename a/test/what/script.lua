@@ -3197,18 +3197,15 @@ newCmd("deletehats", {"nohats"}, "deletehats / nohats", "Delete your Hats", func
 end)
 
 newCmd("droptools", {}, "droptools", "Drop your Tools", function(args, speaker)
-	if speaker and speaker.Character then
-		for _,obj in pairs(speaker.Character:GetChildren()) do
-			if obj:IsA("Tool") then
-				obj.Parent = workspace
-			end
+	for i,v in pairs(Players.LocalPlayer.Backpack:GetChildren()) do
+		if v:IsA("Tool") then
+			v.Parent = Players.LocalPlayer.Character
 		end
 	end
-	if speaker and speaker:FindFirstChildOfClass("Backpack") then
-		for _,obj in pairs(speaker:FindFirstChildOfClass("Backpack"):GetChildren()) do
-			if obj:IsA("Tool") then
-				obj.Parent = workspace
-			end
+	wait()
+	for i,v in pairs(Players.LocalPlayer.Character:GetChildren()) do
+		if v:IsA("Tool") then
+			v.Parent = workspace
 		end
 	end
 end)
@@ -4058,6 +4055,34 @@ newCmd("whisper", {"pm"}, "whisper / pm [plr] [text]", "Makes you whisper a stri
 			game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w " .. plrName .. " " .. pmstring, "All")
 		end)
 	end
+end)
+
+newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows camera to go through objects like walls", function(args, speaker)
+	local sc = (debug and debug.setconstant) or setconstant
+	local gc = (debug and debug.getconstants) or getconstants
+	if not sc or not getgc or not gc then
+		return notify("Incompatible Exploit", "Missing setconstant or getconstants or getgc")
+	end
+	local pop = speaker.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper
+	for _, v in pairs(getgc()) do
+		if type(v) == "function" and getfenv(v).script == pop then
+			for i, v1 in pairs(gc(v)) do
+				if tonumber(v1) == .25 then
+					sc(v, i, 0)
+				elseif tonumber(v1) == 0 then
+					sc(v, i, .25)
+				end
+			end
+		end
+	end
+end)
+
+newCmd("maxzoom", {}, "maxzoom [number]", "Maximum camera zoom", function(args, speaker)
+	speaker.CameraMaxZoomDistance = args[1]
+end)
+
+newCmd("minzoom", {}, "minzoom [number]", "Minimum camera zoom", function(args, speaker)
+	speaker.CameraMinZoomDistance = args[1]
 end)
 
 
