@@ -66,9 +66,21 @@ local customAlias = {}
 local Network_Loop = nil
 local Old_Net_Method = true
 local DEBUG = false
-local Original_User_Id = Players.LocalPlayer.UserId
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
-local origsettings = {abt = game:GetService("Lighting").Ambient, oabt = game:GetService("Lighting").OutdoorAmbient, brt = game:GetService("Lighting").Brightness, time = game:GetService("Lighting").ClockTime, fe = game:GetService("Lighting").FogEnd, fs = game:GetService("Lighting").FogStart, gs = game:GetService("Lighting").GlobalShadows}
+local origsettings = {
+	Lighting = {
+		abt = game:GetService("Lighting").Ambient,
+		oabt = game:GetService("Lighting").OutdoorAmbient,
+		brt = game:GetService("Lighting").Brightness,
+		time = game:GetService("Lighting").ClockTime,
+		fe = game:GetService("Lighting").FogEnd,
+		fs = game:GetService("Lighting").FogStart,
+		gs = game:GetService("Lighting").GlobalShadows
+	},
+	Player = {
+		Id = Players.LocalPlayer.UserId
+	}
+}
 
 function randomString()
 	local length = math.random(10,20)
@@ -282,7 +294,7 @@ end
 
 local inputService = game:GetService("UserInputService")
 local heartbeat = game:GetService("RunService").Heartbeat
-function SmoothDrag(frame)
+local function SmoothDrag(frame)
 	local s, event = pcall(function()
 		return frame.MouseEnter
 	end)
@@ -342,7 +354,7 @@ function CaptureCmdBar()
 	end)
 end
 
-local function tools(plr)
+function tools(plr)
 	if plr:FindFirstChildOfClass("Backpack"):FindFirstChildOfClass("Tool") or plr.Character:FindFirstChildOfClass("Tool") then
 		return true
 	else
@@ -495,7 +507,6 @@ function checkTT()
 			local yP
 			if DAMouse.X > 200 then
 				xP = x - -3
-				-- used to be x - 1
 			else
 				xP = x + 5
 			end
@@ -548,7 +559,7 @@ function r15(speaker)
 	end
 end
 
-local function toClipboard(String) local clipBoard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set); if clipBoard then clipBoard(String); notify("", "Copied to clipboard"); else notify("", "Can't use clipboard, printed instead"); print("[Dark Admin]: " .. String) end end
+function toClipboard(String) local clipBoard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set); if clipBoard then clipBoard(String); notify("", "Copied to clipboard"); else notify("", "Can't use clipboard, printed instead"); print("[Dark Admin]: " .. String) end end
 
 function GetInTable(Table, Name)
 	for i = 1, #Table do
@@ -701,7 +712,7 @@ function addcmd(name,alias,func,plgn)
 		}
 end
 
-function removecmd2(cmd)
+local function removecmd_cmdarea(cmd)
 	if cmd ~= " " then
 		for i = #cmds,1,-1 do
 			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
@@ -721,7 +732,7 @@ end
 
 function removecmd(cmd)
 	spawn(function()
-		removecmd2(cmd)
+		removecmd_cmdarea(cmd)
 	end)
 	if cmd ~= " " then
 		for i = #cmds,1,-1 do
@@ -737,6 +748,27 @@ function removecmd(cmd)
 				end
 			end
 		end
+	end
+end
+
+function replacecmd(cmd, func)
+	if cmd ~= " " then
+		if type(func) == "function" then
+			cmd = string.lower(cmd)
+			for i = #cmds,1,-1 do
+				if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
+					cmds[i].FUNC = func
+				end
+			end
+		end
+	end
+end
+
+function gethum(ch)
+	if ch ~= nil then
+		return ch:FindFirstChildOfClass("Humanoid")
+	else
+		return Players.LocalPlayer:FindFirstChildOfClass("Humanoid")
 	end
 end
 
@@ -3238,7 +3270,7 @@ newCmd("setcreatorid", {}, "setcreatorid", "Set your User ID to the Creator's Us
 end)
 
 newCmd("resetuserid", {}, "resetuserid", "Set your User ID back to normal", function(args, speaker)
-	speaker.UserId = Original_User_Id
+	speaker.UserId = origsettings.Player.Id
 	notify("Set ID", "Set UserId to original")
 end)
 
@@ -3922,13 +3954,13 @@ newCmd("nofog", {}, "nofog (Client)", "Removes fog", function(args, speaker)
 end)
 
 newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting properties", function(args, speaker)
-	game:GetService("Lighting").Ambient = origsettings.abt
-	game:GetService("Lighting").OutdoorAmbient = origsettings.oabt
-	game:GetService("Lighting").Brightness = origsettings.brt
-	game:GetService("Lighting").ClockTime = origsettings.time
-	game:GetService("Lighting").FogEnd = origsettings.fe
-	game:GetService("Lighting").FogStart = origsettings.fs
-	game:GetService("Lighting").GlobalShadows = origsettings.gs
+	game:GetService("Lighting").Ambient = origsettings.Lighting.abt
+	game:GetService("Lighting").OutdoorAmbient = origsettings.Lighting.oabt
+	game:GetService("Lighting").Brightness = origsettings.Lighting.brt
+	game:GetService("Lighting").ClockTime = origsettings.Lighting.time
+	game:GetService("Lighting").FogEnd = origsettings.Lighting.fe
+	game:GetService("Lighting").FogStart = origsettings.Lighting.fs
+	game:GetService("Lighting").GlobalShadows = origsettings.Lighting.gs
 end)
 
 newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for players heads (default is 1)", function(args, speaker)
