@@ -136,7 +136,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 end)
 
-Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+gethum().Died:Connect(function()
 	if getRoot(Players.LocalPlayer.Character) then
 		LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 	end
@@ -159,7 +159,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 		end
 	end)
 	
-	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+	gethum().Died:Connect(function()
 		if getRoot(Players.LocalPlayer.Character) then
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
