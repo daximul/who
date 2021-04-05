@@ -80,8 +80,8 @@ local origsettings = {
 	},
 	Player = {
 		Id = Players.LocalPlayer.UserId,
-		Ws = Players.LocalPlayer.Character:FindFirstChild("Humanoid").WalkSpeed,
-		Jp = Players.LocalPlayer.Character:FindFirstChild("Humanoid").JumpPower,
+		Ws = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed,
+		Jp = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower,
 	},
 }
 
