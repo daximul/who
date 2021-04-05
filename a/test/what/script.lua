@@ -75,11 +75,11 @@ local origsettings = {
 		time = game:GetService("Lighting").ClockTime,
 		fe = game:GetService("Lighting").FogEnd,
 		fs = game:GetService("Lighting").FogStart,
-		gs = game:GetService("Lighting").GlobalShadows
+		gs = game:GetService("Lighting").GlobalShadows,
 	},
 	Player = {
-		Id = Players.LocalPlayer.UserId
-	}
+		Id = Players.LocalPlayer.UserId,
+	},
 }
 
 function randomString()
