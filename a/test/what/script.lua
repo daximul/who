@@ -58,6 +58,7 @@ local Settings = {
 	JoinLogs = false,
 	KeepDA = false,
 	AutoNet = true,
+	cmdautorj = false,
 }
 
 local Cmdbar = Main.Box
@@ -100,7 +101,6 @@ local LastDeathPos = nil
 local spawnpos = nil
 local spawnpoint = false
 local spDelay = 0.1
-local cmdautorj = false
 FLYING = false
 viewing = nil
 fcRunning = false
@@ -1368,6 +1368,7 @@ function saves()
 					if json.JoinLogs ~= nil then Settings.JoinLogs = json.JoinLogs else Settings.JoinLogs = false end
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
 					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = true end
+					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1396,6 +1397,7 @@ function saves()
 				Settings.JoinLogs = false
 				Settings.KeepDA = false
 				Settings.AutoNet = true
+				Settings.cmdautorj = false
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
@@ -1409,6 +1411,7 @@ function saves()
 		Settings.JoinLogs = false
 		Settings.KeepDA = false
 		Settings.AutoNet = true
+		Settings.cmdautorj = false
 	end
 end
 
@@ -1425,6 +1428,7 @@ function updatesaves()
 			JoinLogs = Settings.JoinLogs;
 			KeepDA = Settings.KeepDA;
 			AutoNet = Settings.AutoNet;
+			cmdautorj = Settings.cmdautorj;
 		}
 		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
 	end
@@ -3876,12 +3880,14 @@ newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)",
 end)
 
 newCmd("autorejoin", {"autorj"}, "autorejoin / autorj", "Automatically rejoins the server if you get kicked/disconnected", function(args, speaker)
-	cmdautorj = true
+	Settings.cmdautorj = true
+	updatesaves()
 	notify("Auto Rejoin", "Enabled")
 end)
 
 newCmd("unautorejoin", {"unautorj"}, "unautorejoin / unautorj", "Disable Auto Rejoin", function(args, speaker)
-	cmdautorj = false
+	Settings.cmdautorj = false
+	updatesaves()
 	notify("Auto Rejoin", "Disabled")
 end)
 
