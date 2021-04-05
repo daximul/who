@@ -768,7 +768,7 @@ function gethum(ch)
 	if ch ~= nil then
 		return ch:FindFirstChildOfClass("Humanoid")
 	else
-		return Players.LocalPlayer:FindFirstChildOfClass("Humanoid")
+		return Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 	end
 end
 
