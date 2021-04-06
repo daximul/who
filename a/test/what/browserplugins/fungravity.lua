@@ -26,8 +26,8 @@ local function SelectedPartsCheck()
 end
 
 local Plugin = {
-	["PluginName"] = "Have fun with gravity",
-	["PluginDescription"] = "Have fun with unanchored parts and the gravity",
+	["PluginName"] = "Fun with Gravity",
+	["PluginDescription"] = "",
 	["Commands"] = {
 		["nogravparts"] = {
 			["ListName"] = "nogravparts" ,
