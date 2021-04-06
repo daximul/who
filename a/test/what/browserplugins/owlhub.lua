@@ -7,7 +7,7 @@ local Plugin = {
 			["Description"] = "Load Owl Hub",
 			["Aliases"] = {},
 			["Function"] = function(args,speaker)
-				 loadstring(game:HttpGet('https://raw.githubusercontent.com/ZinityDrops/OwlHubLink/master/OwlHubBack.lua'))();
+				 loadstring(game:HttpGet("https://raw.githubusercontent.com/ZinityDrops/OwlHubLink/master/OwlHubBack.lua"))();
 			end,
 		},
 	},
