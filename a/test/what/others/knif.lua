@@ -1,5 +1,7 @@
 local KnifeAccessory
-local LocalPlayer = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 
 if LocalPlayer.Character:FindFirstChild("YandereKnife") and LocalPlayer.Character["YandereKnife"].ClassName == "Accessory" then
     KnifeAccessory = LocalPlayer.Character["YandereKnife"]
@@ -9,13 +11,13 @@ end
 
 game:GetService("RunService").Heartbeat:Connect(function()
     LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge) * math.huge
-    pcall(function() sethiddenproperty(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
+    pcall(function() sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
 
-    for i, v in pairs(game.Players:GetPlayers()) do
+    for i, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer then
             LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge) * math.huge
-            pcall(function() settings().Physics.AllowSleep = false ; sethiddenproperty(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
-            LocalPlayer.ReplicationFocus = Workspace
+            pcall(function() settings().Physics.AllowSleep = false ; sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
+            LocalPlayer.ReplicationFocus = workspace
         end
     end
 end)
