@@ -2371,6 +2371,7 @@ spawn(function()
 	BrowserBtn("Drag and Resize Chat", "Drag and Resize Chat", "Make the Default ROBLOX Chat Draggable and Resizable", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/dragresizechat.lua'))();")
 	BrowserBtn("Fun Gravity", "Fun Gravity", "Have Fun with Unanchored Parts", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/fungravity.lua'))();")
 	BrowserBtn("Cyclically Btools", "Cyclically's Custom Btools", "Better Btools with Undo & Identify", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/cycbtools.lua'))();")
+	BrowserBtn("Wall Run", "Wall Run", "Walk/Run on Walls!\n\nGravity Controller Originally made by EgoMoose", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/wallrun.lua'))();")
 end)
 --// End of Setup
 
