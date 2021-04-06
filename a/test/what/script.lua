@@ -2772,20 +2772,20 @@ newCmd("sit", {}, "sit", "omega bruh", function(args, speaker)
 end)
 
 newCmd("stun", {}, "stun", "Enable Platform Stand", function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+	speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
 end)
 
 newCmd("unstun", {}, "unstun", "Disable Platform Stand", function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
 end)
 
-newCmd("jump", {}, "jump", "r u serious", function(args, speaker)
+newCmd("jump", {}, "jump", "Jump", function(args, speaker)
 	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
 		speaker.Character:FindFirstChildOfClass("Humanoid").Jump = true
 	end
 end)
 
-newCmd("screenshot", {}, "screenshot", "Take picture ez", function(args, speaker)
+newCmd("screenshot", {}, "screenshot", "Take a Screenshot", function(args, speaker)
 	return game:GetService("CoreGui"):TakeScreenshot()
 end)
 
@@ -2806,21 +2806,21 @@ newCmd("reloadplugin", {}, "reloadplugin [string]", "Reload a Plugin", function(
 	addPlugin(pluginName)
 end)
 
-newCmd("grabknife", {"knife"}, "grabknife / knife", "Use on claimed users", function(args, speaker)
+newCmd("grabknife", {"knife"}, "grabknife / knife", "Load Grab Knife (Works on Claimed Players)", function(args, speaker)
 	notify("", "Loaded Grab Knife", 2)
 	Import("knif.lua")
 end)
 
-newCmd("control", {"control"}, "control [plr]", "Control someone lol", function(args, speaker)
-    local users = getPlayer(args[1], speaker)
-    for i,Target in pairs(users) do
-        if Target and Target.Character and Target.Character:FindFirstChild("-Claimed") then
-            Target.Character.HumanoidRootPart.Parent = game.Players.LocalPlayer.Character
-            game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Character", function(args, speaker)
+	local users = getPlayer(args[1], speaker)
+	for i,Target in pairs(users) do
+		if Target and Target.Character and Target.Character:FindFirstChild("-Claimed") then
+			Target.Character.HumanoidRootPart.Parent = speaker.Character
+			speaker.Character.HumanoidRootPart.Anchored = true
 		else
 			notify("", "Couldn't Control Player")
-        end
-    end
+		end
+	end
 end)
 
 newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't get kicked for being AFK", function(args, speaker)
@@ -2833,13 +2833,13 @@ newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't get kicked for bein
 				v["Disconnect"](v)
 			end
 		end
-		notify("Anti Idle"," Anti idle is enabled")
+		notify("Anti Idle", "Enabled")
 	else
 		notify("Incompatible Exploit", "Missing getconnections")
 	end
 end)
 
-newCmd("btools", {}, "btools", "cringe command", function(args, speaker)
+newCmd("btools", {}, "btools", "Building Tools", function(args, speaker)
 	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 1
 	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 2
 	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 3
@@ -2850,8 +2850,9 @@ newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
 	loadstring(game:GetObjects("rbxassetid://4698064966")[1].Source)()
 end)
 
-newCmd("explorer", {"dex"}, "explorer / dex", "Game Explorer", function(args, speaker)
+newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
 	notify("Loading", "Hold on a sec")
+	wait(0.2)
 	local Dex = game:GetObjects("rbxassetid://3567096419")[1]
 	ParentGui(Dex)
 	local function Load(Obj, Url)
@@ -2892,9 +2893,9 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Game Explorer", function(args, sp
 	Load(Dex)
 end)
 
-newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Remote Spy", function(args, speaker)
+newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Load a Remote Spy (SimpleSpy)", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+	loadstring(game:HttpGetAsync("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
 end)
 
 newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, speaker)
@@ -2902,25 +2903,25 @@ newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, 
 	loadstring(game:HttpGet(('https://pastebin.com/raw/GmbrsEjM'),true))()
 end)
 
-newCmd("vr", {}, "vr", "CLOVR by Abacaxl", function(args, speaker)
+newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, speaker)
 	notify("", "Loading CLOVR . . .", 2)
 	loadstring(game:HttpGet('https://ghostbin.co/paste/yb288/raw'))()
 end)
 
-newCmd("jobid", {}, "jobid", "Copy server's jobid", function(args, speaker)
+newCmd("jobid", {}, "jobid", "Copy the Server's JobId, this can be put in console on Google to join someone's exact server", function(args, speaker)
 	local jobId = ('Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. game.JobId ..'")')
 	toClipboard(jobId)
 end)
 
-newCmd("safechat", {}, "safechat", "Become under 13", function(args, speaker)
+newCmd("safechat", {}, "safechat", "Enable Safechat", function(args, speaker)
 	speaker.SetSuperSafeChat(true)
 end)
 
-newCmd("nosafechat", {}, "nosafechat", "Welcome to the 13 gang", function(args, speaker)
+newCmd("nosafechat", {}, "nosafechat", "Disable Safechat", function(args, speaker)
 	speaker.SetSuperSafeChat(false)
 end)
 
-newCmd("creeper", {}, "creeper", "Aw man", function(args, speaker)
+newCmd("creeper", {}, "creeper", "Become a Creeper", function(args, speaker)
 	if r15(speaker) then
 		speaker.Character.Head:FindFirstChildOfClass("SpecialMesh"):Destroy()
 		speaker.Character.LeftUpperArm:Destroy()
@@ -2934,7 +2935,7 @@ newCmd("creeper", {}, "creeper", "Aw man", function(args, speaker)
 	end
 end)
 
-newCmd("reach", {}, "reach [number]", "Give tool reach", function(args, speaker)
+newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/item", function(args, speaker)
 	execCmd("unreach")
 	wait()
 	for i,v in pairs(speaker.Character:GetDescendants()) do
@@ -2947,8 +2948,8 @@ newCmd("reach", {}, "reach [number]", "Give tool reach", function(args, speaker)
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
-				v.Handle.Size = Vector3.new(0.5,0.5,args[1])
-				v.GripPos = Vector3.new(0,0,0)
+				v.Handle.Size = Vector3.new(0.5, 0.5, args[1])
+				v.GripPos = Vector3.new(0, 0, 0)
 				speaker.Character:FindFirstChildOfClass("Humanoid"):UnequipTools()
 			else
 				currentToolSize = v.Handle.Size
@@ -2958,15 +2959,15 @@ newCmd("reach", {}, "reach [number]", "Give tool reach", function(args, speaker)
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
-				v.Handle.Size = Vector3.new(0.5,0.5,60)
-				v.GripPos = Vector3.new(0,0,0)
+				v.Handle.Size = Vector3.new(0.5, 0.5, 60)
+				v.GripPos = Vector3.new(0, 0, 0)
 				speaker.Character:FindFirstChildOfClass("Humanoid"):UnequipTools()
 			end
 		end
 	end
 end)
 
-newCmd("unreach", {"noreach"}, "unreach / noreach", "Disable reach", function(args, speaker)
+newCmd("unreach", {"noreach"}, "unreach / noreach", "Disable Reach", function(args, speaker)
 	for i,v in pairs(speaker.Character:GetDescendants()) do
 		if v:IsA("Tool") then
 			v.Handle.Size = currentToolSize
@@ -3103,12 +3104,12 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	notify("Invisibility", "You are invisible to players!")
 end)
 
-newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no godmode but tools work", function(args, speaker)
+newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no godmode but some tools work", function(args, speaker)
 	Import("tinv.lua")
-	notify("T Invis", "You are now invisible")
+	notify("T Invis", "You are now Invisible")
 end)
 
-newCmd("visible", {"vis"}, "visible / vis", "Become visible once again", function(args, speaker)
+newCmd("visible", {"vis"}, "visible / vis", "Become Visible", function(args, speaker)
 	TurnVisible()
 end)
 
@@ -3141,7 +3142,7 @@ end)
 newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Player", function(args, speaker)
 	if viewing ~= nil then
 		viewing = nil
-		notify('Spectate','Turned off')
+		notify("Spectate", "Turned Off")
 	end
 	if viewDied then
 		viewDied:Disconnect()
@@ -3153,14 +3154,16 @@ end)
 newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker)
 	execCmd("unspectate")
 	workspace.CurrentCamera:remove()
-	wait(.1)
+	wait(0.1)
 	repeat wait() until speaker.Character ~= nil
 	workspace.CurrentCamera.CameraSubject = speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	workspace.CurrentCamera.CameraType = "Custom"
 	speaker.CameraMinZoomDistance = 0.5
 	speaker.CameraMaxZoomDistance = 400
 	speaker.CameraMode = "Classic"
-	speaker.Character.Head.Anchored = false
+	if speaker.Character:FindFirstChild("Head") then
+		speaker.Character.Head.Anchored = false
+	end
 end)
 
 newCmd("esp", {}, "esp", "Use ESP on Players", function(args, speaker)
@@ -3175,7 +3178,7 @@ end)
 newCmd("unesp", {}, "unesp", "Stop Using ESP on Players", function(args, speaker)
 	ESPenabled = false
 	for i,c in pairs(CoreGui:GetChildren()) do
-		if string.sub(c.Name, -4) == '_ESP' then
+		if string.sub(c.Name, -4) == "_ESP" then
 			c:Destroy()
 		end
 	end
@@ -3188,19 +3191,19 @@ newCmd("locate", {}, "locate [plr]", "View a single player and their status", fu
 	end
 end)
 
-newCmd("unlocate", {}, "unlocate [plr]", "Removes locate", function(args, speaker)
+newCmd("unlocate", {}, "unlocate [plr]", "Removes Locate", function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if args[1] then
 		for i,v in pairs(players) do
 			for i,c in pairs(CoreGui:GetChildren()) do
-				if c.Name == Players[v].Name..'_LC' then
+				if c.Name == Players[v].Name .. "_LC" then
 					c:Destroy()
 				end
 			end
 		end
 	else
 		for i,c in pairs(CoreGui:GetChildren()) do
-			if string.sub(c.Name, -3) == '_LC' then
+			if string.sub(c.Name, -3) == "_LC" then
 				c:Destroy()
 			end
 		end
@@ -3217,7 +3220,7 @@ end)
 
 newCmd("enableshiftlock", {"enablesl"}, "enableshiftlock / enablesl", "Enable Shiftlock", function(args, speaker)
 	speaker.DevEnableMouseLock = true
-	notify("Shiftlock", "Shift lock is now available")
+	notify("Shiftlock", "Shift Lock is now Available")
 end)
 
 newCmd("firstp", {}, "firstp", "First Person", function(args, speaker)
@@ -3228,12 +3231,12 @@ newCmd("thirdp", {}, "thirdp", "Third Person", function(args, speaker)
 	speaker.CameraMode = "Classic"
 end)
 
-newCmd("noprompts", {}, "noprompts", "Stop receiving purchase prompts", function(args, speaker)
+newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function(args, speaker)
 	CoreGui.PurchasePromptApp.PurchasePromptUI.Visible = false
 	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
 end)
 
-newCmd("showprompts", {}, "showprompts", "Receive purchase prompts again", function(args, speaker)
+newCmd("showprompts", {}, "showprompts", "Continue Receiving Purchase Prompts", function(args, speaker)
 	CoreGui.PurchasePromptApp.PurchasePromptUI.Visible = true
 	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
 end)
@@ -3266,7 +3269,7 @@ newCmd("droptools", {}, "droptools", "Drop your Tools", function(args, speaker)
 	end
 end)
 
-newCmd("droppabletools", {}, "droppabletools", "Make undroppable tools droppable", function(args, speaker)
+newCmd("droppabletools", {}, "droppabletools", "Make Undroppable Tools Droppable", function(args, speaker)
 	if speaker and speaker.Character then
 		for _,obj in pairs(speaker.Character:GetChildren()) do
 			if obj:IsA("Tool") then
@@ -3288,7 +3291,7 @@ newCmd("setcreatorid", {}, "setcreatorid", "Set your User ID to the Creator's Us
 		speaker.UserId = game.CreatorId
 		notify("Set ID", "Set UserId to " .. game.CreatorId)
 	elseif game.CreatorType == Enum.CreatorType.Group then
-		local OwnerID = game:GetService('GroupService'):GetGroupInfoAsync(game.CreatorId).Owner.Id
+		local OwnerID = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId).Owner.Id
 		speaker.UserId = OwnerID
 		notify("Set ID", "Set UserId to " .. OwnerID)
 	end
@@ -3455,7 +3458,7 @@ newCmd("flashback", {}, "flashback", "Go back to where you last died", function(
 	end
 end)
 
-newCmd("dupetools", {}, "dupetools [number]", "Duplicate tools in your inventory", function(args, speaker)
+newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory", function(args, speaker)
 	local LOOP_NUM = tonumber(args[1]) or 1
 	local OrigPos = speaker.Character.HumanoidRootPart.Position
 	local Tools, TempPos = {}, Vector3.new(math.random(-2e5, 2e5), 2e5, math.random(-2e5, 2e5))
@@ -3514,7 +3517,7 @@ newCmd("numofcmds", {}, "numofcmds", "Notify the number of commands", function(a
 end)
 
 local CmdNoclipping = nil
-newCmd("noclip", {}, "noclip", "Go through objects", function(args, speaker)
+newCmd("noclip", {}, "noclip", "Go Through Objects", function(args, speaker)
 	CmdClip = false
 	wait(0.1)
 	local function NoclipLoop()
@@ -3531,7 +3534,7 @@ newCmd("noclip", {}, "noclip", "Go through objects", function(args, speaker)
 	notify("Noclip", "Noclip Enabled")
 end)
 
-newCmd("clip", {}, "clip", "Disables noclip", function(args, speaker)
+newCmd("clip", {}, "clip", "Disables Noclip", function(args, speaker)
 	if CmdNoclipping then
 		CmdNoclipping:Disconnect()
 	end
@@ -3575,7 +3578,7 @@ newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speak
 	Spin.AngularVelocity = Vector3.new(0, spinSpeed, 0)
 end)
 
-newCmd("unspin", {}, "unspin", "Disables spin", function(args, speaker)
+newCmd("unspin", {}, "unspin", "Disables Spin", function(args, speaker)
 	for i,v in pairs(getRoot(speaker.Character):GetChildren()) do
 		if v.Name == "Spinning" then
 			v:Destroy()
@@ -3584,7 +3587,7 @@ newCmd("unspin", {}, "unspin", "Disables spin", function(args, speaker)
 end)
 
 cmdflinging = false
-newCmd("fling", {}, "fling", "Flings anyone you touch", function(args, speaker)
+newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
 	for _, child in pairs(speaker.Character:GetDescendants()) do
 		if child:IsA("BasePart") then
 			child.CustomPhysicalProperties = PhysicalProperties.new(2, 0.3, 0.5)
@@ -3621,7 +3624,7 @@ newCmd("fling", {}, "fling", "Flings anyone you touch", function(args, speaker)
 	TouchingFloorReset = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(flingDied)
 end)
 
-newCmd("unfling", {}, "unfling", "Disables the fling command", function(args, speaker)
+newCmd("unfling", {}, "unfling", "Disables the Fling Command", function(args, speaker)
 	execCmd("clip nonotify")
 	if TouchingFloor then
 		TouchingFloor:Disconnect()
@@ -3645,7 +3648,7 @@ newCmd("unfling", {}, "unfling", "Disables the fling command", function(args, sp
 	end
 end)
 
-newCmd("invisfling", {}, "invisfling", "Enables invisible fling", function(args, speaker)
+newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args, speaker)
 	local ch = speaker.Character
 	local prt=Instance.new("Model")
 	prt.Parent = speaker.Character
@@ -3976,11 +3979,11 @@ newCmd("night", {}, "night (Client)", "Changes the time to night for the client"
 	game:GetService("Lighting").ClockTime = 0
 end)
 
-newCmd("nofog", {}, "nofog (Client)", "Removes fog", function(args, speaker)
+newCmd("nofog", {}, "nofog (Client)", "Removes Fog", function(args, speaker)
 	game:GetService("Lighting").FogEnd = 100000
 end)
 
-newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting properties", function(args, speaker)
+newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting Properties", function(args, speaker)
 	game:GetService("Lighting").Ambient = origsettings.Lighting.abt
 	game:GetService("Lighting").OutdoorAmbient = origsettings.Lighting.oabt
 	game:GetService("Lighting").Brightness = origsettings.Lighting.brt
@@ -3990,7 +3993,7 @@ newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restore
 	game:GetService("Lighting").GlobalShadows = origsettings.Lighting.gs
 end)
 
-newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for players heads (default is 1)", function(args, speaker)
+newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for player heads (default is 1)", function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
 		if Players[v] ~= speaker and Players[v].Character:FindFirstChild("Head") then
@@ -4038,7 +4041,7 @@ newCmd("noroot", {}, "noroot", "Removes your characters HumanoidRootPart", funct
 	end
 end)
 
-newCmd("boostfps", {}, "boostfps", "Lowers game quality to boost FPS", function(args, speaker)
+newCmd("boostfps", {}, "boostfps", "Lowers Game Quality to Boost FPS", function(args, speaker)
 	workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
 	workspace:FindFirstChildOfClass("Terrain").WaterWaveSpeed = 0
 	workspace:FindFirstChildOfClass("Terrain").WaterReflectance = 0
@@ -4069,12 +4072,12 @@ end)
 newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args, speaker)
 	if setfpscap and type(setfpscap) == "function" then
 		local num = args[1] or 1e6
-		if num == 'none' then
+		if num == "none" then
 			return setfpscap(1e6)
 		elseif num > 0 then
 			return setfpscap(num)
 		else
-			return notify("Invalid argument", "Please provide a number above 0 or 'none'.")
+			return notify("Invalid Argument", "Please provide a number above 0 or " .. '"none"' .. ".")
 		end
 	else
 		return notify("Incompatible Exploit", "Missing setfpscap")
@@ -4115,7 +4118,7 @@ newCmd("whisper", {"pm"}, "whisper / pm [plr] [text]", "Makes you whisper a stri
 	end
 end)
 
-newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows camera to go through objects like walls", function(args, speaker)
+newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows your Camera to go Through Objects like Walls", function(args, speaker)
 	local sc = (debug and debug.setconstant) or setconstant
 	local gc = (debug and debug.getconstants) or getconstants
 	if not sc or not getgc or not gc then
@@ -4135,11 +4138,11 @@ newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows camera to go through
 	end
 end)
 
-newCmd("maxzoom", {}, "maxzoom [number]", "Maximum camera zoom", function(args, speaker)
+newCmd("maxzoom", {}, "maxzoom [number]", "Maximum Camera Zoom", function(args, speaker)
 	speaker.CameraMaxZoomDistance = args[1]
 end)
 
-newCmd("minzoom", {}, "minzoom [number]", "Minimum camera zoom", function(args, speaker)
+newCmd("minzoom", {}, "minzoom [number]", "Minimum Camera Zoom", function(args, speaker)
 	speaker.CameraMinZoomDistance = args[1]
 end)
 
