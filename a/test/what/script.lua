@@ -2368,7 +2368,8 @@ spawn(function()
 	BrowserBtn("Chat Translator", "Chat Translator", "Translate Chat and Reply\n\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-1_codes\n\nYou have to look the 639-1 column to get a language", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chattranslator.lua'))();")
 	BrowserBtn("Universal Bhop", "Universal Bhop", "Notice: this is a per-character command, meaning if you die and your body parts disintegrate, you need to execute this again, however with generic deaths it should work fine", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
 	BrowserBtn("Toon ESP", "Toon ESP", "Load my ESP Script", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/toonesp.lua'))();")
-	BrowserBtn("Drag & Resize Chat", "Drag & Resize Chat", "Make the Default ROBLOX Chat Draggable and Resizable", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/dragresizechat.lua'))();")
+	BrowserBtn("Drag and Resize Chat", "Drag and Resize Chat", "Make the Default ROBLOX Chat Draggable and Resizable", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/dragresizechat.lua'))();")
+	BrowserBtn("Fun Gravity", "Fun Gravity", "Have Fun with Unanchored Parts", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/fungravity.lua'))();")
 end)
 --// End of Setup
 
