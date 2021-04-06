@@ -774,6 +774,22 @@ function gethum(ch)
 	end
 end
 
+function findhum(ch)
+	if ch ~= nil then
+		if ch:FindFirstChildOfClass("Humanoid") then
+			return true
+		else
+			return false
+		end
+	else
+		if Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+			return true
+		else
+			return false
+		end
+	end
+end
+
 local SpecialPlayerCases = {
 	["all"] = function(speaker)return game.Players:GetPlayers() end,
 	["others"] = function(speaker)
