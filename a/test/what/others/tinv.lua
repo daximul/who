@@ -5,16 +5,16 @@ local touched = false
 local tpdback = false
 LocalPlayer.CharacterAdded:connect(function(char)
     if script.Disabled ~= true then
-        wait(.25)
+        wait(0.25)
         loc = Char.HumanoidRootPart.Position
-        Char:MoveTo(box.Position + Vector3.new(0, .5, 0))
+        Char:MoveTo(box.Position + Vector3.new(0, 0.5, 0))
     end
 end)
 box = Instance.new("Part", workspace)
 box.Anchored = true
 box.CanCollide = true
-box.Size = Vector3.new(10,1,10)
-box.Position = Vector3.new(0,10000,0)
+box.Size = Vector3.new(10, 1, 10)
+box.Position = Vector3.new(0, 10000, 0)
 box.Touched:connect(function(part)
     if (part.Parent.Name == Local.Name) then
         if touched == false then
@@ -22,7 +22,7 @@ box.Touched:connect(function(part)
             function apply()
                 if script.Disabled ~= true then
                     no = Char.HumanoidRootPart:Clone()
-                    wait(.25)
+                    wait(0.25)
                     Char.HumanoidRootPart:Destroy()
                     no.Parent = Char
                     Char:MoveTo(loc)
@@ -36,4 +36,4 @@ box.Touched:connect(function(part)
 end)
 repeat wait() until Char
 loc = Char.HumanoidRootPart.Position
-Char:MoveTo(box.Position + Vector3.new(0, .5, 0))
+Char:MoveTo(box.Position + Vector3.new(0, 0.5, 0))
