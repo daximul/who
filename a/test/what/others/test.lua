@@ -33,8 +33,6 @@ Interface.Main.Box.FocusLost:Connect(function(EnterPressed)
 		if table.find(moment, Interface.Main.Box.Text) then
 			Interface.Main.Box.TextColor3 = colors["Green"]
 			wait(1.9)
-			Interface.Main.Visible = false
-			wait(0.01)
 			Interface:remove()
 			Load()
 		else
@@ -45,7 +43,5 @@ Interface.Main.Box.FocusLost:Connect(function(EnterPressed)
 	end
 end)
 Interface.Close.MouseButton1Down:Connect(function()
-	Interface.Main.Visible = false
-	wait(0.01)
 	Interface:remove()
 end)
