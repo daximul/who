@@ -8,9 +8,9 @@ local Plugin = {
 	["PluginName"] = "RTX",
 	["PluginDescription"] = "Graphics Enhancer",
 	["Commands"] = {
-		["rtx"] = {
-			["ListName"] = "rtx",
-			["Description"] = "RTX Autumn Edition",
+		["autumn"] = {
+			["ListName"] = "autumn (1)",
+			["Description"] = "Autumn Edition",
 			["Aliases"] = {},
 			["Function"] = function(args,speaker)
 				ClearLighting()
@@ -74,7 +74,7 @@ local Plugin = {
 			end,
 		},
 		["rge"] = {
-			["ListName"] = "rge",
+			["ListName"] = "rge (2)",
 			["Description"] = "Roblox Graphics Enhancer",
 			["Aliases"] = {},
 			["Function"] = function(args,speaker)
@@ -138,6 +138,45 @@ local Plugin = {
 					light.OutdoorAmbient = Color3.fromRGB(112, 117, 128)
 					light.Outlines = false
 				end
+			end,
+		},
+		["realism"] = {
+			["ListName"] = "realism (3)",
+			["Description"] = "Realism Mod",
+			["Aliases"] = {},
+			["Function"] = function(args,speaker)
+				local Lighting = game:GetService("Lighting")
+				ClearLighting()
+				Lighting.FogEnd = 4500
+				Lighting.OutdoorAmbient = Color3.fromRGB(140, 140, 140)
+				Lighting.GlobalShadows = true
+				Lighting.Brightness = 1.5
+				Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+				Lighting.ShadowColor = Color3.fromRGB(61, 61, 61)
+				local Blur = Instance.new("BlurEffect")
+				Blur.Name = "Blur"
+				Blur.Enabled = true
+				Blur.Size = 1.2
+				local ColorCorrection = Instance.new("ColorCorrectionEffect")
+				ColorCorrection.Brightness = 0.05
+				ColorCorrection.Contrast = 0.1
+				ColorCorrection.Enabled = true
+				ColorCorrection.Saturation = 0.1
+				ColorCorrection.TintColor = Color3.fromRGB(230, 230, 230)
+				local DepthOfField = Instance.new("DepthOfFieldEffect")
+				DepthOfField.Enabled = true
+				DepthOfField.FarIntensity = 0.15
+				DepthOfField.FocusDistance = 15
+				DepthOfField.InFocusRadius = 50
+				DepthOfField.NearIntensity = 0.75
+				local SunRays = Instance.new("SunRaysEffect")
+				SunRays.Enabled = true
+				SunRays.Intensity = 0.05
+				SunRays.Spread = 0.7
+				Blur.Parent = Lighting
+				ColorCorrection.Parent = Lighting
+				DepthOfField.Parent = Lighting
+				SunRays.Parent = Lighting
 			end,
 		},
 	},
