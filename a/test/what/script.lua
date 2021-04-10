@@ -2372,6 +2372,7 @@ spawn(function()
 	BrowserBtn("Fun Gravity", "Fun Gravity", "Have Fun with Unanchored Parts", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/fungravity.lua'))();")
 	BrowserBtn("Cyclically Btools", "Cyclically's Custom Btools", "Better Btools with Undo & Identify", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/cycbtools.lua'))();")
 	BrowserBtn("Wall Run", "Wall Run", "Walk/Run on Walls!\n\nGravity Controller Originally made by EgoMoose", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/wallrun.lua'))();")
+	BrowserBtn("RTX", "RTX: Graphics Enhancer", "Enhance your Graphics\n\nLevels in the Command Name:\n1: Low, not that good\n2: Medium sort of good\n3: Epic", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/rtx.lua'))();")
 end)
 --// End of Setup
 
@@ -4145,6 +4146,126 @@ end)
 
 newCmd("minzoom", {}, "minzoom [number]", "Minimum Camera Zoom", function(args, speaker)
 	speaker.CameraMinZoomDistance = args[1]
+end)
+
+newCmd("tpunanchored", {"tpua"}, "tpunanchored / tpua [plr]", "Teleports Unanchored Parts to a Player", function(args, speaker)
+	if sethidden then
+		local players = getPlayer(args[1], speaker)
+		for i,v in pairs(players) do
+			local Forces = {}
+			for _,part in pairs(workspace:GetDescendants()) do
+				if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
+					for i,c in pairs(part:GetChildren()) do
+						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+							c:Destroy()
+						end
+					end
+					local ForceInstance = Instance.new("BodyPosition")
+					ForceInstance.Parent = part
+					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+					table.insert(Forces, ForceInstance)
+					if not table.find(frozenParts,part) then
+						table.insert(frozenParts,part)
+					end
+				end
+			end
+			SetSimulationRadius()
+			for i,c in pairs(Forces) do
+				c.Position = Players[v].Character.Head.Position
+			end
+		end
+	else
+		notify("Incompatible Exploit", "Missing sethiddenproperty")
+	end
+end)
+
+newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes Unanchored Parts", function(args, speaker)
+	if sethidden then
+		local badnames = {
+			"Head",
+			"UpperTorso",
+			"LowerTorso",
+			"RightUpperArm",
+			"LeftUpperArm",
+			"RightLowerArm",
+			"LeftLowerArm",
+			"RightHand",
+			"LeftHand",
+			"RightUpperLeg",
+			"LeftUpperLeg",
+			"RightLowerLeg",
+			"LeftLowerLeg",
+			"RightFoot",
+			"LeftFoot",
+			"Torso",
+			"Right Arm",
+			"Left Arm",
+			"Right Leg",
+			"Left Leg",
+			"HumanoidRootPart"
+		}
+		local function FREEZENOOB(v)
+			if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
+				local BADD = false
+				for i = 1,#badnames do
+					if v.Name == badnames[i] then
+						BADD = true
+					end
+				end
+				if speaker.Character and v:IsDescendantOf(speaker.Character) then
+					BADD = true
+				end
+				if BADD == false then
+					for i,c in pairs(v:GetChildren()) do
+						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+							c:Destroy()
+						end
+					end
+					SetSimulationRadius()
+					local bodypos = Instance.new("BodyPosition")
+					bodypos.Parent = v
+					bodypos.Position = v.Position
+					bodypos.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+					local bodygyro = Instance.new("BodyGyro")
+					bodygyro.Parent = v
+					bodygyro.CFrame = v.CFrame
+					bodygyro.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+					if not table.find(frozenParts,v) then
+						table.insert(frozenParts,v)
+					end
+				end
+			end
+		end
+		for i,v in pairs(workspace:GetDescendants()) do
+			FREEZENOOB(v)
+		end
+		freezingua = workspace.DescendantAdded:Connect(FREEZENOOB)
+	else
+		notify("Incompatible Exploit", "Missing sethiddenproperty")
+	end
+end)
+
+newCmd("thawunanchored", {"thawua", "unfreezeua"}, "thawunanchored / thawua / unfreezeua", "Thaws Unanchored Parts", function(args, speaker)
+	if sethidden then
+		if freezingua then
+			freezingua:Disconnect()
+		end
+		SetSimulationRadius()
+		for i,v in pairs(frozenParts) do
+			for i,c in pairs(v:GetChildren()) do
+				if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+					c:Destroy()
+				end
+			end
+		end
+		frozenParts = {}
+	else
+		notify("Incompatible Exploit", "Missing sethiddenproperty")
+	end
+end)
+
+newCmd("flashlight", {}, "flashlight (Client)", "Give yourself a Flashlight", function(args, speaker)
+	loadstring(game:HttpGetAsync(("https://pastebin.com/raw/8K2cTfka")))();
 end)
 
 
