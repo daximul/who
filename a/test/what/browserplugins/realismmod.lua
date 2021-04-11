@@ -42,6 +42,10 @@ local Plugin = {
 				Lighting.Brightness = 1.5
 				Lighting.Ambient = Color3.fromRGB(0, 0, 0)
 				Lighting.ShadowColor = Color3.fromRGB(61, 61, 61)
+				Blur.Enabled = true
+				ColorCorrection.Enabled = true
+				DepthOfField.Enabled = true
+				SunRays.Enabled = true
 				for i,v in pairs(OldChildren) do
 					v.Enabled = false
 				end
