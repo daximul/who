@@ -19,14 +19,14 @@ local SunRays = Instance.new("SunRaysEffect")
 SunRays.Enabled = false
 SunRays.Intensity = 0.05
 SunRays.Spread = 0.7
-Blur.Parent = Lighting
-ColorCorrection.Parent = Lighting
-DepthOfField.Parent = Lighting
-SunRays.Parent = Lighting
 local OldChildren = {}
 for i,v in pairs(Lighting:GetChildren()) do
 	table.insert(OldChildren, v)
 end
+Blur.Parent = Lighting
+ColorCorrection.Parent = Lighting
+DepthOfField.Parent = Lighting
+SunRays.Parent = Lighting
 local Plugin = {
 	["PluginName"] = "Realism Mod",
 	["PluginDescription"] = "Graphics Enhancer",
