@@ -2148,6 +2148,7 @@ local function UserBuild()
 	build.Interface = GUI
 	build.newCmd = newCmd
 	build.BrowserBtn = BrowserBtn
+	build.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	getgenv().DA_PUBLIC_USER_BUILD = build
 end
 
