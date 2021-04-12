@@ -32,7 +32,6 @@ local function Import(Asset)
 end
 
 local GUI = Import("interface.lua")
-getgenv().DA_PUBLIC_USER_BUILD = GUI
 local Main = GUI.Main
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
@@ -2142,6 +2141,14 @@ local newCmd = function(name, aliases, title, description, func)
 		ALIAS = aliases or {},
 		FUNC = func
 	}
+end
+
+local function UserBuild()
+	local build = {}
+	build.Interface = GUI
+	build.newCmd = newCmd
+	build.BrowserBtn = BrowserBtn
+	getgenv().DA_PUBLIC_USER_BUILD = build
 end
 
 --// Setup Admin & Ui & Plugin Browser
@@ -4279,6 +4286,7 @@ end
 if Settings.AutoNet then
 	SetSimulationRadius()
 end
-wait()
+--wait()
+UserBuild()
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
