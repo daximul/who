@@ -32,6 +32,7 @@ local function Import(Asset)
 end
 
 local GUI = Import("interface.lua")
+getgenv().DA_PUBLIC_USER_BUILD = GUI
 local Main = GUI.Main
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
