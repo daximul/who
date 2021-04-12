@@ -2145,6 +2145,7 @@ end
 
 local function UserBuild()
 	local build = {}
+	build.loaded = true
 	build.Interface = GUI
 	build.newCmd = newCmd
 	build.BrowserBtn = BrowserBtn
