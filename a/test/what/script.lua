@@ -2449,9 +2449,9 @@ newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", func
 	notify("", "Simradius set to 139")
 end)
 
-newCmd("synnet", {}, "synnet [Unstable]", "Unstable But Good Net", function(args, speaker)
-	notify("", "Simradius set to Syn")
-	Import("cl_net.lua")
+newCmd("niconet", {}, "niconet", "Run Nico's Net", function(args, speaker)
+	notify("", "Simradius set to Ni_Nt")
+	Import("ni_nt.lua")
 end)
 
 newCmd("autoloadnet", {}, "autoloadnet", "Load Full Network Ownership Upon Execute", function(args, speaker)
