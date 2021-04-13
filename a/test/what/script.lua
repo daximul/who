@@ -4278,6 +4278,26 @@ newCmd("flashlight", {}, "flashlight (Client)", "Give yourself a Flashlight", fu
 	loadstring(game:HttpGetAsync(("https://pastebin.com/raw/8K2cTfka")))();
 end)
 
+newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value", function(args, speaker)
+	if args[1] and args[2] then
+		local getrawmt = (debug and debug.getmetatable) or getrawmetatable
+		local setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end)
+		local GameMt = getrawmetatable(game)
+		local OldIndex = GameMt.__index
+		
+		setReadOnly(GameMt, false)
+		
+		GameMt.__index = newcclosure(function(Self, Key)
+			if Key == args[1] then
+				return getstring(2)
+			end
+			return OldIndex(Self, Key)
+		end)
+	else
+		notify("Meta Hook", "Missing a Argument")
+	end
+end)
+
 
 
 
