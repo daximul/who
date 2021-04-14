@@ -6,7 +6,7 @@ local Plugin = {
 			["ListName"] = "sentineldex / sendex",
 			["Description"] = "Loads Sentinel Dex",
 			["Aliases"] = {"sendex"},
-			["Function"] = function(args,speaker)
+			["Function"] = function(args, speaker)
 					loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua"))();
 				end
 			end
@@ -15,7 +15,7 @@ local Plugin = {
 			["ListName"] = "dexv2",
 			["Description"] = "Loads Dex v2",
 			["Aliases"] = {},
-			["Function"] = function(args,speaker)
+			["Function"] = function(args, speaker)
 					loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
 				end
 			end
