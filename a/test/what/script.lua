@@ -4293,6 +4293,8 @@ newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value
 			end
 			return OldIndex(Self, Key)
 		end)
+		
+		setReadOnly(GameMt, true)
 	else
 		notify("Meta Hook", "Missing a Argument")
 	end
