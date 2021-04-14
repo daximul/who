@@ -4283,7 +4283,7 @@ newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value
 	if args[1] and args[2] then
 		local getrawmt = (debug and debug.getmetatable) or getrawmetatable
 		local setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end)
-		local GameMt = getrawmetatable(game)
+		local GameMt = getrawmt(game)
 		local OldIndex = GameMt.__index
 		
 		setReadOnly(GameMt, false)
