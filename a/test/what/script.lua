@@ -64,9 +64,12 @@ local Settings = {
 local Cmdbar = Main.Box
 local cmds = {}
 local customAlias = {}
+local DEBUG = false
 local Network_Loop = nil
 local Old_Net_Method = true
-local DEBUG = false
+local SU_SomeCheckPlace = {
+	Attachment = "HairAttachment";
+}
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
@@ -115,16 +118,16 @@ invisRunning = false
 
 --// End of Command Variables
 
-local SU_SomeCheckPlace = {
-	Attachment = "HairAttachment";
-}
-local SU_Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
-if SU_Check1 then
-	local SU_Check2 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
-	if SU_Check2 then
-		SU_Check2:Destroy()
+spawn(function()
+	local SU_Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
+	if SU_Check1 then
+		local SU_Check2 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
+		if SU_Check2 then
+			SU_Check2:Destroy()
+		end
 	end
-end
+end)
+
 Players.LocalPlayer.CharacterAdded:Connect(function()
 	wait(1)
 	local SU_Check3 = Players.LocalPlayer.Character:FindFirstChild("Head")
@@ -2155,7 +2158,7 @@ local function UserBuild()
 end
 
 --// Setup Admin & Ui & Plugin Browser
-pcall(function()
+spawn(function()
 	Startup()
 	ParentGui(GUI)
 	SmoothDrag(CommandsGui)
@@ -4327,7 +4330,6 @@ end
 if Settings.AutoNet then
 	SetSimulationRadius()
 end
---wait()
 UserBuild()
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
