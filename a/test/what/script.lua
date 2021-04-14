@@ -2144,6 +2144,7 @@ local newCmd = function(name, aliases, title, description, func)
 end
 
 local function UserBuild()
+	if not getgenv then return end
 	local build = {}
 	build.loaded = true
 	build.Interface = GUI
@@ -2384,7 +2385,6 @@ spawn(function()
 	BrowserBtn("RTX", "RTX: Graphics Enhancer", "Enhance your Graphics\n\nLevels in the Command Name:\n1: Low, not that good\n2: Medium sort of good\n3: Epic", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/rtx.lua'))();")
 	BrowserBtn("Empty Server Finder", "Empty Server Finder", "Find the emptiest server of the current game you are playing", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/emptyserverfinder.lua'))();")
 	BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
-	BrowserBtn("More Dex", "More Dex", "Adds More Explorers", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/moredex.lua'))();")
 end)
 --// End of Setup
 
