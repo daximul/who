@@ -2393,19 +2393,19 @@ end)
 
 --// Commands
 
-newCmd("commands", {"cmds"}, "commands / cmds", "List of Commands", function(args, speaker)
+newCmd("commands", {"cmds"}, "commands / cmds", "Open a List of Commands", function(args, speaker)
 	CmdListStatus(true)
 end)
 
-newCmd("ui", {}, "ui", "Open Dark Admin UI", function(args, speaker)
+newCmd("ui", {}, "ui", "Open the Dark Admin UI", function(args, speaker)
 	DaUiStatus(true)
 end)
 
-newCmd("browser", {}, "browser", "Plugin Browser", function(args, speaker)
+newCmd("browser", {}, "browser", "Open the Plugin Browser", function(args, speaker)
 	PlugBrowseStatus(true)
 end)
 
-newCmd("prefix", {}, "prefix [string]", "Change the prefix", function(args, speaker)
+newCmd("prefix", {}, "prefix [string]", "Change the Prefix", function(args, speaker)
 	local pref = args[1]
 	if typeof(pref) == "string" and #pref <= 2 then
 		Settings.Prefix = pref
@@ -2416,7 +2416,7 @@ newCmd("prefix", {}, "prefix [string]", "Change the prefix", function(args, spea
     end
 end)
 
-newCmd("currentprefix", {}, "currentprefix", "Notify current prefix", function(args, speaker)
+newCmd("currentprefix", {}, "currentprefix", "Notify the Current Prefix", function(args, speaker)
 	notify("", "Current prefix is " .. Settings.Prefix)
 end)
 
@@ -2457,26 +2457,26 @@ newCmd("niconet", {}, "niconet", "Run Nico's Net", function(args, speaker)
 	Import("ni_nt.lua")
 end)
 
-newCmd("autoloadnet", {}, "autoloadnet", "Load Full Network Ownership Upon Execute", function(args, speaker)
+newCmd("autoloadnet", {}, "autoloadnet", "Auto Load Full Network Ownership Upon Execute", function(args, speaker)
 	Settings.AutoNet = true
 	updatesaves()
 	notify("Auto Net", "Enabled")
 end)
 
-newCmd("unautoloadnet", {}, "unautoloadnet", "Disable Load Full Network Ownership Upon Execute", function(args, speaker)
+newCmd("unautoloadnet", {}, "unautoloadnet", "Disable Auto Load Full Network Ownership Upon Execute", function(args, speaker)
 	Settings.AutoNet = false
 	updatesaves()
 	notify("Auto Net", "Disabled")
 end)
 
-newCmd("netcheck", {}, "netcheck", "Notify who is using Network Ownership", function(args, speaker)
+newCmd("netcheck", {}, "netcheck", "Notify Who is Using Network Ownership", function(args, speaker)
 	local whoisnet = {}
 	for i,v in pairs(Players:GetPlayers()) do
-		if gethiddenproperty then	
-			if gethiddenproperty(v, "SimulationRadius") > 1000 then
+		if gethidden then	
+			if gethidden(v, "SimulationRadius") > 1000 then
 				table.insert(whoisnet, v.Name)
-			elseif set_hidden_property then
-				if get_hidden_property(v, "SimulationRadius") > 1000 then
+			elseif sethidden then
+				if gethidden(v, "SimulationRadius") > 1000 then
 					table.insert(whoisnet, v.Name)
 				end
 			end
@@ -2485,21 +2485,21 @@ newCmd("netcheck", {}, "netcheck", "Notify who is using Network Ownership", func
 	notify("Net Check", table.concat(whoisnet, ", "))
 end)
 
-newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "speed gamer", function(args, speaker)
+newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", function(args, speaker)
 	local wspeed = args[1]
-	if wspeed and isNumber(wspeed) then
+	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") and wspeed and isNumber(wspeed) then
 		speaker.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = wspeed
 	end
 end)
 
-newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "jump power gamer", function(args, speaker)
+newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "Change your JumpPower", function(args, speaker)
 	local jpower = args[1]
-	if jpower and isNumber(jpower) then
+	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") and jpower and isNumber(jpower) then
 		speaker.Character:FindFirstChildOfClass("Humanoid").JumpPower = jpower
 	end
 end)
 
-newCmd("goto", {"to"}, "goto / to [plr]", "tp to player", function(args, speaker)
+newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users) do
 		if Players[v].Character ~= nil then
@@ -2531,7 +2531,7 @@ newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 	notify("Noclip", "Noclip Enabled")
 end)
 
-newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop noclipping", function(args, speaker)
+newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args, speaker)
 	if Noclipping then
 		Noclipping:Disconnect()
 	end
@@ -2540,7 +2540,7 @@ newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop noclipping", function(args
 	notify("Noclip", "Noclip Disabled")
 end)
 
-newCmd("fly", {}, "fly [number]", "bird simulator", function(args, speaker)
+newCmd("fly", {}, "fly [number]", "Be Able to Fly", function(args, speaker)
 	NOFLY()
 	wait()
 	sFLY()
@@ -2550,7 +2550,7 @@ newCmd("fly", {}, "fly [number]", "bird simulator", function(args, speaker)
 	end
 end)
 
-newCmd("vfly", {"vehiclefly"}, "vfly / vehiclefly [number]", "Fly vehicles", function(args, speaker)
+newCmd("vfly", {"vehiclefly"}, "vfly / vehiclefly [number]", "Be Able to Make Vehicles Fly", function(args, speaker)
 	NOFLY()
 	wait()
 	sFLY(true)
@@ -2560,7 +2560,7 @@ newCmd("vfly", {"vehiclefly"}, "vfly / vehiclefly [number]", "Fly vehicles", fun
 	end
 end)
 
-newCmd("flyspeed", {"flysp"}, "flyspeed / flysp", "Change your flyspeed", function(args, speaker)
+newCmd("flyspeed", {"flysp"}, "flyspeed / flysp", "Change your Flyspeed", function(args, speaker)
 	local speed = args[1] or 1
 	if isNumber(speed) then
 		Settings.daflyspeed = speed
@@ -2568,7 +2568,7 @@ newCmd("flyspeed", {"flysp"}, "flyspeed / flysp", "Change your flyspeed", functi
 	end
 end)
 
-newCmd("vflyspeed", {"vflysp"}, "vflyspeed / vflysp", "Change your vehicle flyspeed", function(args, speaker)
+newCmd("vflyspeed", {"vflysp"}, "vflyspeed / vflysp", "Change your Vehicle Flyspeed", function(args, speaker)
 	local speed = args[1] or 1
 	if isNumber(speed) then
 		Settings.vehicleflyspeed = speed
@@ -2576,23 +2576,23 @@ newCmd("vflyspeed", {"vflysp"}, "vflyspeed / vflysp", "Change your vehicle flysp
 	end
 end)
 
-newCmd("unfly", {"unvfly"}, "unfly / unvfly", "Stop flying", function(args, speaker)
+newCmd("unfly", {"unvfly"}, "unfly / unvfly", "Stop Flying", function(args, speaker)
 	NOFLY()
 end)
 
-newCmd("anchor", {}, "anchor", "Makes your player unmovable", function(args, speaker)
+newCmd("anchor", {}, "anchor", "Anchor your RootPart", function(args, speaker)
 	speaker.Character.HumanoidRootPart.Anchored = true
 end)
 
-newCmd("unanchor", {}, "unanchor", "Makes your player movable again", function(args, speaker)
+newCmd("unanchor", {}, "unanchor", "Makes your Player Movable Again", function(args, speaker)
 	speaker.Character.HumanoidRootPart.Anchored = false
 end)
 
-newCmd("reset", {}, "reset", "die ig", function(args, speaker)
+newCmd("reset", {}, "reset", "Reset your Character", function(args, speaker)
 	speaker.Character:BreakJoints()
 end)
 
-newCmd("notify", {}, "notify [title] [desc] [time]", "notification LOL", function(args, speaker)
+newCmd("notify", {}, "notify [title] [desc] [time]", "Notify Yourself (i guess...)", function(args, speaker)
 	if args[3] ~= nil then
 		notify(args[1], args[2], args[3])
 	else
@@ -2600,7 +2600,7 @@ newCmd("notify", {}, "notify [title] [desc] [time]", "notification LOL", functio
 	end
 end)
 
-newCmd("checkclaim", {}, "checkclaim [plr]", "Check if a player is claimed", function(args, speaker)
+newCmd("checkclaim", {}, "checkclaim [plr]", "Check if a player is Claimed", function(args, speaker)
 	local isOwner = isnetworkowner
 	if isOwner then
 		local users = getPlayer(args[1], speaker)
@@ -2626,16 +2626,16 @@ newCmd("checkclaim", {}, "checkclaim [plr]", "Check if a player is claimed", fun
 	end
 end)
 
-newCmd("claimkill", {"ckill"}, "claimkill / ckill [plr]", "Kill a claimed user", function(args, speaker)
+newCmd("claimkill", {"ckill"}, "claimkill / ckill [plr]", "Kill a Claimed User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
-		if Target and Target.Character then
+		if Target and Target.Character and Target.Character:FindFirstChildOfClass("Humanoid") then
 			Target.Character:FindFirstChildOfClass("Humanoid").Health = 0
 		end
 	end
 end)
 
-newCmd("kill", {}, "kill [plr]", "Try to kill a user", function(args, speaker)
+newCmd("kill", {}, "kill [plr]", "Try to Kill a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
 		if Target and Target.Character then
@@ -2644,7 +2644,7 @@ newCmd("kill", {}, "kill [plr]", "Try to kill a user", function(args, speaker)
 	end
 end)
 
-newCmd("fastkill", {}, "fastkill [plr]", "Try to kill a user fast", function(args, speaker)
+newCmd("fastkill", {}, "fastkill [plr]", "Try to Kill a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
 		if Target and Target.Character then
@@ -2653,7 +2653,7 @@ newCmd("fastkill", {}, "fastkill [plr]", "Try to kill a user fast", function(arg
 	end
 end)
 
-newCmd("bring", {}, "bring [plr]", "Try to bring a user", function(args, speaker)
+newCmd("bring", {}, "bring [plr]", "Try to Bring a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
 		if Target and Target.Character then
@@ -2662,7 +2662,7 @@ newCmd("bring", {}, "bring [plr]", "Try to bring a user", function(args, speaker
 	end
 end)
 
-newCmd("fastbring", {}, "fastbring [plr]", "Try to bring a user fast", function(args, speaker)
+newCmd("fastbring", {}, "fastbring [plr]", "Try to Bring a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
 		if Target and Target.Character then
@@ -2671,7 +2671,7 @@ newCmd("fastbring", {}, "fastbring [plr]", "Try to bring a user fast", function(
 	end
 end)
 
-newCmd("clientbring", {"cbring"}, "clientbring / cbring [plr]", "Bring a user on your client", function(args, speaker)
+newCmd("clientbring", {"cbring"}, "clientbring / cbring [plr]", "Bring a User on your Client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users)do
 		if Players[v].Character ~= nil then
@@ -2684,15 +2684,15 @@ newCmd("clientbring", {"cbring"}, "clientbring / cbring [plr]", "Bring a user on
 	end
 end)
 
-newCmd("respawn", {}, "respawn", "Respawn your character", function(args, speaker)
+newCmd("respawn", {}, "respawn", "Respawn your Character", function(args, speaker)
 	respawn(speaker)
 end)
 
-newCmd("refresh", {"re"}, "refresh / re", "Respawn in the same spot", function(args, speaker)
+newCmd("refresh", {"re"}, "refresh / re", "Respawn in the Same Spot", function(args, speaker)
 	refresh(speaker)
 end)
 
-newCmd("split", {}, "split", "Become cut in half", function(args, speaker)
+newCmd("split", {}, "split", "Split Your Character in Half", function(args, speaker)
 	if r15(speaker) then
 		speaker.Character.UpperTorso.Waist:Destroy()
 	else
@@ -2700,7 +2700,7 @@ newCmd("split", {}, "split", "Become cut in half", function(args, speaker)
 	end
 end)
 
-newCmd("float", {}, "float", "Walk on an invisible part", function(args, speaker)
+newCmd("float", {}, "float", "Walk On An Invisible Part to Look Like You Are Floating", function(args, speaker)
 	Floating = true
 	local pchar = speaker.Character
 	if pchar and not pchar:FindFirstChild(floatName) then
@@ -2762,7 +2762,7 @@ newCmd("float", {}, "float", "Walk on an invisible part", function(args, speaker
 	end
 end)
 
-newCmd("unfloat", {}, "unfloat", "Stop floating", function(args, speaker)
+newCmd("unfloat", {}, "unfloat", "Disable Floating", function(args, speaker)
 	Floating = false
 	local pchar = speaker.Character
 	notify("Float", "Float Disabled")
@@ -2779,21 +2779,25 @@ newCmd("unfloat", {}, "unfloat", "Stop floating", function(args, speaker)
 	end
 end)
 
-newCmd("sit", {}, "sit", "omega bruh", function(args, speaker)
+newCmd("sit", {}, "sit", "Make your Character Sit", function(args, speaker)
 	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
 		speaker.Character:FindFirstChildOfClass("Humanoid").Sit = true
 	end
 end)
 
 newCmd("stun", {}, "stun", "Enable Platform Stand", function(args, speaker)
-	speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
+	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
+		speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
+	end
 end)
 
 newCmd("unstun", {}, "unstun", "Disable Platform Stand", function(args, speaker)
-	speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
+		speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+	end
 end)
 
-newCmd("jump", {}, "jump", "Jump", function(args, speaker)
+newCmd("jump", {}, "jump", "Make your Character Jump", function(args, speaker)
 	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
 		speaker.Character:FindFirstChildOfClass("Humanoid").Jump = true
 	end
@@ -2837,7 +2841,7 @@ newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Char
 	end
 end)
 
-newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't get kicked for being AFK", function(args, speaker)
+newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't Get Kicked for Being AFK", function(args, speaker)
 	local GC = getconnections or get_signal_cons
 	if GC then
 		for i,v in pairs(GC(Players.LocalPlayer.Idled)) do
