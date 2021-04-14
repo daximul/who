@@ -2907,14 +2907,24 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 	Load(Dex)
 end)
 
+newCmd("sentineldex", {}, "sentineldex", "Load Sentinel's Dex", function(args, speaker)
+	notify("Loading", "Hold on a sec", 2)
+	loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua"))();
+end)
+
+newCmd("dexv2", {}, "dexv2", "Load Dex v2", function(args, speaker)
+	notify("Loading", "Hold on a sec", 2)
+	loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
+end)
+
 newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Load a Remote Spy (SimpleSpy)", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGetAsync("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+	loadstring(game:HttpGetAsync(("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua")))();
 end)
 
 newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGet(('https://pastebin.com/raw/GmbrsEjM'),true))()
+	loadstring(game:HttpGetAsync(("https://pastebin.com/raw/GmbrsEjM")))();
 end)
 
 newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, speaker)
