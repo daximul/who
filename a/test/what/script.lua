@@ -1566,7 +1566,7 @@ function LoadPlugin(val,startup)
 				for i,v in pairs(cmdNames) do
 					newName = newName:gsub(v,v..cmdExt)
 				end
-				addcmdtext(newName,val,v["Description"],true)
+				addcmdtext(newName, val, v["Description"], true)
 				addcmdareatext(cmdName, newName, v["Aliases"], v["Description"], true)
 			else
 				addcmdtext(cmdName,val,v["Description"],true)
