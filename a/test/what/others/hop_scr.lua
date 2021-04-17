@@ -1,76 +1,76 @@
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 
 local BhopInfo = {
-    CurrentVel = 0,
-    VelCap = 3,
-    JumpBoostAmt = 0.1
+	CurrentVel = 0,
+	VelCap = 3,
+	JumpBoostAmt = 0.1
 }
 
 local RolvePatch = false
-local RolvePlaces = {286090429, 301549746, 328028363, 4572253581, 746820961, 4292776423, 2182391396, 2609550642}
-
-if table.find(RolvePlaces, game.PlaceId) then
-  RolvePatch = true
-else
-  RolvePatch = false
+if game.CreatorType == Enum.CreatorType.Group then
+	local Group = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId)
+	if Group.Name == "ROLVe Community" then
+		RolvePatch = true
+	end
 end
 
-local helper = {
-    getChar = function()
-        return Players.LocalPlayer.Character
-    end
-}
+local function GetCharacter()
+	return Players.LocalPlayer.Character
+end
 
-local function checkOnGround(char)
-    local ray = Ray.new(char.HumanoidRootPart.Position,-(char.HumanoidRootPart.CFrame.UpVector * 100))
-    local part, pos = workspace:FindPartOnRay(ray,char)
-    
-    if part then
-        if pos then
-            local farness = math.ceil((char.HumanoidRootPart.Position - pos).Magnitude)
-            if farness > 3 then
-                return false
-            elseif farness <= 3 then
-                return true
-            end
-        end
-    end
+local function GetHumanoid()
+	return Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+end
+
+local function CheckOnGround(char)
+	local ray = Ray.new(char.HumanoidRootPart.Position,-(char.HumanoidRootPart.CFrame.UpVector * 100))
+	local part, pos = workspace:FindPartOnRay(ray,char)
+	
+	if part then
+		if pos then
+			local farness = math.ceil((char.HumanoidRootPart.Position - pos).Magnitude)
+			if farness > 3 then
+				return false
+			elseif farness <= 3 then
+				return true
+			end
+		end
+	end
 end
 
 
 
-UIS.JumpRequest:Connect(function()
-
-    if (UIS:IsKeyDown(Enum.KeyCode.W) == false) and (UIS:IsKeyDown(Enum.KeyCode.A) or UIS:IsKeyDown(Enum.KeyCode.D)) == true and BhopInfo.CurrentVel < BhopInfo.VelCap then
-        BhopInfo.CurrentVel = BhopInfo.CurrentVel + BhopInfo.JumpBoostAmt
-    end
+UserInputService.JumpRequest:Connect(function()
+	if (UserInputService:IsKeyDown(Enum.KeyCode.W) == false) and (UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.D)) == true and BhopInfo.CurrentVel < BhopInfo.VelCap then
+		BhopInfo.CurrentVel = BhopInfo.CurrentVel + BhopInfo.JumpBoostAmt
+	end
 end)
 
-local char = helper.getChar()
+local Human = GetHumanoid()
 
-char.Humanoid.StateChanged:Connect(function(oldstate,newstate)
-    if newstate == Enum.HumanoidStateType.Landed then
-        char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,true)
-    end
+Human.StateChanged:Connect(function(oldstate, newstate)
+	if newstate == Enum.HumanoidStateType.Landed then
+		Human:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+	end
 end)
 
 spawn(function()
-    while true do
-        local char = helper.getChar()
-    
-        if checkOnGround(char) == false and BhopInfo.CurrentVel ~= 0 then
-            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame + (char.HumanoidRootPart.CFrame.LookVector * BhopInfo.CurrentVel/6)
-        end
-
-        if UIS:IsKeyDown(Enum.KeyCode.Space) == false then
-            BhopInfo.CurrentVel = 0
-        elseif UIS:IsKeyDown(Enum.KeyCode.Space) == true and UIS:IsKeyDown(Enum.KeyCode.W) then
-            BhopInfo.CurrentVel = math.clamp(BhopInfo.CurrentVel - 0.01, 0, BhopInfo.VelCap)
-        elseif UIS:IsKeyDown(Enum.KeyCode.Space) == true then
-            if RolvePatch == true then char.Humanoid.Jump = true end
-        end
-
-        game:GetService("RunService").Stepped:Wait()
-    end
+	while true do
+		local Char = GetCharacter()
+		
+		if CheckOnGround(Char) == false and BhopInfo.CurrentVel ~= 0 then
+			Char.HumanoidRootPart.CFrame = Char.HumanoidRootPart.CFrame + (Char.HumanoidRootPart.CFrame.LookVector * BhopInfo.CurrentVel/6)
+		end
+		
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) == false then
+			BhopInfo.CurrentVel = 0
+		elseif UserInputService:IsKeyDown(Enum.KeyCode.Space) == true and UserInputService:IsKeyDown(Enum.KeyCode.W) then
+			BhopInfo.CurrentVel = math.clamp(BhopInfo.CurrentVel - 0.01,0,BhopInfo.VelCap)
+		elseif UserInputService:IsKeyDown(Enum.KeyCode.Space) == true then
+			if RolvePatch == true then Char.Humanoid.Jump = true end
+		end
+		
+		game:GetService("RunService").Stepped:Wait()
+	end
 end)
