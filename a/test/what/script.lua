@@ -2089,9 +2089,7 @@ end
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
-		spawn(function()
-			IndexContents(Cmdbar.Text)
-		end)
+		IndexContents(Cmdbar.Text)
 	end
 end)
 
