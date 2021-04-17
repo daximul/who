@@ -4,9 +4,9 @@ local Plugin = {
 	["Commands"] = {
 		["bhop"] = {
 			["ListName"] = "bhop",
-			["Description"] = "Start Bhopping",
+			["Description"] = "Start Up the Bhop Mechanic",
 			["Aliases"] = {},
-			["Function"] = function(args,speaker)
+			["Function"] = function(args, speaker)
 				 loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/hop_scr.lua"))();
 			end,
 		},
