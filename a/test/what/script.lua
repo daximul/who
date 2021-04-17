@@ -2089,29 +2089,37 @@ end
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
-		IndexContents(Cmdbar.Text)
+		spawn(function()
+			IndexContents(Cmdbar.Text)
+		end)
 	end
 end)
 
 Players.LocalPlayer.Chatted:Connect(function(message)
-	wait()
-	message = message:lower()
-	do_exec(message, Players.LocalPlayer)
+	spawn(function()
+		wait()
+		message = message:lower()
+		do_exec(message, Players.LocalPlayer)
+	end)
 end)
 
 DAMouse.KeyDown:Connect(function(key)
 	if (key == Settings.Prefix) then
-		CaptureCmdBar()
+		spawn(function()
+			CaptureCmdBar()
+		end)
 	end
 end)
 
 Cmdbar.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
-		pcall(function()
+		spawn(function()
 			CmdBarStatus(false)
 		end)
-		local cmdbarText = Cmdbar.Text:gsub("^"..'%'..Settings.Prefix,"")
-		execCmd(cmdbarText,Players.LocalPlayer,true)
+		spawn(function()
+			local cmdbarText = Cmdbar.Text:gsub("^"..'%'..Settings.Prefix,"")
+			execCmd(cmdbarText,Players.LocalPlayer,true)
+		end)
 	end
 	wait()
 	if not Cmdbar:IsFocused() then
