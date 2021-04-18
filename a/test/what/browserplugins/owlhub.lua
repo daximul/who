@@ -7,8 +7,11 @@ local Plugin = {
 			["Description"] = "Load Owl Hub",
 			["Aliases"] = {},
 			["Function"] = function(args,speaker)
-				 -- loadstring(game:HttpGet("https://raw.githubusercontent.com/ZinityDrops/OwlHubLink/master/OwlHubBack.lua"))();
-				loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/owlhub.lua"))();
+				if (not is_sirhurt_closure) and syn then
+					loadstring(game:HttpGet("https://raw.githubusercontent.com/ZinityDrops/OwlHubLink/master/OwlHubBack.lua"))();
+				else
+					loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/owlhub.lua"))();
+				end
 			end,
 		},
 	},
