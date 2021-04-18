@@ -35,8 +35,6 @@ local function CheckOnGround(char)
 	end
 end
 
-
-
 UserInputService.JumpRequest:Connect(function()
 	if ScriptEnabled == true then
 		if (UserInputService:IsKeyDown(Enum.KeyCode.W) == false) and (UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.D)) == true and BhopInfo.CurrentVel < BhopInfo.VelCap then
