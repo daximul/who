@@ -2390,6 +2390,7 @@ spawn(function()
 	BrowserBtn("Empty Server Finder", "Empty Server Finder", "Find the emptiest server of the current game you are playing", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/emptyserverfinder.lua'))();")
 	BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
 	BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
+	BrowserBtn("Syn Net", "Syn Net [WARNING]", "Load Synttax's Net\n\nUpon adding this plugin, you sign the agreement of anything bad happening to you is not the fault of the DA Team.\n\nMake sure all your IY plugins are in a folder. Yes, they can be in a folder.\naddplugin IY/bruh", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/synnet.lua'))();")
 end)
 --// End of Setup
 
