@@ -1,4 +1,4 @@
-local Interface = game:GetObjects("rbxassetid://6550967663")[1]
+local Interface = game:GetObjects("rbxassetid://6700620187")[1]
 Interface.Main.Position = UDim2.new(0.5, -75, 1.5, -105)
 Interface.NotificationTemplate.Position = UDim2.new(-1, -75, 1.029, -105)
 Interface.CMDS.Position = UDim2.new(0.694, -75, 10, -105)
@@ -9,5 +9,5 @@ Interface.Assets.CommandTemplate.Label.TextScaled = true
 Interface.Tooltip.Title.TextScaled = true
 Interface.Tooltip.Border.Frame.Description.TextScaled = true
 Interface.Main.Box.Text = ""
-Interface.Main.cmdsu.Text = "commands"
+Interface.Main.cmdsu.Text = ""
 return Interface
