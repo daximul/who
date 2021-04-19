@@ -7,7 +7,7 @@ local Build = DA_PUBLIC_USER_BUILD
 
 local function Themeify(bgc3, bc3)
 	for i,v in pairs(Build.Interface:GetDescendants()) do
-		if v:IsA("TextButton") or v:IsA("Frame") or (v.Name == "Box" and v.Parent.Name == "CmdSearch") then
+		if v:IsA("TextButton") or v:IsA("Frame") or (v.Name == "Box" and v.Parent.Name == "CmdSearch") or (v.Name == "Box" and v.Parent.Name == "PrefixBox") then
 			v.BackgroundColor3 = Color3.fromRGB(bgc3[1], bgc3[2], bgc3[3])
 			v.BorderColor3 = Color3.fromRGB(bc3[1], bc3[2], bc3[3])
 		end
