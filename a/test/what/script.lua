@@ -452,6 +452,7 @@ function notify(NotifName, NotifDesc, NotifDuration)
 			NewNotification.Parent = GUI.Notifications
 			NewNotification.Title.Text = NotificationName
 			NewNotification.Border.Frame.Description.Text = NotifDesc
+			NewNotification.Size = UDim2.new(0, (150 + NewNotification.Title.TextBounds.Y), 0, 73)
 			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
 		else
 			for i,v in pairs(Notifications) do
@@ -462,6 +463,7 @@ function notify(NotifName, NotifDesc, NotifDuration)
 			NewNotification.Parent = GUI.Notifications
 			NewNotification.Title.Text = NotificationName
 			NewNotification.Border.Frame.Description.Text = NotifDesc
+			NewNotification.Size = UDim2.new(0, (150 + NewNotification.Title.TextBounds.Y), 0, 73)
 			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
 			delay(NotificationDuration,function()
 				NewNotification:TweenPosition(UDim2.new(-1, -75, NewNotification.Position.Y.Scale, -105),"InOut","Linear",0.2,true);wait(0.2)
