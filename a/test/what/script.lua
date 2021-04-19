@@ -2478,19 +2478,32 @@ newCmd("unautoloadnet", {}, "unautoloadnet", "Disable Auto Load Full Network Own
 end)
 
 newCmd("netcheck", {}, "netcheck", "Notify Who is Using Network Ownership", function(args, speaker)
-	local whoisnet = {}
-	for i,v in pairs(Players:GetPlayers()) do
-		if gethidden then	
-			if gethidden(v, "SimulationRadius") > 1000 then
-				table.insert(whoisnet, v.Name)
-			elseif sethidden then
-				if gethidden(v, "SimulationRadius") > 1000 then
-					table.insert(whoisnet, v.Name)
-				end
+	local CheckIfWorks = pcall(function()
+		gethidden(Players.LocalPlayer, "SimulationRadius")
+	end)
+	
+	local Plrs = {}
+	local Msg = ""
+	
+	if CheckIfWorks then
+		for i, v in pairs(Players:GetPlayers()) do
+			if gethidden(v, "SimulationRadius") >= 5000 then
+				table.insert(Plrs, v.Name)
 			end
 		end
+		
+		if #Plrs <= 0 then
+			Msg = "No Players Found"
+		elseif #Plrs == 1 then
+			Msg = Plrs[1]
+		elseif #Plrs > 1 then
+			Msg = table.concat(Plrs, ", ")
+		end
+		
+		return notify("Net Check", Msg)
+	else
+		return notify("Incompatible Exploit", "Missing gethiddenproperty")
 	end
-	notify("Net Check", table.concat(whoisnet, ", "))
 end)
 
 newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", function(args, speaker)
