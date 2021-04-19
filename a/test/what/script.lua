@@ -66,7 +66,6 @@ local cmds = {}
 local customAlias = {}
 local DEBUG = false
 local Network_Loop = nil
-local Old_Net_Method = true
 local SU_SomeCheckPlace = {
 	Attachment = "HairAttachment";
 }
@@ -106,6 +105,7 @@ local LastDeathPos = nil
 local spawnpos = nil
 local spawnpoint = false
 local spDelay = 0.1
+local WallTpTouch = nil
 FLYING = false
 viewing = nil
 fcRunning = false
@@ -363,17 +363,15 @@ end
 
 -- net is patched, both methods dont work now. fix this idiot : snipdoa
 local function SetSimulationRadius()
-	if Old_Net_Method == true then
-		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+	Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+		pcall(function()
 			workspace.FallenPartsDestroyHeight = 0/1/0
 			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
 			settings().Physics.AllowSleep = false
 			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
 			Players.LocalPlayer.SimulationRadius = math.huge
 		end)
-	else
-		Import("cl_net.lua")
-	end
+	end)
 end
 
 function CmdListStatus(bool)
@@ -2376,7 +2374,7 @@ spawn(function()
 end)
 spawn(function()
 	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
-	BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\nControls\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
+	BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\n~ Controls ~\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
 	BrowserBtn("Freecam", "Freecam", "Control your Camera in a Smooth way", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/freecam.lua'))();")
 	BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
 	BrowserBtn("Chat Spy", "Chat Spy", "Spy on Messages in Chat", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chatspy.lua'))();")
@@ -2461,8 +2459,10 @@ newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", func
 end)
 
 newCmd("niconet", {}, "niconet", "Run Nico's Net", function(args, speaker)
-	notify("", "Simradius set to Ni_Nt")
-	Import("ni_nt.lua")
+	notify("", "Simradius set to Inf")
+	pcall(function()
+		Import("ni_nt.lua")
+	end)
 end)
 
 newCmd("autoloadnet", {}, "autoloadnet", "Auto Load Full Network Ownership Upon Execute", function(args, speaker)
@@ -2828,6 +2828,10 @@ newCmd("screenshot", {}, "screenshot", "Take a Screenshot", function(args, speak
 	return game:GetService("CoreGui"):TakeScreenshot()
 end)
 
+newCmd("togglefullscreen", {"togglefs"}, "togglefullscreen / togglefs", "Toggles Fullscreen", function(args, speaker)
+	return game:GetService("GuiService"):ToggleFullscreen()
+end)
+
 newCmd("addplugin", {}, "addplugin [string]", "Add a Plugin", function(args, speaker)
 	addPlugin(getstring(1))
 	updatesaves()
@@ -2890,56 +2894,52 @@ newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
 end)
 
 newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
-	notify("Loading", "Hold on a sec")
-	wait(0.2)
-	local Dex = game:GetObjects("rbxassetid://3567096419")[1]
-	ParentGui(Dex)
-	local function Load(Obj, Url)
-		local function GiveOwnGlobals(Func, Script)
-			local Fenv = {}
-			local RealFenv = {script = Script}
-			local FenvMt = {}
-			FenvMt.__index = function(a,b)
-				if RealFenv[b] == nil then
-					return getfenv()[b]
-				else
-					return RealFenv[b]
+	if (not is_sirhurt_closure) and syn then
+		notify("Loading", "Hold on a sec")
+		wait(0.2)
+		local Dex = game:GetObjects("rbxassetid://3567096419")[1]
+		ParentGui(Dex)
+		local function Load(Obj, Url)
+			local function GiveOwnGlobals(Func, Script)
+				local Fenv = {}
+				local RealFenv = {script = Script}
+				local FenvMt = {}
+				FenvMt.__index = function(a,b)
+					if RealFenv[b] == nil then
+						return getfenv()[b]
+					else
+						return RealFenv[b]
+					end
+				end
+				FenvMt.__newindex = function(a, b, c)
+					if RealFenv[b] == nil then
+						getfenv()[b] = c
+					else
+						RealFenv[b] = c
+					end
+				end
+				setmetatable(Fenv, FenvMt)
+				setfenv(Func, Fenv)
+				return Func
+			end
+			local function LoadScripts(Script)
+				if Script.ClassName == "Script" or Script.ClassName == "LocalScript" then
+					spawn(function()
+						GiveOwnGlobals(loadstring(Script.Source, "=" .. Script:GetFullName()), Script)()
+					end)
+				end
+				for i,v in pairs(Script:GetChildren()) do
+					LoadScripts(v)
 				end
 			end
-			FenvMt.__newindex = function(a, b, c)
-				if RealFenv[b] == nil then
-					getfenv()[b] = c
-				else
-					RealFenv[b] = c
-				end
-			end
-			setmetatable(Fenv, FenvMt)
-			setfenv(Func, Fenv)
-			return Func
+			LoadScripts(Obj)
 		end
-		local function LoadScripts(Script)
-			if Script.ClassName == "Script" or Script.ClassName == "LocalScript" then
-				spawn(function()
-					GiveOwnGlobals(loadstring(Script.Source, "=" .. Script:GetFullName()), Script)()
-				end)
-			end
-			for i,v in pairs(Script:GetChildren()) do
-				LoadScripts(v)
-			end
-		end
-		LoadScripts(Obj)
+		Load(Dex)
+	else
+		notify("Loading", "Hold on a sec")
+		wait(0.2)
+		loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
 	end
-	Load(Dex)
-end)
-
-newCmd("sentineldex", {}, "sentineldex", "Load Sentinel's Dex", function(args, speaker)
-	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua"))();
-end)
-
-newCmd("dexv2", {}, "dexv2", "Load Dex v2", function(args, speaker)
-	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
 end)
 
 newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Load a Remote Spy (SimpleSpy)", function(args, speaker)
@@ -4334,6 +4334,74 @@ newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value
 		setReadOnly(GameMt, true)
 	else
 		notify("Meta Hook", "Missing a Argument")
+	end
+end)
+
+newCmd("cancelteleport", {"canceltp"}, "cancelteleport / canceltp", "Cancels Teleports in Progress", function(args, speaker)
+	game:GetService("TeleportService"):TeleportCancel()
+end)
+
+newCmd("copyemote", {}, "copyemote [plr]", "Copies a Player's Animation", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for _,v in ipairs(players)do
+		local char = Players[v].Character
+		for _, v1 in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+			v1:Stop()
+		end
+		for _, v1 in pairs(Players[v].Character:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+			if not string.find(v1.Animation.AnimationId, "507768375") then
+				local PlayerAnimation = speaker.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(v1.Animation)
+				PlayerAnimation:Play(.1, 1, v1.Speed)
+				PlayerAnimation.TimePosition = v1.TimePosition
+				spawn(function()
+					v1.Stopped:Wait()
+					PlayerAnimation:Stop()
+					PlayerAnimation:Destroy()
+				end)
+			end
+		end
+	end
+end)
+
+newCmd("teleporttool", {"tptool"}, "teleporttool / tptool", "Gives You a Teleport Tool", function(args, speaker)
+	local TpTool = Instance.new("Tool")
+	TpTool.Name = "Teleport Tool"
+	TpTool.RequiresHandle = false
+	TpTool.Parent = speaker.Backpack
+	TpTool.Activated:Connect(function()
+		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
+		local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
+		if not Char or not HRP then
+			return notify("Error", "Failed to Find HumanoidRootPart")
+		end
+		HRP.CFrame = CFrame.new(DAMouse.Hit.X, DAMouse.Hit.Y + 3, DAMouse.Hit.Z, select(4, HRP.CFrame:components()))
+	end)
+end)
+
+newCmd("walltp", {}, "walltp", "Teleports You Above/Over Any Wall You Run Into", function(args, speaker)
+	local Torso = nil
+	if r15(speaker) then
+		Torso = speaker.Character.UpperTorso
+	else
+		Torso = speaker.Character.Torso
+	end
+	local function TouchedFunc(hit)
+		local Root = getRoot(speaker.Character)
+		if hit:IsA("BasePart") and hit.Position.Y > Root.Position.Y - speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight then
+			local HitP = getRoot(hit.Parent)
+			if HitP ~= nil then
+				Root.CFrame = hit.CFrame * CFrame.new(Root.CFrame.lookVector.X,HitP.Size.Z/2 + speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight,Root.CFrame.lookVector.Z)
+			elseif HitP == nil then
+				Root.CFrame = hit.CFrame * CFrame.new(Root.CFrame.lookVector.X,hit.Size.Y/2 + speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight,Root.CFrame.lookVector.Z)
+			end
+		end
+	end
+	WallTpTouch = Torso.Touched:Connect(TouchedFunc)
+end)
+
+newCmd("unwalltp", {}, "unwalltp", "Disables Walltp", function(args, speaker)
+	if WallTpTouch then
+		WallTpTouch:Disconnect()
 	end
 end)
 
