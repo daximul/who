@@ -106,6 +106,8 @@ local spawnpos = nil
 local spawnpoint = false
 local spDelay = 0.1
 local WallTpTouch = nil
+local walkto = false
+local StareLoop = nil
 FLYING = false
 viewing = nil
 fcRunning = false
@@ -2824,12 +2826,12 @@ newCmd("jump", {}, "jump", "Make your Character Jump", function(args, speaker)
 	end
 end)
 
-newCmd("screenshot", {}, "screenshot", "Take a Screenshot", function(args, speaker)
-	return game:GetService("CoreGui"):TakeScreenshot()
-end)
-
 newCmd("togglefullscreen", {"togglefs"}, "togglefullscreen / togglefs", "Toggles Fullscreen", function(args, speaker)
 	return game:GetService("GuiService"):ToggleFullscreen()
+end)
+
+newCmd("screenshot", {}, "screenshot", "Take a Screenshot", function(args, speaker)
+	return game:GetService("CoreGui"):TakeScreenshot()
 end)
 
 newCmd("addplugin", {}, "addplugin [string]", "Add a Plugin", function(args, speaker)
@@ -4032,6 +4034,42 @@ newCmd("nofog", {}, "nofog (Client)", "Removes Fog", function(args, speaker)
 	game:GetService("Lighting").FogEnd = 100000
 end)
 
+newCmd("brightness", {}, "brightness [num] (Client)", "Changes the Brightness Lighting Property", function(args, speaker)
+	if args[1] then
+		game:GetService("Lighting").Brightness = args[1]
+	else
+		game:GetService("Lighting").Brightness = origsettings.Lighting.brt
+	end
+end)
+
+newCmd("globalshadows", {"gshadows"}, "globalshadows / gshadows", "Enables Global Shadows", function(args, speaker)
+	game:GetService("Lighting").GlobalShadows = true
+end)
+
+newCmd("noglobalshadows", {"nogshadows"}, "noglobalshadows / nogshadows", "Disables Global Shadows", function(args, speaker)
+	game:GetService("Lighting").GlobalShadows = false
+end)
+
+newCmd("light", {}, "light [radius] [brightness] (Client)", "Gives your Player Dynamic Light", function(args, speaker)
+	local light = Instance.new("PointLight")
+	light.Parent = getRoot(speaker.Character)
+	light.Range = 30
+	if args[1] then
+		light.Brightness = args[2]
+		light.Range = args[1]
+	else
+		light.Brightness = 5
+	end
+end)
+
+newCmd("unlight", {}, "unlight", "Removes Dynamic Light from your Player", function(args, speaker)
+	for i,v in pairs(speaker.Character:GetDescendants()) do
+		if v.ClassName == "PointLight" then
+			v:Destroy()
+		end
+	end
+end)
+
 newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting Properties", function(args, speaker)
 	game:GetService("Lighting").Ambient = origsettings.Lighting.abt
 	game:GetService("Lighting").OutdoorAmbient = origsettings.Lighting.oabt
@@ -4402,6 +4440,170 @@ end)
 newCmd("unwalltp", {}, "unwalltp", "Disables Walltp", function(args, speaker)
 	if WallTpTouch then
 		WallTpTouch:Disconnect()
+	end
+end)
+
+newCmd("bang", {}, "bang [plr] [speed]", "I don't want to explain this", function(args, speaker)
+	if not r15(speaker) then
+		execCmd("unbang")
+		wait()
+		local players = getPlayer(args[1], speaker)
+		for i,v in pairs(players) do
+			bangAnim = Instance.new("Animation")
+			bangAnim.AnimationId = "rbxassetid://148840371"
+			bang = speaker.Character.Humanoid:LoadAnimation(bangAnim)
+			bang:Play(.1, 1, 1)
+			if args[2] then
+				bang:AdjustSpeed(args[2])
+			else
+				bang:AdjustSpeed(3)
+			end
+			local bangplr = Players[v].Name
+			bangDied = speaker.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+				bangLoop:Disconnect()
+				bang:Stop()
+				bangAnim:Destroy()
+				bangDied:Disconnect()
+			end)
+			bangLoop = game:GetService("RunService").Stepped:Connect(function()
+				pcall(function()
+					getRoot(Players.LocalPlayer.Character).CFrame = getRoot(Players[bangplr].Character).CFrame
+				end)
+			end)
+		end
+	else
+		notify("R6 Required", "Requires R6 Rig Type")
+	end
+end)
+
+newCmd("unbang", {}, "unbang", "Humanity Restored", function(args, speaker)
+	if bangLoop then
+		bangLoop:Disconnect()
+		bangDied:Disconnect()
+		bang:Stop()
+		bangAnim:Destroy()
+	end
+end)
+
+newCmd("carpet", {}, "carpet [plr]", "Become a Player's Carpet", function(args, speaker)
+	if not r15(speaker) then
+		execCmd("uncarpet")
+		wait()
+		local players = getPlayer(args[1], speaker)
+		for i,v in pairs(players) do
+			carpetAnim = Instance.new("Animation")
+			carpetAnim.AnimationId = "rbxassetid://282574440"
+			carpet = speaker.Character.Humanoid:LoadAnimation(carpetAnim)
+			carpet:Play(.1, 1, 1)
+			local carpetplr = Players[v].Name
+			carpetDied = speaker.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+				carpetLoop:Disconnect()
+				carpet:Stop()
+				carpetAnim:Destroy()
+				carpetDied:Disconnect()
+			end)
+			carpetLoop = game:GetService("RunService").Heartbeat:Connect(function()
+				pcall(function()
+					getRoot(Players.LocalPlayer.Character).CFrame = getRoot(Players[carpetplr].Character).CFrame
+				end)
+			end)
+		end
+	else
+		notify("R6 Required", "Requires R6 Rig Type")
+	end
+end)
+
+newCmd("uncarpet", {}, "uncarpet", "Undoes Carpet", function(args, speaker)
+	if carpetLoop then
+		carpetLoop:Disconnect()
+		carpetDied:Disconnect()
+		carpet:Stop()
+		carpetAnim:Destroy()
+	end
+end)
+
+newCmd("walkto", {"follow"}, "walkto / follow [plr]", "Follow a Player", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		if Players[v].Character ~= nil then
+			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
+				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+				wait(.1)
+			end
+			walkto = true
+			repeat wait()
+				speaker.Character:FindFirstChildOfClass("Humanoid"):MoveTo(getRoot(Players[v].Character).Position)
+			until Players[v].Character == nil or not getRoot(Players[v].Character) or walkto == false
+		end
+	end
+end)
+
+newCmd("pathfindwalkto", {"pathfindfollow"}, "pathfindwalkto / pathfindfollow [plr]", "Follow a Player Using Pathfinding", function(args, speaker)
+	walkto = false
+	wait()
+	local players = getPlayer(args[1], speaker)
+	local PathService = game:GetService("PathfindingService")
+	local hum = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+	local path = PathService:CreatePath()
+	for i,v in pairs(players) do
+		if Players[v].Character ~= nil then
+			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
+				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+				wait(.1)
+			end
+			walkto = true
+			repeat wait()
+				local success, response = pcall(function()
+					path:ComputeAsync(getRoot(speaker.Character).Position, getRoot(Players[v].Character).Position)
+					local waypoints = path:GetWaypoints()
+					local distance 
+					for waypointIndex, waypoint in pairs(waypoints) do
+						local waypointPosition = waypoint.Position
+						hum:MoveTo(waypointPosition)
+						repeat 
+							distance = (waypointPosition - hum.Parent.PrimaryPart.Position).magnitude
+							wait()
+						until
+						distance <= 5
+					end	 
+				end)
+				if not success then
+					speaker.Character:FindFirstChildOfClass("Humanoid"):MoveTo(getRoot(Players[v].Character).Position)
+				end
+			until Players[v].Character == nil or not getRoot(Players[v].Character) or walkto == false
+		end
+	end
+end)
+
+newCmd("unwalkto", {"unfollow"}, "unwalkto / unfollow", "Follow a Player Using Pathfinding", function(args, speaker)
+	walkto = false
+end)
+
+newCmd("stare", {}, "stare [plr]", "Stare at a Player", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		if StareLoop then
+			StareLoop:Disconnect()
+		end
+		if not Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and Players[v].Character:FindFirstChild("HumanoidRootPart") then return end
+		local function StareFunc()
+			if Players.LocalPlayer.Character.PrimaryPart and Players:FindFirstChild(v) and Players[v].Character ~= nil and Players[v].Character:FindFirstChild("HumanoidRootPart") then
+				local chrPos = Players.LocalPlayer.Character.PrimaryPart.Position
+				local tPos = Players[v].Character:FindFirstChild("HumanoidRootPart").Position
+				local modTPos = Vector3.new(tPos.X, chrPos.Y, tPos.Z)
+				local newCF = CFrame.new(chrPos, modTPos)
+				Players.LocalPlayer.Character:SetPrimaryPartCFrame(newCF)
+			elseif not Players:FindFirstChild(v) then
+				StareLoop:Disconnect()
+			end
+		end
+		StareLoop = game:GetService("RunService").RenderStepped:Connect(StareFunc)
+	end
+end)
+
+newCmd("unstare", {}, "unstare [plr]", "Disables Stare", function(args, speaker)
+	if StareLoop then
+		StareLoop:Disconnect()
 	end
 end)
 
