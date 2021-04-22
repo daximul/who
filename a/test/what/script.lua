@@ -363,15 +363,17 @@ function tools(plr)
 	end
 end
 
--- net is patched, both methods dont work now. fix this idiot : snipdoa
+--// Net is patched. Fix this idiot Dax
+-- snipdoa
 local function SetSimulationRadius()
 	Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
 		pcall(function()
 			workspace.FallenPartsDestroyHeight = 0/1/0
 			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
 			settings().Physics.AllowSleep = false
-			setsimulationradius(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+			setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
 			Players.LocalPlayer.SimulationRadius = math.huge
+			Players.LocalPlayer.ReplicationFocus = workspace
 		end)
 	end)
 end
