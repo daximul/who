@@ -4669,6 +4669,11 @@ newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set
 	end
 end)
 
+newCmd("nameprotect", {}, "nameprotect", "Protect your Name Locally by Setting it to \"User\"", function(args, speaker)
+	Import("nameprot.lua")
+	notify("", "Name Protected")
+end)
+
 
 
 
