@@ -1,4 +1,4 @@
-while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer or not game:GetService("Players").LocalPlayer.PlayerGui do wait() end
+pcall(function() while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer or not game:GetService("Players").LocalPlayer:FindFirstChildOfClass("PlayerGui") do wait() end end)
 
 if DA_ISLOADED then
 	warn("[da]: Already Running!")
