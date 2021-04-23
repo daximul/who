@@ -108,6 +108,7 @@ local spDelay = 0.1
 local WallTpTouch = nil
 local walkto = false
 local StareLoop = nil
+local HumanModCons = {}
 FLYING = false
 viewing = nil
 fcRunning = false
@@ -2517,11 +2518,64 @@ newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", 
 	end
 end)
 
+newCmd("loopspeed", {"loopws"}, "loopspeed / loopws [num]", "Loops your Walkspeed", function(args, speaker)
+	local speed = args[1] or 16
+	if args[2] then
+		speed = args[2] or 16
+	end
+	if isNumber(speed) then
+		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
+		local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
+		local function WalkSpeedChange()
+			if Char and Human then
+				Human.WalkSpeed = speed
+			end
+		end
+		WalkSpeedChange()
+		HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or Human:GetPropertyChangedSignal("WalkSpeed"):Connect(WalkSpeedChange)
+		HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or speaker.CharacterAdded:Connect(function(nChar)
+			Char, Human = nChar, nChar:WaitForChild("Humanoid")
+			WalkSpeedChange()
+			HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or Human:GetPropertyChangedSignal("WalkSpeed"):Connect(WalkSpeedChange)
+		end)
+	end
+end)
+
+newCmd("unloopspeed", {"unloopws"}, "unloopspeed / unloopws", "Disable LoopSpeed", function(args, speaker)
+	HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or nil
+	HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or nil
+end)
+
 newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "Change your JumpPower", function(args, speaker)
 	local jpower = args[1]
 	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") and jpower and isNumber(jpower) then
 		speaker.Character:FindFirstChildOfClass("Humanoid").JumpPower = jpower
 	end
+end)
+
+newCmd("loopjumppower", {"loopjp"}, "loopjumppower / loopjp [num]", "Loops your Jump Height", function(args, speaker)
+	local jpower = args[1] or 50
+	if isNumber(jpower) then
+		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
+		local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
+		local function JumpPowerChange()
+			if Char and Human then
+				Human.JumpPower = jpower
+			end
+		end
+		JumpPowerChange()
+		HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or Human:GetPropertyChangedSignal("JumpPower"):Connect(JumpPowerChange)
+		HumanModCons.jpCA = (HumanModCons.jpCA and HumanModCons.jpCA:Disconnect() and false) or speaker.CharacterAdded:Connect(function(nChar)
+			Char, Human = nChar, nChar:WaitForChild("Humanoid")
+			JumpPowerChange()
+			HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or Human:GetPropertyChangedSignal("JumpPower"):Connect(JumpPowerChange)
+		end)
+	end
+end)
+
+newCmd("unloopjumppower", {"unloopjp"}, "unloopjumppower / unloopjp", "Disable LoopJumpPower", function(args, speaker)
+	HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or nil
+	HumanModCons.jpCA = (HumanModCons.jpCA and HumanModCons.jpCA:Disconnect() and false) or nil
 end)
 
 newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args, speaker)
@@ -4606,6 +4660,12 @@ end)
 newCmd("unstare", {}, "unstare [plr]", "Disables Stare", function(args, speaker)
 	if StareLoop then
 		StareLoop:Disconnect()
+	end
+end)
+
+newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set IncomingReplicationLag", function(args, speaker)
+	if tonumber(args[1]) then
+		settings():GetService("NetworkSettings").IncomingReplicationLag = args[1]
 	end
 end)
 
