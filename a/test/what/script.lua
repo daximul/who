@@ -1,17 +1,20 @@
-pcall(function() while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer or not game:GetService("Players").LocalPlayer:FindFirstChildOfClass("PlayerGui") do wait() end end)
+pcall(function() while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer do wait() end end)
 
-if DA_ISLOADED then
-	warn("[da]: Already Running!")
-	return
+if getgenv().DA_ISLOADED then
+	return getgenv().DA_PUBLIC_USER_BUILD.notification("", "Already Running!")
 end
 
 pcall(function() getgenv().DA_ISLOADED = true end)
 
-if isfolder and makefolder and isfile and writefile then
-	if not isfolder("Dark Admin Plugins") then
-		makefolder("Dark Admin Plugins")
+local StartingTick = StartingTick or tick() or os.clock()
+
+spawn(function()
+	if isfolder and makefolder and isfile and writefile then
+		if not isfolder("Dark Admin Plugins") then
+			makefolder("Dark Admin Plugins")
+		end
 	end
-end
+end)
 
 local function Import(Asset)
 	if (type(Asset) == "number") then
@@ -65,6 +68,7 @@ local Cmdbar = Main.Box
 local cmds = {}
 local customAlias = {}
 local DEBUG = false
+local tabComplete = nil
 local Network_Loop = nil
 local SU_SomeCheckPlace = {
 	Attachment = "HairAttachment";
@@ -367,14 +371,16 @@ end
 --// Net is patched. Fix this idiot Dax
 -- snipdoa
 local function SetSimulationRadius()
-	Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
-		pcall(function()
-			workspace.FallenPartsDestroyHeight = 0/1/0
-			settings().Physics.ThrottleAdjustTime = math.huge-math.huge
-			settings().Physics.AllowSleep = false
-			setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-			Players.LocalPlayer.SimulationRadius = math.huge
-			Players.LocalPlayer.ReplicationFocus = workspace
+	spawn(function()
+		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+			pcall(function()
+				workspace.FallenPartsDestroyHeight = 0/1/0
+				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
+				settings().Physics.AllowSleep = false
+				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+				Players.LocalPlayer.SimulationRadius = math.huge
+				Players.LocalPlayer.ReplicationFocus = workspace
+			end)
 		end)
 	end)
 end
@@ -769,22 +775,18 @@ function replacecmd(cmd, func)
 end
 
 function gethum(ch)
-	if ch ~= nil then
-		return ch:FindFirstChildOfClass("Humanoid")
-	else
-		return Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-	end
+	return ch:FindFirstChildWhichIsA("Humanoid") or Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
 end
 
 function findhum(ch)
 	if ch ~= nil then
-		if ch:FindFirstChildOfClass("Humanoid") then
+		if ch:FindFirstChildWhichIsA("Humanoid") then
 			return true
 		else
 			return false
 		end
 	else
-		if Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+		if Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 			return true
 		else
 			return false
@@ -1167,9 +1169,12 @@ function IndexContents(str)
 		end
 	end
 end
-IndexContents('')
 
-getprfx=function(strn)
+spawn(function()
+	IndexContents("")
+end)
+
+function getprfx(strn)
 	if strn:sub(1,string.len(Settings.Prefix))==Settings.Prefix then return{'cmd',string.len(Settings.Prefix)+1}
 	end return
 end
@@ -1185,13 +1190,12 @@ function do_exec(str, plr)
 	end
 end
 
-local tabComplete = nil
 Cmdbar.FocusLost:Connect(function(enterPressed)
 	CmdSu.Text = ""
 	if tabComplete then tabComplete:Disconnect() end
 	wait()
 	if not Cmdbar:IsFocused() then
-		IndexContents('')
+		IndexContents("")
 	end
 end)
 
@@ -1255,24 +1259,26 @@ Cmdbar.Changed:Connect(Search)
 DaUi.CmdSearch.Box:GetPropertyChangedSignal("Text"):Connect(function()
 	Search2()
 end)
-CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
+spawn(function()
+	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
+	PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+	DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+end)
 CMDsF.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
 end)
-PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 PluginBrowser.Area.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
-DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 DaUi.ChatLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 	DaUi.ChatLogsArea.ScrollingFrame.CanvasPosition = Vector2.new(0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
-DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 DaUi.JoinLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
-DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 DaUi.CmdArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
@@ -1436,7 +1442,9 @@ function saves()
 	end
 end
 
-saves()
+spawn(function()
+	saves()
+end)
 
 function updatesaves()
 	if nosaves == false and writefileExploit() then
@@ -2160,16 +2168,19 @@ local function UserBuild()
 	build.newCmd = newCmd
 	build.BrowserBtn = BrowserBtn
 	build.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
+	build.notification = notify
 	getgenv().DA_PUBLIC_USER_BUILD = build
 end
 
 --// Setup Admin & Ui & Plugin Browser
 spawn(function()
-	Startup()
 	ParentGui(GUI)
-	SmoothDrag(CommandsGui)
-	SmoothDrag(PluginBrowser)
-	SmoothDrag(DaUi)
+	spawn(function()
+		Startup()
+		SmoothDrag(CommandsGui)
+		SmoothDrag(PluginBrowser)
+		SmoothDrag(DaUi)
+	end)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
 		CmdListStatus(false)
 	end)
@@ -3216,6 +3227,17 @@ newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no god
 	notify("T Invis", "You are now Invisible")
 end)
 
+newCmd("invisible2", {"invis2"}, "invisible2 / invis2", "Second Version of Invisibility", function(args, speaker)
+	local OldPos = getRoot(Players.LocalPlayer.Character).CFrame
+	getRoot(Players.LocalPlayer.Character).CFrame = CFrame.new(9e9, 9e9, 9e9)
+	local Clone = getRoot(Players.LocalPlayer.Character):Clone()
+	wait(.2)
+	getRoot(Players.LocalPlayer.Character):Destroy()
+	Clone.CFrame = OldPos
+	Clone.Parent = Players.LocalPlayer.Character
+	notify("Invisibility 2", "You are now Invisible")
+end)
+
 newCmd("visible", {"vis"}, "visible / vis", "Become Visible", function(args, speaker)
 	TurnVisible()
 end)
@@ -3620,7 +3642,7 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory
 end)
 
 newCmd("numofcmds", {}, "numofcmds", "Notify the number of commands", function(args, speaker)
-	notify("", #cmds)
+	notify("Commands", #cmds)
 end)
 
 local CmdNoclipping = nil
@@ -4674,17 +4696,42 @@ newCmd("nameprotect", {}, "nameprotect", "Protect your Name Locally by Setting i
 	notify("", "Name Protected")
 end)
 
+newCmd("ping", {}, "ping", "Notify yourself your Ping", function(args, speaker)
+	local Current_Ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString():split(" ")[1] .. "ms"
+	notify("Ping", Current_Ping)
+end)
+
+newCmd("fps", {"frames"}, "fps / frames", "Notify yourself your Framerate", function(args, speaker)
+	local x = 0	
+	local a = tick()
+	local fpsget = function()
+		x = (1 / (tick() - a))
+		a = tick()
+		return ("%.3f"):format(x)
+	end
+	local fps = nil
+	local v = game:GetService("RunService").Stepped:Connect(function()
+		fps = fpsget()
+	end)
+	wait(.2)
+	v:Disconnect()
+	notify("FPS", "Current FPS is " .. fps)
+end)
 
 
 
 
 
-if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
-	FindPlugins(Settings.PluginsTable)
-end
-if Settings.AutoNet then
-	SetSimulationRadius()
-end
-UserBuild()
+
+spawn(function()
+	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
+		FindPlugins(Settings.PluginsTable)
+	end
+	if Settings.AutoNet then
+		SetSimulationRadius()
+	end
+	UserBuild()
+end)
+notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StartingTick))
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
