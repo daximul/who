@@ -36,6 +36,7 @@ end
 
 local GUI = Import("interface.lua")
 local Main = GUI.Main
+local Cmdbar = Main.Box
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local NotificationTemplate = GUI.NotificationTemplate
@@ -64,16 +65,15 @@ local Settings = {
 	cmdautorj = false,
 }
 
-local Cmdbar = Main.Box
 local cmds = {}
 local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
 local SU_SomeCheckPlace = {
+local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 	Attachment = "HairAttachment";
 }
-local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
 		abt = game:GetService("Lighting").Ambient,
@@ -122,6 +122,7 @@ local swimming = false
 local floatName = randomString()
 local QEfly = true
 local invisRunning = false
+local spinhats = nil
 
 --// End of Command Variables \\--
 
@@ -4716,6 +4717,149 @@ newCmd("fps", {"frames"}, "fps / frames", "Notify yourself your Framerate", func
 	wait(.2)
 	v:Disconnect()
 	notify("FPS", "Current FPS is " .. fps)
+end)
+
+newCmd("clearhats", {}, "clearhats", "Clears Hats in the Workspace", function(args, speaker)
+	if firetouchinterest then
+		local Player = Players.LocalPlayer
+		local Character = Player.Character
+		local Old = Character:FindFirstChild("HumanoidRootPart").CFrame
+		local Hats = {}
+		for _,x in next, workspace:GetChildren() do
+			if x:IsA("Accessory") then
+				table.insert(Hats,x)
+			end
+		end
+		for _,getacc in next, Character:FindFirstChildOfClass("Humanoid"):GetAccessories() do
+			getacc:Destroy()
+		end
+		for i = 1,#Hats do
+			repeat game:GetService("RunService").Heartbeat:wait() until Hats[i]
+			firetouchinterest(Hats[i].Handle,Character:FindFirstChild("HumanoidRootPart"),0)
+			repeat game:GetService("RunService").Heartbeat:wait() until Character:FindFirstChildOfClass("Accessory")
+			Character:FindFirstChildOfClass("Accessory"):Destroy()
+			repeat game:GetService("RunService").Heartbeat:wait() until not Character:FindFirstChildOfClass("Accessory")
+		end
+		Character:BreakJoints()
+		Player.CharacterAdded:wait()
+		for i = 1,20 do game:GetService("RunService").Heartbeat:wait()
+			if Player.Character:FindFirstChild("HumanoidRootPart") then
+				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = Old
+			end
+		end
+	else
+		notify("Incompatible Exploit", "Missing firetouchinterest")
+	end
+end)
+
+newCmd("hatspin", {}, "hatspin", "Spins your Character's Accessories", function(args, speaker)
+	execCmd("unhatspin")
+	wait(.5)
+	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
+		local keep = Instance.new("BodyPosition") keep.Name = randomString() keep.Parent = v.Handle
+		local spin = Instance.new("BodyAngularVelocity") spin.Name = randomString() spin.Parent = v.Handle
+		v.Handle:FindFirstChildOfClass("Weld"):Destroy()
+		if args[1] then
+			spin.AngularVelocity = Vector3.new(0, args[1], 0)
+			spin.MaxTorque = Vector3.new(0, args[1] * 2, 0)
+		else
+			spin.AngularVelocity = Vector3.new(0, 100, 0)
+			spin.MaxTorque = Vector3.new(0, 200, 0)
+		end
+		keep.P = 30000
+		keep.D = 50
+		spinhats = game:GetService("RunService").Stepped:Connect(function()
+			pcall(function()
+				keep.Position = Players.LocalPlayer.Character.Head.Position
+			end)
+		end)
+	end
+end)
+
+newCmd("unhatspin", {}, "unhatspin", "Disables Hatspin", function(args, speaker)
+	if spinhats and spinhats ~= nil then
+		spinhats:Disconnect()
+	end
+	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
+		v.Parent = workspace
+		for i,c in pairs(v.Handle) do
+			if c:IsA("BodyPosition") or c:IsA("BodyAngularVelocity") then
+				c:Destroy()
+			end
+		end
+		wait()
+		v.Parent = speaker.Character
+	end
+end)
+
+newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
+	if setscriptable then
+		local function prep(plr)
+			if plr and plr.Character then
+				for _,char in pairs(plr.Character:GetChildren()) do
+					game:GetService("RunService").RenderStepped:Connect(function()
+						pcall(function()
+							if char:IsA("Part") or char:IsA("BasePart") then
+								char.Velocity = Vector3.new(30, 0, 4)
+							end
+						end)
+					end)
+				end
+			end
+		end
+		game:GetService("RunService").Heartbeat:Connect(function()
+			setscriptable(Players.LocalPlayer, "SimulationRadius", true)
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
+					game:GetService("RunService").RenderStepped:Connect(function()
+						pcall(function()
+							if char:IsA("Part") or char:IsA("BasePart") then
+								char.Velocity = Vector3.new(30, 4, 0)
+							end
+						end)
+					end)
+				end
+			end
+		end)
+		for i,v in pairs(Players:GetPlayers()) do
+			if v ~= Players.LocalPlayer then
+				prep(v)
+			end
+		end
+	else
+		local function prep(plr)
+			if plr and plr.Character then
+				for _,char in pairs(plr.Character:GetChildren()) do
+					game:GetService("RunService").RenderStepped:Connect(function()
+						pcall(function()
+							if char:IsA("Part") or char:IsA("BasePart") then
+								char.Velocity = Vector3.new(30, 0, 4)
+							end
+						end)
+					end)
+				end
+			end
+		end
+		game:GetService("RunService").Heartbeat:Connect(function()
+			setsimulation(true, true)
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
+					game:GetService("RunService").RenderStepped:Connect(function()
+						pcall(function()
+							if char:IsA("Part") or char:IsA("BasePart") then
+								char.Velocity = Vector3.new(30, 4, 0)
+							end
+						end)
+					end)
+				end
+			end
+		end)
+		for i,v in pairs(Players:GetPlayers()) do
+			if v ~= Players.LocalPlayer then
+				prep(v)
+			end
+		end
+	end
 end)
 
 
