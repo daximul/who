@@ -401,7 +401,7 @@ local function SetSimulationRadius()
 						end)
 					end
 				end
-			end
+			end)
 		end)
 	end)
 end
