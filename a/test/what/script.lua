@@ -70,6 +70,7 @@ local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
+local Net_Test = true
 local SU_SomeCheckPlace = {
 	Attachment = "HairAttachment";
 }
@@ -371,7 +372,7 @@ end
 --// Net is patched. Fix this idiot Dax
 -- snipdoa
 local function SetSimulationRadius()
-	spawn(function()
+	if not Net_Test then
 		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
 			pcall(function()
 				workspace.FallenPartsDestroyHeight = 0/1/0
@@ -381,6 +382,26 @@ local function SetSimulationRadius()
 				Players.LocalPlayer.SimulationRadius = math.huge
 				Players.LocalPlayer.ReplicationFocus = workspace
 			end)
+		end)
+	else
+		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+			pcall(function()
+				workspace.FallenPartsDestroyHeight = 0/1/0
+				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
+				settings().Physics.AllowSleep = false
+				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+				Players.LocalPlayer.SimulationRadius = math.huge
+				sethidden(Players.LocalPlayer, "SimulationRadius", math.huge)
+				Players.LocalPlayer.ReplicationFocus = workspace
+				for w,x in pairs(Players:GetPlayers()) do
+					if x ~= Players.LocalPlayer then
+						pcall(function()
+							sethidden(x, "SimulationRadius", 0)
+							sethidden(x, "MaximumSimulationRadius", 0)
+						end)
+					end
+				end
+			end
 		end)
 	end)
 end
