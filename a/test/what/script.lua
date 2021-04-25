@@ -372,6 +372,21 @@ end
 --// Net is patched. Fix this idiot Dax
 -- snipdoa
 local function SetSimulationRadius()
+	spawn(function()
+		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+			pcall(function()
+				workspace.FallenPartsDestroyHeight = 0/1/0
+				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
+				settings().Physics.AllowSleep = false
+				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
+				Players.LocalPlayer.SimulationRadius = math.huge
+				Players.LocalPlayer.ReplicationFocus = workspace
+			end)
+		end)
+	end)
+end
+--[[
+local function SetSimulationRadius()
 	if not Net_Test then
 		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
 			pcall(function()
@@ -405,6 +420,7 @@ local function SetSimulationRadius()
 		end)
 	end)
 end
+]]--
 
 function CmdListStatus(bool)
 	local Gui_Pos = {
