@@ -70,7 +70,6 @@ local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
-local Net_Test = true
 local SU_SomeCheckPlace = {
 	Attachment = "HairAttachment";
 }
@@ -101,7 +100,7 @@ function randomString()
 	return table.concat(array)
 end
 
---// Command Variables
+--// Start of Command Variables \\--
 
 local currentToolSize = ""
 local currentGripPos = ""
@@ -114,17 +113,17 @@ local WallTpTouch = nil
 local walkto = false
 local StareLoop = nil
 local HumanModCons = {}
-FLYING = false
-viewing = nil
-fcRunning = false
-ESPenabled = false
-Floating = false
-swimming = false
-floatName = randomString()
-QEfly = true
-invisRunning = false
+local FLYING = false
+local viewing = nil
+local fcRunning = false
+local ESPenabled = false
+local Floating = false
+local swimming = false
+local floatName = randomString()
+local QEfly = true
+local invisRunning = false
 
---// End of Command Variables
+--// End of Command Variables \\--
 
 spawn(function()
 	local SU_Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
@@ -385,42 +384,6 @@ local function SetSimulationRadius()
 		end)
 	end)
 end
---[[
-local function SetSimulationRadius()
-	if not Net_Test then
-		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
-			pcall(function()
-				workspace.FallenPartsDestroyHeight = 0/1/0
-				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
-				settings().Physics.AllowSleep = false
-				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-				Players.LocalPlayer.SimulationRadius = math.huge
-				Players.LocalPlayer.ReplicationFocus = workspace
-			end)
-		end)
-	else
-		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
-			pcall(function()
-				workspace.FallenPartsDestroyHeight = 0/1/0
-				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
-				settings().Physics.AllowSleep = false
-				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
-				Players.LocalPlayer.SimulationRadius = math.huge
-				sethidden(Players.LocalPlayer, "SimulationRadius", math.huge)
-				Players.LocalPlayer.ReplicationFocus = workspace
-				for w,x in pairs(Players:GetPlayers()) do
-					if x ~= Players.LocalPlayer then
-						pcall(function()
-							sethidden(x, "SimulationRadius", 0)
-							sethidden(x, "MaximumSimulationRadius", 0)
-						end)
-					end
-				end
-			end)
-		end)
-	end)
-end
-]]--
 
 function CmdListStatus(bool)
 	local Gui_Pos = {
