@@ -2964,51 +2964,57 @@ newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
 end)
 
 newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
-	if (not is_sirhurt_closure) and syn then
+	if args[1] and string.lower(args[1]) == ("sentinel" or "sen") then
 		notify("Loading", "Hold on a sec")
 		wait(0.2)
-		local Dex = game:GetObjects("rbxassetid://3567096419")[1]
-		ParentGui(Dex)
-		local function Load(Obj, Url)
-			local function GiveOwnGlobals(Func, Script)
-				local Fenv = {}
-				local RealFenv = {script = Script}
-				local FenvMt = {}
-				FenvMt.__index = function(a,b)
-					if RealFenv[b] == nil then
-						return getfenv()[b]
-					else
-						return RealFenv[b]
-					end
-				end
-				FenvMt.__newindex = function(a, b, c)
-					if RealFenv[b] == nil then
-						getfenv()[b] = c
-					else
-						RealFenv[b] = c
-					end
-				end
-				setmetatable(Fenv, FenvMt)
-				setfenv(Func, Fenv)
-				return Func
-			end
-			local function LoadScripts(Script)
-				if Script.ClassName == "Script" or Script.ClassName == "LocalScript" then
-					spawn(function()
-						GiveOwnGlobals(loadstring(Script.Source, "=" .. Script:GetFullName()), Script)()
-					end)
-				end
-				for i,v in pairs(Script:GetChildren()) do
-					LoadScripts(v)
-				end
-			end
-			LoadScripts(Obj)
-		end
-		Load(Dex)
+		loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua")))();
 	else
-		notify("Loading", "Hold on a sec")
-		wait(0.2)
-		loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
+		if (not is_sirhurt_closure) and syn then
+			notify("Loading", "Hold on a sec")
+			wait(0.2)
+			local Dex = game:GetObjects("rbxassetid://3567096419")[1]
+			ParentGui(Dex)
+			local function Load(Obj, Url)
+				local function GiveOwnGlobals(Func, Script)
+					local Fenv = {}
+					local RealFenv = {script = Script}
+					local FenvMt = {}
+					FenvMt.__index = function(a,b)
+						if RealFenv[b] == nil then
+							return getfenv()[b]
+						else
+							return RealFenv[b]
+						end
+					end
+					FenvMt.__newindex = function(a, b, c)
+						if RealFenv[b] == nil then
+							getfenv()[b] = c
+						else
+							RealFenv[b] = c
+						end
+					end
+					setmetatable(Fenv, FenvMt)
+					setfenv(Func, Fenv)
+					return Func
+				end
+				local function LoadScripts(Script)
+					if Script.ClassName == "Script" or Script.ClassName == "LocalScript" then
+						spawn(function()
+							GiveOwnGlobals(loadstring(Script.Source, "=" .. Script:GetFullName()), Script)()
+						end)
+					end
+					for i,v in pairs(Script:GetChildren()) do
+						LoadScripts(v)
+					end
+				end
+				LoadScripts(Obj)
+			end
+			Load(Dex)
+		else
+			notify("Loading", "Hold on a sec")
+			wait(0.2)
+			loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
+		end
 	end
 end)
 
