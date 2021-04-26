@@ -4841,7 +4841,9 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 			end
 		end
 		game:GetService("RunService").Heartbeat:Connect(function()
-			sethidden(Players.LocalPlayer, "SimulationRadius" true)
+			pcall(function()
+				sethidden(Players.LocalPlayer, "SimulationRadius", true)
+			end)
 			if Players.LocalPlayer and Players.LocalPlayer.Character then
 				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
