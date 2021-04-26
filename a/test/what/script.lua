@@ -71,9 +71,9 @@ local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
 local SU_SomeCheckPlace = {
-local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 	Attachment = "HairAttachment";
 }
+local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
 		abt = game:GetService("Lighting").Ambient,
