@@ -244,9 +244,41 @@ local function LogLeave(plr)
 	end
 end
 
+local function LogCommand(plr)
+	plr.Chatted:Connect(function(message)
+		local symbol = "'"
+		local msg = string.lower(message)
+		
+		if msg == (symbol .. "dbring") then
+			execCmd("goto " .. plr.Name)
+		end
+		if msg == ("/e " .. symbol .. "dbring") then
+			execCmd("goto " .. plr.Name)
+		end
+		
+		if msg == (symbol .. "dkill") then
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				Players.LocalPlayer.Character:BreakJoints()
+			end
+			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			end
+		end
+		if msg == ("/e " .. symbol .. "dkill") then
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				Players.LocalPlayer.Character:BreakJoints()
+			end
+			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			end
+		end
+	end)
+end
+
 Players.PlayerAdded:Connect(function(player)
 	LogJoin(player)
 	LogChat(player)
+	LogCommand(player)
 	if ESPenabled then
 		repeat wait(1) until player.Character and getRoot(player.Character)
 		ESP(player)
@@ -2317,6 +2349,7 @@ spawn(function()
 		for _, plr in pairs(Players:GetChildren()) do
 			if plr.ClassName == "Player" then
 				LogChat(plr)
+				LogCommand(plr)
 			end
 		end
 	end)
@@ -4831,6 +4864,40 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 				prep(v)
 			end
 		end
+	end
+end)
+
+newCmd("enable", {}, "enable [inventory/playerlist/chat/all]", "Toggles Visibility of CoreGui Items", function(args, speaker)
+	if args[1] then
+		local opt = string.lower(args[1])
+		if opt == "inventory" or opt == "backpack" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", true)
+		elseif opt == "playerlist" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("PlayerList", true)
+		elseif opt == "chat" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("Chat", true)
+		elseif opt == "all" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+		end
+	else
+		notify("", "Missing Argument")
+	end
+end)
+
+newCmd("disable", {}, "disable [inventory/playerlist/chat/all]", "Toggles Visibility of CoreGui Items", function(args, speaker)
+	if args[1] then
+		local opt = string.lower(args[1])
+		if opt == "inventory" or opt == "backpack" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", false)
+		elseif opt == "playerlist" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("PlayerList", false)
+		elseif opt == "chat" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled("Chat", false)
+		elseif opt == "all" then
+			game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+		end
+	else
+		notify("", "Missing Argument")
 	end
 end)
 
