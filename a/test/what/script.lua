@@ -70,9 +70,6 @@ local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
-local SU_SomeCheckPlace = {
-	Attachment = "HairAttachment";
-}
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
@@ -111,8 +108,8 @@ local spawnpoint = false
 local spDelay = 0.1
 local WallTpTouch = nil
 local walkto = false
-local StareLoop = nil
 local HumanModCons = {}
+local StareLoop = nil
 local FLYING = false
 local viewing = nil
 local fcRunning = false
@@ -127,30 +124,11 @@ local spinhats = nil
 --// End of Command Variables \\--
 
 spawn(function()
-	local SU_Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
-	if SU_Check1 then
-		local SU_Check2 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
-		if SU_Check2 then
-			SU_Check2:Destroy()
+	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+		if getRoot(Players.LocalPlayer.Character) then
+			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
-	end
-end)
-
-Players.LocalPlayer.CharacterAdded:Connect(function()
-	wait(1)
-	local SU_Check3 = Players.LocalPlayer.Character:FindFirstChild("Head")
-	if SU_Check3 then
-		local SU_Check4 = SU_Check1:FindFirstChild(SU_SomeCheckPlace.Attachment)
-		if SU_Check4 then
-			SU_Check4:Destroy()
-		end
-	end
-end)
-
-Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-	if getRoot(Players.LocalPlayer.Character) then
-		LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
-	end
+	end)
 end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
@@ -2408,6 +2386,7 @@ spawn(function()
 	BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
 	BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
 	BrowserBtn("Syn Net", "Syn Net [WARNING]", "Load Synttax's Net\n\nUpon adding this plugin, you sign the agreement of anything bad happening to you is not the fault of the DA Team.\n\nMake sure all your IY plugins are in a folder. Yes, they can be in a folder.\naddplugin IY/bruh", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/synnet.lua'))();")
+	BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
 end)
 --// End of Setup
 
@@ -3566,21 +3545,6 @@ newCmd("breakvelocity", {}, "breakvelocity", "Break your Velocity", function(arg
 			end
 		end
 		wait()
-	end
-end)
-
-newCmd("scriptusers", {}, "scriptusers", "See who else is using DA", function(args, speaker)
-	for i,v in pairs(Players:GetPlayers()) do
-		local su_che1 = v.Character:FindFirstChild("Head")
-		if su_che1 then
-			local su_che2 = su_che1:FindFirstChild(SU_SomeCheckPlace.Attachment)
-			if not su_che2 then
-				local FoundUsersList = {}
-				table.insert(FoundUsersList, v.Name)
-				local CommasList = table.concat(FoundUsersList, ", ")
-				notify("Users Using DA", CommasList)
-			end
-		end
 	end
 end)
 
@@ -4814,7 +4778,9 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 			end
 		end
 		game:GetService("RunService").Heartbeat:Connect(function()
-			setscriptable(Players.LocalPlayer, "SimulationRadius", true)
+			pcall(function()
+				setscriptable(Players.LocalPlayer, "SimulationRadius", true)
+			end)
 			if Players.LocalPlayer and Players.LocalPlayer.Character then
 				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
