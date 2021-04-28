@@ -2432,6 +2432,7 @@ end)
 --// End of Setup
 
 
+spawn(function()
 
 
 --// Commands
@@ -4993,6 +4994,7 @@ end)
 
 
 
+end)
 
 
 
