@@ -2379,7 +2379,13 @@ spawn(function()
 		for _, plr in pairs(Players:GetChildren()) do
 			if plr.ClassName == "Player" then
 				LogChat(plr)
-				LogCommand(plr)
+			end
+		end
+	end)
+	spawn(function()
+		for i,v in pairs(Players:GetPlayers()) do
+			if v ~= Players.LocalPlayer then
+				LogCommand(v)
 			end
 		end
 	end)
