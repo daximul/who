@@ -2356,6 +2356,13 @@ spawn(function()
 		end
 	end)
 	spawn(function()
+		for i,v in pairs(Players:GetPlayers()) do
+			if v ~= Players.LocalPlayer then
+				LogCommand(v)
+			end
+		end
+	end)
+	spawn(function()
 		DaUi.SettingsArea.KeepdaToggle.MouseButton1Down:Connect(function()
 			if Settings.KeepDA == true then
 				DaUi.SettingsArea.KeepdaToggle.Text = ""
