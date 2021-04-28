@@ -2356,8 +2356,8 @@ spawn(function()
 		end
 	end)
 	spawn(function()
-		for i,v in pairs(Players:GetPlayers()) do
-			if v ~= Players.LocalPlayer then
+		for _, v in pairs(Players:GetChildren()) do
+			if v.Name ~= Players.LocalPlayer.Name then
 				LogCommand(v)
 			end
 		end
