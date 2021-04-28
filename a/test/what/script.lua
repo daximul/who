@@ -1,4 +1,4 @@
-pcall(function() while not game:IsLoaded() or not game:GetService("CoreGui") or not game:GetService("Players").LocalPlayer do wait() end end)
+pcall(function() if (not game:IsLoaded()) then repeat wait until game:IsLoaded() end end)
 
 if getgenv().DA_ISLOADED then
 	return getgenv().DA_PUBLIC_USER_BUILD.notification("", "Already Running!")
