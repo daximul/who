@@ -393,6 +393,9 @@ local function SetSimulationRadius()
 				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
 				Players.LocalPlayer.SimulationRadius = math.huge
 				Players.LocalPlayer.ReplicationFocus = workspace
+				if setfflag then
+					setfflag("PlayerNoAccessRadius", "False")
+				end
 			end)
 		end)
 	end)
@@ -4990,6 +4993,12 @@ newCmd("undarkbubbles", {}, "undarkbubbles", "Disable Darkbubbles", function(arg
 	DarkBubbleChat:Disconnect()
 	DarkBubbleChat = nil
 	notify("Dark Bubble Chat", "Disabled")
+end)
+
+newCmd("reanimate", {"reanim"}, "reanimate / reanim", "Reanimate your Character to make some Net Scripts Netless", function(args, speaker)
+	notify("Re-Animation", "Hold on a sec")
+	wait(0.2)
+	Import("anim.lua")
 end)
 
 
