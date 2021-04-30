@@ -393,9 +393,6 @@ local function SetSimulationRadius()
 				setsimulation(math.huge*math.huge,math.huge*math.huge,1/0*1/0*1/0*1/0*1/0)
 				Players.LocalPlayer.SimulationRadius = math.huge
 				Players.LocalPlayer.ReplicationFocus = workspace
-				if setfflag then
-					setfflag("PlayerNoAccessRadius", "False")
-				end
 			end)
 		end)
 	end)
