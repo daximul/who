@@ -1,5 +1,5 @@
-local Interface = game:GetObjects("rbxassetid://6700620187")[1]
-Interface.Main.Position = UDim2.new(0.5, -75, 1.5, -105)
+local Interface = game:GetObjects("rbxassetid://6748093164")[1]
+Interface.Main.Position = UDim2.new(0.5, -100, 1, 5)
 Interface.NotificationTemplate.Position = UDim2.new(-1, -75, 1.029, -105)
 Interface.CMDS.Position = UDim2.new(0.694, -75, 10, -105)
 Interface.PluginBrowser.Position = UDim2.new(0.42, -75, 2, -105)
