@@ -410,15 +410,23 @@ function CmdListStatus(bool)
 	end
 end
 
+function TweenObj(Object, Style, Direction, Time, Goal)
+	local TweenService = game:GetService("TweenService")
+	local TInfo = TweenInfo.new(Time, Enum.EasingStyle[Style], Enum.EasingDirection[Direction])
+	local Tween = TweenService:Create(Object, TInfo, Goal)
+	Tween:Play()
+	return Tween
+end
+
 function CmdBarStatus(bool)
-	local GuiPositions = {
-		Shown = UDim2.new(0.5, -75, 0.997, -105),
-		Hidden = UDim2.new(0.5, -75, 1.5, -105),
-	}
 	if bool == true then
-		Main:TweenPosition(GuiPositions.Shown, "InOut", "Sine", 0.4, true, nil)
+		TweenObj(Main, "Quint", "Out", .5, {
+			Position = UDim2.new(0.5, -100, 1, -110)
+		})
 	else
-		Main:TweenPosition(GuiPositions.Hidden, "InOut", "Sine", 0.4, true, nil)
+		TweenObj(Main, "Quint", "Out", .5, {
+			Position = UDim2.new(0.5, -100, 1, 5)
+		})
 	end
 end
 
