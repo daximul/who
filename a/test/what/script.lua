@@ -2415,6 +2415,10 @@ spawn(function()
 			syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
 		end
 	end)
+	spawn(function()
+		local Phrase = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/randompost/main/random_phrase.lua")))();
+		DaUi.MessageLabel.Text = Phrase
+	end)
 end)
 spawn(function()
 	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
