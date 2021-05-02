@@ -10,8 +10,14 @@ local StartingTick = StartingTick or tick() or os.clock()
 
 spawn(function()
 	if isfolder and makefolder and isfile and writefile then
-		if not isfolder("Dark Admin Plugins") then
-			makefolder("Dark Admin Plugins")
+		if not isfolder("Dark Admin") then
+			makefolder("Dark Admin")
+			if not isfolder("Dark Admin/Plugins") then
+				makefolder("Dark Admin/Plugins")
+			end
+			if not isfolder("Dark Admin/Logs") then
+				makefolder("Dark Admin/Logs")
+			end
 		end
 	end
 end)
@@ -121,7 +127,6 @@ local QEfly = true
 local invisRunning = false
 local spinhats = nil
 local BubbleChatFix = nil
-local DarkBubbleChat = nil
 
 --// End of Command Variables \\--
 
@@ -339,15 +344,6 @@ local function SmoothDrag(frame)
 	end
 end
 
-local function OldParentGui(Gui)
-	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
-	if CoreGui:FindFirstChild("RobloxGui") then
-		Gui.Parent = CoreGui["RobloxGui"]
-	else
-		Gui.Parent = CoreGui
-	end
-end
-
 local function ParentGui(Gui)
 	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	if (not is_sirhurt_closure) and (syn and syn.protect_gui) then
@@ -361,6 +357,53 @@ local function ParentGui(Gui)
 	else
 		Gui.Parent = CoreGui
 	end
+end
+
+local function SmoothScroll(content, SmoothingFactor)
+	content.ScrollingEnabled = false
+	local input = content:Clone()
+	input:ClearAllChildren()
+	input.BackgroundTransparency = 1
+	input.ScrollBarImageTransparency = 1
+	input.ZIndex = content.ZIndex + 1
+	input.Name = "_smoothinputframe"
+	input.ScrollingEnabled = true
+	input.Parent = content.Parent
+	local function syncProperty(prop)
+		content:GetPropertyChangedSignal(prop):Connect(function()
+			if prop == "ZIndex" then
+				input[prop] = content[prop] + 1
+			else
+				input[prop] = content[prop]
+			end
+		end)
+	end
+	syncProperty("CanvasSize")
+	syncProperty("Position")
+	syncProperty("Rotation")
+	syncProperty("ScrollingDirection")
+	syncProperty("ScrollBarThickness")
+	syncProperty("BorderSizePixel")
+	syncProperty("ElasticBehavior")
+	syncProperty("SizeConstraint")
+	syncProperty("ZIndex")
+	syncProperty("BorderColor3")
+	syncProperty("Size")
+	syncProperty("AnchorPoint")
+	syncProperty("Visible")
+	local smoothConnection = game:GetService("RunService").RenderStepped:Connect(function()
+		local a = content.CanvasPosition
+		local b = input.CanvasPosition
+		local c = SmoothingFactor
+		local d = (b - a) * c + a
+		content.CanvasPosition = d
+	end)
+	content.AncestryChanged:Connect(function()
+		if content.Parent == nil then
+			input:Destroy()
+			smoothConnection:Disconnect()
+		end
+	end)
 end
 
 function CaptureCmdBar()
@@ -1396,7 +1439,7 @@ function writefileCooldown(name,data)
 	end)
 end
 
-local Settings_FileName = ("DA_FE.da");
+local Settings_FileName = ("Dark Admin/Settings.json");
 defaults = game:GetService("HttpService"):JSONEncode(Settings)
 
 nosaves = false
@@ -1485,34 +1528,34 @@ function updatesaves()
 end
 
 function addPlugin(name)
-	if name:lower() == 'plugin file name' or name:lower() == 'da_fe.da' or name == 'da' then
-		notify('Plugin Error','Please enter a valid plugin')
+	if name:lower() == 'plugin file name' or name:lower() == 'dark admin' or name == 'settings' then
+		notify("Plugin Error", "Please enter a valid plugin")
 	else
 		local file
 		local fileName
-		if name:sub(-3) == '.da' then
-			pcall(function() file = readfile("Dark Admin Plugins/" .. name) end)
+		if name:sub(-3) == ".da" then
+			pcall(function() file = readfile("Dark Admin/Plugins/" .. name) end)
 			fileName = name
 		else
-			pcall(function() file = readfile("Dark Admin Plugins/".. name .. ".da") end)
-			fileName = name..'.da'
+			pcall(function() file = readfile("Dark Admin/Plugins/".. name .. ".da") end)
+			fileName = name .. ".da"
 		end
 		if file then
 			if not FindInTable(Settings.PluginsTable, fileName) then
 				table.insert(Settings.PluginsTable, fileName)
 				LoadPlugin(fileName)
 			else
-				notify('Plugin Error','This plugin is already added')
+				notify("Plugin Error", "This plugin is already added")
 			end
 		else
-			notify('Plugin Error','Cannot locate file "'..fileName..'".')
+			notify('Plugin Error', 'Cannot locate file "'..fileName..'".')
 		end
 	end
 end
 
 function deletePlugin(name)
-	local pName = name..'.da'
-	if name:sub(-3) == '.da' then
+	local pName = name .. ".da"
+	if name:sub(-3) == ".da" then
 		pName = name
 	end
 	for i = #cmds,1,-1 do
@@ -1521,25 +1564,25 @@ function deletePlugin(name)
 		end
 	end
 	for i,v in pairs(CMDsF:GetChildren()) do
-		if v.Name == 'PLUGIN_'..pName then
+		if v.Name == "PLUGIN_" .. pName then
 			v:Destroy()
 		end
 	end
 	for i,v in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
-		if v.Name == 'PLUGIN_'..name then
+		if v.Name == "PLUGIN_" .. name then
 			v:Destroy()
 		end
-		if v.Name == 'PLUGIN_'..pName then
+		if v.Name == "PLUGIN_" .. pName then
 			v:Destroy()
 		end
 	end
 	for i,v in pairs(Settings.PluginsTable) do
 		if v == pName then
 			table.remove(Settings.PluginsTable, i)
-			notify('Removed Plugin',pName..' was removed')
+			notify("Removed Plugin", pName .. " was removed")
 		end
 	end
-	IndexContents('')
+	IndexContents("")
 end
 
 local PluginCache
@@ -1547,11 +1590,11 @@ function LoadPlugin(val,startup)
 	local plugin
 
 	function CatchedPluginLoad()
-		plugin = loadfile("Dark Admin Plugins/" .. val)()
+		plugin = loadfile("Dark Admin/Plugins/" .. val)()
 	end
 
 	function handlePluginError(plerror)
-		notify('Plugin Error', val)
+		notify("Plugin Error", val)
 		if FindInTable(Settings.PluginsTable,val) then
 			for i,v in pairs(Settings.PluginsTable) do
 				if v == val then
@@ -1574,11 +1617,11 @@ function LoadPlugin(val,startup)
 	if plugin ~= nil then
 		if not startup then
 			spawn(function()
-				notify('Loaded Plugin',"Name: " .. plugin["PluginName"])
+				notify("Loaded Plugin", "Name: " .. plugin["PluginName"])
 			end)
 		end
 		for i,v in pairs(plugin["Commands"]) do 
-			local cmdExt = ''
+			local cmdExt = ""
 			local cmdName = i
 			local function handleNames()
 				cmdName = i
@@ -1608,7 +1651,7 @@ function LoadPlugin(val,startup)
 				addcmdareatext(cmdName, cmdName, v["Aliases"], v["Description"], true)
 			end
 		end
-		IndexContents('')
+		IndexContents("")
 	elseif plugin == nil then
 		plugin = nil
 	end
@@ -1617,7 +1660,7 @@ end
 function FindPlugins()
 	if Settings.PluginsTable ~= nil and type(Settings.PluginsTable) == "table" then
 		for i,v in pairs(Settings.PluginsTable) do
-			LoadPlugin(v,true)
+			LoadPlugin(v, true)
 		end
 	end
 end
@@ -2085,7 +2128,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 	local BrowserLabel = Assets.BrowserLabel:Clone()
 	local OldFileName = string.lower(name)
 	local NewFileName = string.gsub(OldFileName, " ", "")
-	local ExtensionFile = ("Dark Admin Plugins/" .. NewFileName .. ".da")
+	local ExtensionFile = ("Dark Admin/Plugins/" .. NewFileName .. ".da")
 	PlugAreaTemplate.Parent = PluginBrowser.Container
 	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
 	BrowserLabel.Visible = true
@@ -2201,6 +2244,11 @@ spawn(function()
 		SmoothDrag(CommandsGui)
 		SmoothDrag(PluginBrowser)
 		SmoothDrag(DaUi)
+		SmoothScroll(CMDsF, 0.14)
+		SmoothScroll(PluginBrowser.Area.ScrollingFrame, 0.14)
+		SmoothScroll(DaUi.CmdArea.ScrollingFrame, 0.14)
+		SmoothScroll(DaUi.ChatLogsArea.ScrollingFrame, 0.14)
+		SmoothScroll(DaUi.JoinLogsArea.ScrollingFrame, 0.14)
 	end)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
 		CmdListStatus(false)
@@ -2283,16 +2331,16 @@ spawn(function()
 				local fileext = 0
 				local function nameFile()
 					local file
-					pcall(function() file = readfile(placeName..' Chat Logs ('..fileext..').txt') end)
+					pcall(function() file = readfile("Dark Admin/Logs/" .. placeName .. ' Chat Logs ('..fileext..').txt') end)
 					if file then
 						fileext = fileext+1
 						nameFile()
 					else
-						writefileCooldown(placeName..' Chat Logs ('..fileext..').txt', writelogsFile)
+						writefileCooldown("Dark Admin/Logs/" .. placeName ..' Chat Logs ('..fileext..').txt', writelogsFile)
 					end
 				end
 				nameFile()
-				notify("Chat Logs", "Check the Workspace Folder of your Exploit")
+				notify("Chat Logs", "Check the Logs Folder")
 			end
 		else
 			notify("writefile", "Cannot Save File")
@@ -2313,28 +2361,19 @@ spawn(function()
 				local fileext = 0
 				local function nameFile()
 					local file
-					pcall(function() file = readfile(placeName..' Join Logs ('..fileext..').txt') end)
+					pcall(function() file = readfile("Dark Admin/Logs/" .. placeName ..' Join Logs ('..fileext..').txt') end)
 					if file then
 						fileext = fileext+1
 						nameFile()
 					else
-						writefileCooldown(placeName..' Join Logs ('..fileext..').txt', writelogsFile)
+						writefileCooldown("Dark Admin/Logs/" .. placeName ..' Join Logs ('..fileext..').txt', writelogsFile)
 					end
 				end
 				nameFile()
-				notify("Join Logs", "Check the Workspace Folder of your Exploit")
+				notify("Join Logs", "Check the Logs Folder")
 			end
 		else
 			notify("writefile", "Cannot Save File")
-		end
-	end)
-	spawn(function()
-		while wait(0.05) do
-			if PluginBrowser.Area.Visible == false then
-				PluginBrowser.GoBack.Visible = true
-			else
-				PluginBrowser.GoBack.Visible = false
-			end
 		end
 	end)
 	spawn(function()
@@ -4977,37 +5016,20 @@ newCmd("unfixbubblechat", {}, "unfixbubblechat", "Disable Fixbubblechat", functi
 	notify("Bubble Chat", "Reverted Fix")
 end)
 
-newCmd("darkbubbles", {}, "darkbubbles", "Make Bubblechat Dark Themed", function(args, speaker)
-	if DarkBubbleChat then
-		return notify("Dark Bubble Chat", "Already Enabled")
-	end
-	if Players.LocalPlayer["PlayerGui"] and Players.LocalPlayer["PlayerGui"]:FindFirstChild("BubbleChat") then
-		DarkBubbleChat = Players.LocalPlayer.PlayerGui.BubbleChat.DescendantAdded:connect(function(message)
-			if message:IsA("ImageLabel") and message.Name == "ChatBubble" or message:IsA("ImageLabel") and message.Name == "ChatBubbleTail" or message:IsA("ImageLabel") and message.Name == "SmallTalkBubble" then
-				message.ImageColor3 = Color3.fromRGB(0, 0, 0)
-			end
-			if message:IsA("TextLabel") and message.Name == "BubbleText" then
-				message.TextColor3 = Color3.fromRGB(255, 255, 255)
-				message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-			end
-		end)
-	end
-	notify("Dark Bubble Chat", "Enabled")
-end)
-
-newCmd("undarkbubbles", {}, "undarkbubbles", "Disable Darkbubbles", function(args, speaker)
-	if DarkBubbleChat == nil then
-		return notify("Dark Bubble Chat", "Wasn't Enabled")
-	end
-	DarkBubbleChat:Disconnect()
-	DarkBubbleChat = nil
-	notify("Dark Bubble Chat", "Disabled")
-end)
-
 newCmd("reanimate", {"reanim"}, "reanimate / reanim", "Reanimate your Character to make some Net Scripts Netless", function(args, speaker)
 	notify("Re-Animation", "Hold on a sec")
 	wait(0.2)
 	Import("anim.lua")
+end)
+
+newCmd("classicchat", {"clchat"}, "classicchat / clchat", "Enable Roblox's Classic Chat", function(args, speaker)
+	local PlayerGui = speaker:WaitForChild("PlayerGui")
+	PlayerGui:WaitForChild("Chat")
+	if PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible ~= true then
+		PlayerGui.Chat.Frame.ChatBarParentFrame.Position = PlayerGui.Chat.Frame.ChatChannelParentFrame.Position + UDim2.new(UDim.new(0,0), PlayerGui.Chat.Frame.ChatChannelParentFrame.Size.Y)
+		PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible = true
+		PlayerGui.Chat.Frame.ChatChannelParentFrame.Size = UDim2.new(1, 0, 1, -46)	
+	end
 end)
 
 
