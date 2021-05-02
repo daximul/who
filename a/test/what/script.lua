@@ -2377,6 +2377,15 @@ spawn(function()
 		end
 	end)
 	spawn(function()
+		while wait(0.05) do
+			if PluginBrowser.Area.Visible == false then
+				PluginBrowser.GoBack.Visible = true
+			else
+				PluginBrowser.GoBack.Visible = false
+			end
+		end
+	end)
+	spawn(function()
 		DaUi.SettingsArea.PrefixBox.Box.Text = Settings.Prefix
 		if Settings.KeepDA == true then
 			DaUi.SettingsArea.KeepdaToggle.Text = utf8.char(10003)
