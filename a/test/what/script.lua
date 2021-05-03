@@ -75,7 +75,7 @@ local cmds = {}
 local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
-local Network_Loop = nil
+local function getda() return {} end
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
@@ -93,7 +93,6 @@ local origsettings = {
 		Jp = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower,
 	},
 }
-
 function randomString()
 	local length = math.random(10,20)
 	local array = {}
@@ -105,6 +104,7 @@ end
 
 --// Start of Command Variables \\--
 
+getda()["Network_Loop"] = nil
 local currentToolSize = ""
 local currentGripPos = ""
 local cmdinfjump = false
@@ -138,7 +138,7 @@ spawn(function()
 	end)
 end)
 
-Players.LocalPlayer.CharacterAdded:Connect(function()
+local function RestartEffects()
 	NOFLY()
 	Floating = false
 	FLYING = false
@@ -160,6 +160,10 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
 	end)
+end
+
+Players.LocalPlayer.CharacterAdded:Connect(function()
+	RestartEffects()
 end)
 
 PromptOverlay.DescendantAdded:Connect(function(Overlay)
@@ -428,7 +432,7 @@ end
 -- snipdoa
 local function SetSimulationRadius()
 	spawn(function()
-		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
+		getda()["Network_Loop"] = game:GetService("RunService").RenderStepped:Connect(function()
 			pcall(function()
 				workspace.FallenPartsDestroyHeight = 0/1/0
 				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
@@ -497,11 +501,11 @@ function DaUiStatus(bool)
 	end
 end
 
-MaxNotifications = 5
-NotificationName = nil
-NotificationDuration = nil
 function notify(NotifName, NotifDesc, NotifDuration)
 	spawn(function()
+		local MaxNotifications = 10
+		local NotificationName = nil
+		local NotificationDuration = nil
 		if NotifDuration ~= nil then
 			NotificationDuration = NotifDuration
 		else
@@ -2544,9 +2548,9 @@ newCmd("fullnet", {}, "fullnet", "Full Network Ownership", function(args, speake
 end)
 
 newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", function(args, speaker)
-	Network_Loop:Disconnect()
+	getda()["Network_Loop"]:Disconnect()
 	wait()
-	Network_Loop = nil
+	getda()["Network_Loop"] = nil
 	if setsimulation then
 		setsimulation(139, 139)
 	else
