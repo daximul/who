@@ -500,7 +500,7 @@ function DaUiStatus(bool)
 	end
 end
 
-local MaxNotifications = 10
+local MaxNotifications = 5
 local NotificationName = nil
 local NotificationDuration = nil
 function notify(NotifName, NotifDesc, NotifDuration)
