@@ -75,7 +75,7 @@ local cmds = {}
 local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
-local function getda() return {} end
+local Network_Loop = nil
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
@@ -104,7 +104,6 @@ end
 
 --// Start of Command Variables \\--
 
-getda()["Network_Loop"] = nil
 local currentToolSize = ""
 local currentGripPos = ""
 local cmdinfjump = false
@@ -432,7 +431,7 @@ end
 -- snipdoa
 local function SetSimulationRadius()
 	spawn(function()
-		getda()["Network_Loop"] = game:GetService("RunService").RenderStepped:Connect(function()
+		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
 			pcall(function()
 				workspace.FallenPartsDestroyHeight = 0/1/0
 				settings().Physics.ThrottleAdjustTime = math.huge-math.huge
@@ -501,11 +500,11 @@ function DaUiStatus(bool)
 	end
 end
 
+local MaxNotifications = 10
+local NotificationName = nil
+local NotificationDuration = nil
 function notify(NotifName, NotifDesc, NotifDuration)
 	spawn(function()
-		local MaxNotifications = 10
-		local NotificationName = nil
-		local NotificationDuration = nil
 		if NotifDuration ~= nil then
 			NotificationDuration = NotifDuration
 		else
@@ -2548,9 +2547,9 @@ newCmd("fullnet", {}, "fullnet", "Full Network Ownership", function(args, speake
 end)
 
 newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", function(args, speaker)
-	getda()["Network_Loop"]:Disconnect()
+	Network_Loop:Disconnect()
 	wait()
-	getda()["Network_Loop"] = nil
+	Network_Loop = nil
 	if setsimulation then
 		setsimulation(139, 139)
 	else
