@@ -862,17 +862,17 @@ function findhum(ch)
 end
 
 local SpecialPlayerCases = {
-	["all"] = function(speaker)return game.Players:GetPlayers() end,
+	["all"] = function(speaker) return Players:GetPlayers() end,
 	["others"] = function(speaker)
 		local plrs = {}
-		for i,v in pairs(game.Players:GetPlayers()) do
+		for i,v in pairs(Players:GetPlayers()) do
 			if v ~= speaker then
 				table.insert(plrs,v)
 			end
 		end
 		return plrs
 	end,
-	["me"] = function(speaker)return {speaker} end,
+	["me"] = function(speaker) return {speaker} end,
 	["#(%d+)"] = function(speaker,args,currentList)
 		local returns = {}
 		local randAmount = tonumber(args[1])
@@ -1087,7 +1087,7 @@ end
 
 function getPlayersByName(name)
 	local found = {}
-	for i,v in pairs(game.Players:GetChildren()) do
+	for i,v in pairs(Players:GetChildren()) do
 		if string.sub(string.lower(v.Name),1,#name) == string.lower(name) then
 			table.insert(found,v)
 		end
@@ -1097,41 +1097,41 @@ end
 
 function getPlayer(list,speaker)
 	if list == nil then return {speaker.Name} end
-	local nameList = splitString(list,",")
+	local nameList = splitString(list, ",")
 
 	local foundList = {}
 
 	for _,name in pairs(nameList) do
-		if string.sub(name,1,1) ~= "+" and string.sub(name,1,1) ~= "-" then name = "+"..name end
+		if string.sub(name,1,1) ~= "+" and string.sub(name,1,1) ~= "-" then name = "+" .. name end
 		local tokens = toTokens(name)
-		local initialPlayers = game.Players:GetPlayers()
+		local initialPlayers = Players:GetPlayers()
 
 		for i,v in pairs(tokens) do
 			if v.Operator == "+" then
 				local tokenContent = v.Name
 				local foundCase = false
 				for regex,case in pairs(SpecialPlayerCases) do
-					local matches = {string.match(tokenContent,"^"..regex.."$")}
+					local matches = {string.match(tokenContent, "^" .. regex .. "$")}
 					if #matches > 0 then
 						foundCase = true
-						initialPlayers = onlyIncludeInTable(initialPlayers,case(speaker,matches,initialPlayers))
+						initialPlayers = onlyIncludeInTable(initialPlayers, case(speaker, matches, initialPlayers))
 					end
 				end
 				if not foundCase then
-					initialPlayers = onlyIncludeInTable(initialPlayers,getPlayersByName(tokenContent))
+					initialPlayers = onlyIncludeInTable(initialPlayers, getPlayersByName(tokenContent))
 				end
 			else
 				local tokenContent = v.Name
 				local foundCase = false
 				for regex,case in pairs(SpecialPlayerCases) do
-					local matches = {string.match(tokenContent,"^"..regex.."$")}
+					local matches = {string.match(tokenContent, "^" .. regex .. "$")}
 					if #matches > 0 then
 						foundCase = true
-						initialPlayers = removeTableMatches(initialPlayers,case(speaker,matches,initialPlayers))
+						initialPlayers = removeTableMatches(initialPlayers, case(speaker, matches, initialPlayers))
 					end
 				end
 				if not foundCase then
-					initialPlayers = removeTableMatches(initialPlayers,getPlayersByName(tokenContent))
+					initialPlayers = removeTableMatches(initialPlayers, getPlayersByName(tokenContent))
 				end
 			end
 		end
@@ -1143,6 +1143,10 @@ function getPlayer(list,speaker)
 	for i,v in pairs(foundList) do table.insert(foundNames,v.Name) end
 
 	return foundNames
+end
+
+function MatchSearch(str1, str2)
+	return str1 == string.sub(str2, 1, #str1)
 end
 
 local function isClaimed(Users)
@@ -1179,37 +1183,6 @@ local function autoComplete(str,curText)
 	wait()
 	Cmdbar.Text = Cmdbar.Text:gsub( '\t', '' )
 	Cmdbar.CursorPosition = #Cmdbar.Text+1
-end
-
-local function updateCmdsu(str,curText)
-	wait(0.02)
-	if str == nil then
-		-- do nothing
-	else
-		local endingChar = {"[", "/", "(", " "}
-		local stop = 0
-		for i=1,#str do
-			local c = str:sub(i,i)
-			if table.find(endingChar, c) then
-				stop = i
-				break
-			end
-		end
-		curText = curText or Cmdbar.Text
-		local subPos = 0
-		local pos = 1
-		local findRes = string.find(curText,"\\",pos)
-		while findRes do
-			subPos = findRes
-			pos = findRes+1
-			findRes = string.find(curText,"\\",pos)
-			wait(0.02)
-		end
-		if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
-		CmdSu.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
-		wait()
-		CmdSu.Text = CmdSu.Text:gsub( '\t', '' )
-	end
 end
 
 function Match(name,str)
@@ -1269,7 +1242,27 @@ end)
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 	if Cmdbar:IsFocused() then
 		IndexContents(Cmdbar.Text)
-		updateCmdsu(topCommand)
+		CmdSu.Text = ""
+		local InputText = string.lower(Cmdbar.Text)
+		if InputText == "" then return end
+		if InputText == " " then return end
+		for _, v in next, cmds do
+			local Name = v.NAME
+			local Aliases = v.ALIAS
+			local FoundAlias = false
+			if MatchSearch(InputText, Name) then
+				CmdSu.Text = Name
+				break
+			end
+			for _, v2 in next, Aliases do
+				if MatchSearch(InputText, v2) then
+					FoundAlias = true
+					CmdSu.Text = v2
+					break
+				end
+				if FoundAlias then break end
+			end
+		end
 	end
 end)
 
@@ -1277,8 +1270,14 @@ Cmdbar.Focused:Connect(function()
 	local userinpser = game:GetService("UserInputService")
 	tabComplete = userinpser.InputBegan:Connect(function(input, gameProcessed)
 		if Cmdbar:IsFocused() then
-			if input.KeyCode == Enum.KeyCode.Tab and topCommand ~= nil then
-				autoComplete(topCommand)
+			if input.KeyCode == Enum.KeyCode.Tab then
+				if CmdSu.Text == "" then
+					autoComplete("commands")
+				elseif CmdSu.Text == " " then
+					autoComplete("commands")
+				else
+					autoComplete(CmdSu.Text)
+				end
 			end
 		else
 			tabComplete:Disconnect()
@@ -1286,12 +1285,12 @@ Cmdbar.Focused:Connect(function()
 	end)
 end)
 
-local function Search()
-	local InputText = Cmdbar.Text
-	for _,button in pairs(CMDsF:GetChildren())do
+local function Cmdbar_Search()
+	local InputText = string.lower(Cmdbar.Text)
+	for _, button in pairs(CMDsF:GetChildren()) do
 		if button:IsA("TextButton") then
 			local chunks = {}
-			if InputText:sub(#InputText,#InputText) == "\\" then InputText = "" end
+			if InputText:sub(#InputText, #InputText) == "\\" then InputText = "" end
 			for w in string.gmatch(InputText, "[^\\]+") do
 				table.insert(chunks, w)
 			end
@@ -1304,27 +1303,31 @@ local function Search()
 		end
 	end
 end
-local function Search2()
-	local InputText = DaUi.CmdSearch.Box.Text
-	for _,button in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren())do
+local function DaUi_Search()
+	local InputText = string.lower(DaUi.CmdSearch.Box.Text)
+	for _, button in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
 		if button:IsA("TextButton") then
 			local chunks = {}
-			if InputText:sub(#InputText,#InputText) == "\\" then InputText = "" end
+			if InputText:sub(#InputText, #InputText) == "\\" then InputText = "" end
 			for w in string.gmatch(InputText, "[^\\]+") do
 				table.insert(chunks, w)
 			end
 			if #chunks > 0 then InputText = chunks[#chunks] end
 			if Match(button.Label.Text, InputText) then
 				button.Visible = true
+				break
 			else
 				button.Visible = false
+				break
 			end
 		end
 	end
 end
-Cmdbar.Changed:Connect(Search)
+Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
+	Cmdbar_Search()
+end)
 DaUi.CmdSearch.Box:GetPropertyChangedSignal("Text"):Connect(function()
-	Search2()
+	DaUi_Search()
 end)
 spawn(function()
 	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
@@ -1712,8 +1715,8 @@ function sFLY(vfly)
 
 	local function FLY()
 		FLYING = true
-		local BG = Instance.new('BodyGyro')
-		local BV = Instance.new('BodyVelocity')
+		local BG = Instance.new("BodyGyro")
+		local BV = Instance.new("BodyVelocity")
 		BG.P = 9e4
 		BG.Parent = T
 		BV.Parent = T
@@ -2191,7 +2194,7 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 		end)
 		spawn(function()
 			local cmdbarText = Cmdbar.Text:gsub("^"..'%'..Settings.Prefix,"")
-			execCmd(cmdbarText,Players.LocalPlayer,true)
+			execCmd(cmdbarText, Players.LocalPlayer, true)
 		end)
 	end
 	wait()
