@@ -605,8 +605,16 @@ function notify(Title, Desc, Duration)
 				Notification:Destroy()
 			end
 		end
-		Notification.Title.Text = Title or "Notification"
-		Notification.Description.Text = Desc or "Message"
+		if Title == ("" or " " or nil) then
+			Notification.Title.Text = "Notification"
+		else
+			Notification.Title.Text = Title
+		end
+		if Desc == ("" or " " or nil) then
+			Notification.Description.Text = "Message"
+		else
+			Notification.Description.Text = Desc
+		end
 		SetAllTrans(Notification)
 		Notification.Visible = true
 		if Desc:len() >= 35 then
