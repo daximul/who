@@ -43,6 +43,7 @@ end
 local GUI = Import("interface.lua")
 local Main = GUI.Main
 local Cmdbar = Main.Box
+local CmdbarTransparencyClone = Cmdbar:Clone()
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local NotificationTemplate = GUI.NotificationTemplate
@@ -464,7 +465,101 @@ function TweenObj(Object, Style, Direction, Time, Goal)
 	return Tween
 end
 
+function TweenAllTrans(Object, Time)
+	local Tween
+	Tween = TweenObj(Object, "Sine", "Out", Time, {
+		BackgroundTransparency = 1
+	})
+	for _, v in ipairs(Object:GetDescendants()) do
+		local IsText = v:IsA("TextBox") or v:IsA("TextLabel") or v:IsA("TextButton")
+		local IsImage = v:IsA("ImageLabel") or v:IsA("ImageButton")
+		local IsScrollingFrame = v:IsA("ScrollingFrame")
+			if not v:IsA("UIListLayout") then
+				if IsText then
+					TweenObj(v, "Sine", "Out", Time, {
+						TextTransparency = 1,
+						BackgroundTransparency = 1
+					})
+				elseif IsImage then
+					TweenObj(v, "Sine", "Out", Time, {
+						ImageTransparency = 1,
+						BackgroundTransparency = 1
+					})
+				elseif IsScrollingFrame then
+					TweenObj(v, "Sine", "Out", Time, {
+						ScrollBarImageTransparency = 1,
+						BackgroundTransparency = 1
+					})
+				else
+					TweenObj(v, "Sine", "Out", Time, {
+						BackgroundTransparency = 1
+					})
+			end
+		end
+	end
+	return Tween
+end
+
+function SetAllTrans(Object)
+	Object.BackgroundTransparency = 1
+	for _, v in ipairs(Object:GetDescendants()) do
+		local IsText = v:IsA("TextBox") or v:IsA("TextLabel") or v:IsA("TextButton")
+		local IsImage = v:IsA("ImageLabel") or v:IsA("ImageButton")
+		local IsScrollingFrame = v:IsA("ScrollingFrame")
+		if not v:IsA("UIListLayout") then	
+			v.BackgroundTransparency = 1
+			if IsText then
+				v.TextTransparency = 1
+			elseif IsImage then
+				v.ImageTransparency = 1
+			elseif IsScrollingFrame then
+				v.ScrollBarImageTransparency = 1
+			end
+		end
+	end
+end
+
+function TweenAllTransToObject(Object, Time, BeforeObject)
+	local Descendants = Object:GetDescendants()
+    local OldDescentants = BeforeObject:GetDescendants()
+    local Tween
+    Tween = TweenObj(Object, "Sine", "Out", Time, {
+        BackgroundTransparency = BeforeObject.BackgroundTransparency
+    })
+    for i, v in next, Descendants do
+        local IsText = v:IsA("TextBox") or v:IsA("TextLabel") or v:IsA("TextButton")
+        local IsImage = v:IsA("ImageLabel") or v:IsA("ImageButton")
+        local IsScrollingFrame = v:IsA("ScrollingFrame")
+        if not v:IsA("UIListLayout") then
+            if IsText then
+                TweenObj(v, "Sine", "Out", Time, {
+                    TextTransparency = OldDescentants[i].TextTransparency,
+                    TextStrokeTransparency = OldDescentants[i].TextStrokeTransparency,
+                    BackgroundTransparency = OldDescentants[i].BackgroundTransparency
+                })
+            elseif IsImage then
+                TweenObj(v, "Sine", "Out", Time, {
+                    ImageTransparency = OldDescentants[i].ImageTransparency,
+                    BackgroundTransparency = OldDescentants[i].BackgroundTransparency
+                })
+            elseif IsScrollingFrame then
+                TweenObj(v, "Sine", "Out", Time, {
+                    ScrollBarImageTransparency = OldDescentants[i].ScrollBarImageTransparency,
+                    BackgroundTransparency = OldDescentants[i].BackgroundTransparency
+                })
+            else
+                TweenObj(v, "Sine", "Out", Time, {
+                    BackgroundTransparency = OldDescentants[i].BackgroundTransparency
+                })
+            end
+        end
+    end
+    return Tween
+end
+
 function CmdBarStatus(bool)
+	local TransparencyTween = bool and TweenAllTransToObject or TweenAllTrans
+	local Tween = TransparencyTween(Cmdbar, .5, CmdbarTransparencyClone)
 	if bool == true then
 		TweenObj(Main, "Quint", "Out", .5, {
 			Position = UDim2.new(0.5, -100, 1, -110)
@@ -500,52 +595,40 @@ function DaUiStatus(bool)
 	end
 end
 
-local MaxNotifications = 5
-local NotificationName = nil
-local NotificationDuration = nil
-function notify(NotifName, NotifDesc, NotifDuration)
+function notify(Title, Desc, Duration)
 	spawn(function()
-		if NotifDuration ~= nil then
-			NotificationDuration = NotifDuration
-		else
-			NotificationDuration = 5
-		end
-		if NotifName ~= "" then
-			NotificationName = NotifName
-		else
-			NotificationName = "Notification"
-		end
-		local Notifications = GUI.Notifications:GetChildren()
-		if #Notifications >= MaxNotifications then
-			Notifications[1]:TweenPosition(UDim2.new(-1, -75, Notifications[1].Position.Y.Scale, -105),"InOut","Linear",0.2,true);wait(0.2)
-			Notifications[1]:Destroy()
-			for i,v in pairs(Notifications) do if v ~= nil then
-					v:TweenPosition(UDim2.new(0.079, -75, v.Position.Y.Scale - 0.12, -105),"InOut","Linear",0.2,true)
-				end
+		local Notification = NotificationTemplate:Clone()
+		local function TweenDestroy()
+			if Notification then
+				local Tween = TweenAllTrans(Notification, .25)
+				Tween.Completed:Wait()
+				Notification:Destroy()
 			end
-			local NewNotification = NotificationTemplate:Clone()
-			NewNotification.Name = tostring(#Notifications+1)
-			NewNotification.Parent = GUI.Notifications
-			NewNotification.Title.Text = NotificationName
-			NewNotification.Border.Frame.Description.Text = NotifDesc
-			NewNotification.Size = UDim2.new(0, (150 + NewNotification.Title.TextBounds.Y), 0, 73)
-			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
-		else
-			for i,v in pairs(Notifications) do
-				v:TweenPosition(UDim2.new(0.079, -75, v.Position.Y.Scale - 0.12, -105),"InOut","Linear",0.2,true)
-			end
-			local NewNotification = NotificationTemplate:Clone()
-			NewNotification.Name = tostring(#Notifications+1)
-			NewNotification.Parent = GUI.Notifications
-			NewNotification.Title.Text = NotificationName
-			NewNotification.Border.Frame.Description.Text = NotifDesc
-			NewNotification.Size = UDim2.new(0, (150 + NewNotification.Title.TextBounds.Y), 0, 73)
-			NewNotification:TweenPosition(UDim2.new(0.079, -75, 1.029, -105),"InOut","Linear",0.2,true)
-			delay(NotificationDuration,function()
-				NewNotification:TweenPosition(UDim2.new(-1, -75, NewNotification.Position.Y.Scale, -105),"InOut","Linear",0.2,true);wait(0.2)
-				NewNotification:Destroy()
-			end)
 		end
+		Notification.Title.Text = Title or "Notification"
+		Notification.Description.Text = Desc or "Message"
+		SetAllTrans(Notification)
+		Notification.Visible = true
+		if Desc:len() >= 35 then
+			Notification.AutomaticSize = Enum.AutomaticSize.Y
+			Notification.Description.AutomaticSize.Y = Enum.AutomaticSize.Y
+			Notification.Description.TextScaled = false
+			Notification.Description.TextYAlignment = Enum.TextYAlignment.Top
+			Notification.Shadow.AutomaticSize = Enum.AutomaticSize.Y
+		end
+		Notification.Parent = GUI.NotificationList
+		coroutine.wrap(function()
+			local Tween = TweenAllTransToObject(Notification, .5, NotificationTemplate)
+			Tween.Completed:Wait()
+			wait(Duration or 5)
+			if Notification then
+				TweenDestroy()
+			end
+		end)()
+		Notification.Close.MouseButton1Down:Connect(function()
+			TweenDestroy()
+		end)
+		return TweenDestroy
 	end)
 end
 
