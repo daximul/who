@@ -2641,16 +2641,19 @@ newCmd("fullnet", {}, "fullnet", "Full Network Ownership", function(args, speake
 end)
 
 newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", function(args, speaker)
-	Network_Loop:Disconnect()
-	wait()
-	Network_Loop = nil
-	if setsimulation then
-		setsimulation(139, 139)
-	else
-		sethidden(speaker, "MaximumSimulationRadius", 139)
-		sethidden(speaker, "SimulationRadius", 139)
+	if Network_Loop ~= nil then
+		Network_Loop:Disconnect()
+		wait()
+		Network_Loop = nil
+		if setsimulation then
+			setsimulation(139, 139)
+		else
+			sethidden(speaker, "MaximumSimulationRadius", 139)
+			sethidden(speaker, "SimulationRadius", 139)
+		end
+		if args[1] and args[1] == "nonotify" then return end
+		notify("", "Simradius set to 139")
 	end
-	notify("", "Simradius set to 139")
 end)
 
 newCmd("niconet", {}, "niconet", "Run Nico's Net", function(args, speaker)
@@ -5123,7 +5126,7 @@ newCmd("unfixbubblechat", {}, "unfixbubblechat", "Disable Fixbubblechat", functi
 end)
 
 newCmd("reanimate", {"reanim"}, "reanimate / reanim", "Reanimate your Character to make some Net Scripts Netless", function(args, speaker)
-	notify("Re-Animation", "Hold on a sec")
+	notify("Selexity", "Hold on a sec")
 	wait(0.2)
 	Import("anim.lua")
 end)
