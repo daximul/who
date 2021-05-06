@@ -1,10 +1,6 @@
-pcall(function() if (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end end)
+if (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end
 
-if getgenv().DA_ISLOADED then
-	return getgenv().DA_PUBLIC_USER_BUILD.notification("", "Already Running!")
-end
-
-pcall(function() getgenv().DA_ISLOADED = true end)
+if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["notify"]("", "Already Running!") end
 
 local StartingTick = StartingTick or tick() or os.clock()
 
@@ -1444,7 +1440,7 @@ DaUi.CmdArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteConte
 	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 end)
 
-function addcmdareatext(name,cmdname,alias,desc,plug)
+function addcmdareatext(name, cmdname, aliases, desc, plug)
 	local nametextlabel = string.lower(name)
 	local cmdNamePicked = nil
 	if plug ~= nil then
@@ -1460,7 +1456,8 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 	NewCommand.Label.Text = tostring(cmdname)
 	NewCommand.MouseButton1Down:Connect(function()
 		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
-		CommandFrame.Alias.Text = ("Aliases: " .. table.concat(alias, ", "))
+		-- CommandFrame.Alias.Text = ("Aliases: " .. table.concat(aliases, ", "))
+		CommandFrame.Alias.Text = (#aliases > 0 and table.concat(aliases, ", ") or "There are no aliases")
 		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
 		DaUi.GoBack.Visible = true
@@ -1478,7 +1475,7 @@ function addcmdareatext(name,cmdname,alias,desc,plug)
 	end)
 end
 
-function addcmdtext(text,name,desc,plug)
+function addcmdtext(text, name, desc, plug)
 	local newcommand = Assets.CommandTemplate:Clone()
 	local cmdNamePicked = nil
 	local tooltipText = tostring(text)
@@ -2321,16 +2318,17 @@ local newCmd = function(name, aliases, title, description, func)
 	}
 end
 
-local function UserBuild()
+local function VirtualEnvironment()
 	if not getgenv then return end
-	local build = {}
-	build.loaded = true
-	build.Interface = GUI
-	build.newCmd = newCmd
-	build.BrowserBtn = BrowserBtn
-	build.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
-	build.notification = notify
-	getgenv().DA_PUBLIC_USER_BUILD = build
+	local Space = {}
+	Space.loaded = true
+	Space.Interface = GUI
+	Space.newCmd = newCmd
+	Space.BrowserBtn = BrowserBtn
+	Space.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
+	Space.notify = notify
+	getgenv()["DA_ENV"] = Space
+	getgenv()["da_env"] = Space
 end
 
 --// Setup Admin & Ui & Plugin Browser
@@ -5145,13 +5143,13 @@ end)
 
 
 spawn(function()
-	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
-		FindPlugins(Settings.PluginsTable)
-	end
+	VirtualEnvironment()
 	if Settings.AutoNet then
 		SetSimulationRadius()
 	end
-	UserBuild()
+	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
+		FindPlugins(Settings.PluginsTable)
+	end
 end)
 notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StartingTick))
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
