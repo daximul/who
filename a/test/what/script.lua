@@ -617,6 +617,7 @@ function notify(Title, Message, Duration)
 		if Desc:len() >= 35 then
 			Notification.AutomaticSize = Enum.AutomaticSize.Y
 			Notification.Description.AutomaticSize.Y = Enum.AutomaticSize.Y
+			Notification.Description.RichText = true
 			Notification.Description.TextScaled = false
 			Notification.Description.TextYAlignment = Enum.TextYAlignment.Top
 			Notification.Shadow.AutomaticSize = Enum.AutomaticSize.Y
