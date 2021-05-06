@@ -1457,7 +1457,7 @@ function addcmdareatext(name, cmdname, aliases, desc, plug)
 	NewCommand.MouseButton1Down:Connect(function()
 		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
 		-- CommandFrame.Alias.Text = ("Aliases: " .. table.concat(aliases, ", "))
-		CommandFrame.Alias.Text = (#aliases > 0 and table.concat(aliases, ", ") or "There are no aliases")
+		CommandFrame.Alias.Text = (#aliases > 0 and ("Aliases: " .. table.concat(aliases, ", ")) or "Aliases: There are no aliases")
 		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
 		DaUi.GoBack.Visible = true
