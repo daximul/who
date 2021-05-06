@@ -591,9 +591,10 @@ function DaUiStatus(bool)
 	end
 end
 
-function notify(Title, Desc, Duration)
+function notify(Title, Message, Duration)
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
+		local Desc = tostring(Message)
 		local function TweenDestroy()
 			if Notification then
 				local Tween = TweenAllTrans(Notification, .25)
@@ -3841,8 +3842,8 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory
 	end
 end)
 
-newCmd("numofcmds", {}, "numofcmds", "Notify the number of commands", function(args, speaker)
-	notify("Commands", #cmds)
+newCmd("commandcount", {}, "commandcount", "Notify the number of commands", function(args, speaker)
+	notify("Command Count", #cmds)
 end)
 
 local CmdNoclipping = nil
