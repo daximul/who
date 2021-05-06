@@ -1,4 +1,4 @@
-if (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end
+pcall(function() if (not game) and (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end end)
 
 if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["notify"]("", "Already Running!") end
 
