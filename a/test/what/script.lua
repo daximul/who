@@ -613,7 +613,7 @@ function notify(Title, Desc, Duration)
 		end
 		SetAllTrans(Notification)
 		Notification.Visible = true
-		if Desc:len() >= 35 then
+		if (#Desc >= 35) then
 			Notification.AutomaticSize = Enum.AutomaticSize.Y
 			Notification.Description.AutomaticSize.Y = Enum.AutomaticSize.Y
 			Notification.Description.TextScaled = false
