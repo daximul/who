@@ -1,9 +1,9 @@
 -- Example of what you should do
 loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();
 
-while not getgenv().DA_PUBLIC_USER_BUILD.loaded do wait() end
+while (not getgenv()["da_env"]) and (not getgenv()["da_env"]["loaded"]) do wait() end
 
-local Build = DA_PUBLIC_USER_BUILD
+local Build = getgenv()["da_env"]
 
 local function Themeify(bgc3, bc3)
 	for i,v in pairs(Build.Interface:GetDescendants()) do
@@ -37,6 +37,10 @@ Build.loaded                if the build has loaded
 Build.Interface             get the gui of DA
 
 Build.build_key             honestly just a randomly generated string thats it
+
+Bui.notify                  legit just notify
+     Build.notify("title", "hi")
+     Build.notify("", "default stuff idk")
 
 Build.newCmd                make a new command
      Build.newCmd("command name", {"alias1", "alias2", "leave blank for no alias like {}"}, "the name you see in the command lists", "command description", function(args, speaker)
