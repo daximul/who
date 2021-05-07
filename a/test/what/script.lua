@@ -89,6 +89,9 @@ local origsettings = {
 		Ws = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed,
 		Jp = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower,
 	},
+	Camera = {
+		Fov = workspace.CurrentCamera.FieldOfView
+	},
 }
 function randomString()
 	local length = math.random(10,20)
@@ -2329,6 +2332,7 @@ local function VirtualEnvironment()
 	Space.BrowserBtn = BrowserBtn
 	Space.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	Space.notify = notify
+	Space.events = {}
 	getgenv()["DA_ENV"] = Space
 	getgenv()["da_env"] = Space
 end
@@ -3316,10 +3320,8 @@ newCmd("unreach", {"noreach"}, "unreach / noreach", "Disable Reach", function(ar
 end)
 
 newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
-	local fov = args[1] or 70
-	if isNumber(fov) then
-		workspace.CurrentCamera.FieldOfView = fov
-	end
+	local FOV = tonumber(args[1]) or origsettings.Camera.Fov or 70
+	workspace.CurrentCamera.FieldOfView = FOV
 end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
