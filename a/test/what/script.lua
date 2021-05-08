@@ -72,6 +72,7 @@ local customAlias = {}
 local DEBUG = false
 local tabComplete = nil
 local Network_Loop = nil
+local superinternal = false
 local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
@@ -1458,7 +1459,6 @@ function addcmdareatext(name, cmdname, aliases, desc, plug)
 	NewCommand.Label.Text = tostring(cmdname)
 	NewCommand.MouseButton1Down:Connect(function()
 		CommandFrame:FindFirstChild("Name").Text = ("Name: " .. nametextlabel)
-		-- CommandFrame.Alias.Text = ("Aliases: " .. table.concat(aliases, ", "))
 		CommandFrame.Alias.Text = (#aliases > 0 and ("Aliases: " .. table.concat(aliases, ", ")) or "Aliases: There are no aliases")
 		CommandFrame.Desc.Text = ("Description: " .. desc)
 		CommandFrame.Visible = true
@@ -2262,6 +2262,7 @@ Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
 end)
 
 Players.LocalPlayer.Chatted:Connect(function(message)
+	if superinternal == true then return end
 	spawn(function()
 		wait()
 		message = message:lower()
@@ -2271,6 +2272,7 @@ end)
 
 DAMouse.KeyDown:Connect(function(key)
 	if (key == Settings.Prefix) then
+		if superinternal == true then return end
 		spawn(function()
 			CaptureCmdBar()
 		end)
@@ -2279,18 +2281,19 @@ end)
 
 Cmdbar.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
+		if superinternal == true then return end
 		spawn(function()
 			CmdBarStatus(false)
 		end)
 		spawn(function()
-			local cmdbarText = Cmdbar.Text:gsub("^"..'%'..Settings.Prefix,"")
+			local cmdbarText = Cmdbar.Text:gsub("^" .. "%" .. Settings.Prefix, "")
 			execCmd(cmdbarText, Players.LocalPlayer, true)
 		end)
 	end
 	wait()
 	if not Cmdbar:IsFocused() then
 		Cmdbar.Text = ""
-		IndexContents('')
+		IndexContents("")
 	end
 end)
 
@@ -2329,6 +2332,17 @@ local function VirtualEnvironment()
 	Space.BrowserBtn = BrowserBtn
 	Space.build_key = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	Space.notify = notify
+	Space.getcmds = function()
+		return cmds
+	end
+	Space.internal = function(bool)
+		superinternal = bool
+	end
+	Space.disablecmdbar = function()
+		Cmdbar.Visible = false
+	end
+	Space.matchsearch = MatchSearch
+	Space.execCmd = execCmd
 	Space.events = {}
 	getgenv()["DA_ENV"] = Space
 	getgenv()["da_env"] = Space
