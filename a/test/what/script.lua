@@ -39,7 +39,6 @@ end
 local GUI = Import("interface.lua")
 local Main = GUI.Main
 local Cmdbar = Main.Box
-local CmdbarTransparencyClone = Cmdbar:Clone()
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local NotificationTemplate = GUI.NotificationTemplate
@@ -519,7 +518,7 @@ function SetAllTrans(Object)
 end
 
 function TweenAllTransToObject(Object, Time, BeforeObject)
-	local Descendants = Object:GetDescendants()
+    local Descendants = Object:GetDescendants()
     local OldDescentants = BeforeObject:GetDescendants()
     local Tween
     Tween = TweenObj(Object, "Sine", "Out", Time, {
@@ -557,8 +556,6 @@ function TweenAllTransToObject(Object, Time, BeforeObject)
 end
 
 function CmdBarStatus(bool)
-	local TransparencyTween = bool and TweenAllTransToObject or TweenAllTrans
-	local Tween = TransparencyTween(Cmdbar, .5, CmdbarTransparencyClone)
 	if bool == true then
 		TweenObj(Main, "Quint", "Out", .5, {
 			Position = UDim2.new(0.5, -100, 1, -110)
