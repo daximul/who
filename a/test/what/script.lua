@@ -1385,7 +1385,7 @@ local function Cmdbar_Search()
 				table.insert(chunks, w)
 			end
 			if #chunks > 0 then InputText = chunks[#chunks] end
-			if Match(button.Label.Text, InputText) then
+			if Match(string.lower(button.Label.Text), InputText) then
 				button.Visible = true
 			else
 				button.Visible = false
@@ -1403,7 +1403,7 @@ local function DaUi_Search()
 				table.insert(chunks, w)
 			end
 			if #chunks > 0 then InputText = chunks[#chunks] end
-			if Match(button.Label.Text, InputText) then
+			if Match(string.lower(button.Label.Text), InputText) then
 				button.Visible = true
 				break
 			else
