@@ -639,6 +639,51 @@ function notify(Title, Message, Duration)
 	end)
 end
 
+function bignotify(Title, Message, Duration)
+	spawn(function()
+		local Notification = NotificationTemplate:Clone()
+		local Desc = tostring(Message)
+		local function TweenDestroy()
+			if Notification then
+				local Tween = TweenAllTrans(Notification, .25)
+				Tween.Completed:Wait()
+				Notification:Destroy()
+			end
+		end
+		if Title == ("" or " " or nil) then
+			Notification.Title.Text = "Notification"
+		else
+			Notification.Title.Text = Title
+		end
+		if Desc == ("" or " " or nil) then
+			Notification.Description.Text = "Message"
+		else
+			Notification.Description.Text = Desc
+		end
+		SetAllTrans(Notification)
+		Notification.Visible = true
+		Notification.AutomaticSize = Enum.AutomaticSize.Y
+		Notification.Description.AutomaticSize = Enum.AutomaticSize.Y
+		Notification.Description.RichText = true
+		Notification.Description.TextScaled = false
+		Notification.Description.TextYAlignment = Enum.TextYAlignment.Top
+		Notification.Shadow.AutomaticSize = Enum.AutomaticSize.Y
+		Notification.Parent = GUI.NotificationList
+		coroutine.wrap(function()
+			local Tween = TweenAllTransToObject(Notification, .5, NotificationTemplate)
+			Tween.Completed:Wait()
+			wait(Duration or 5)
+			if Notification then
+				TweenDestroy()
+			end
+		end)()
+		Notification.Close.MouseButton1Down:Connect(function()
+			TweenDestroy()
+		end)
+		return TweenDestroy
+	end)
+end
+
 function getText(object)
 	if object ~= nil then
 		if object:FindFirstChild("Desc") ~= nil then
@@ -1624,7 +1669,7 @@ function updatesaves()
 end
 
 function addPlugin(name)
-	if name:lower() == 'plugin file name' or name:lower() == 'dark admin' or name == 'settings' then
+	if name:lower() == "plugin file name" or name:lower() == "dark admin" or name == "settings" then
 		notify("Plugin Error", "Please enter a valid plugin")
 	else
 		local file
@@ -1665,9 +1710,6 @@ function deletePlugin(name)
 		end
 	end
 	for i,v in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
-		if v.Name == "PLUGIN_" .. name then
-			v:Destroy()
-		end
 		if v.Name == "PLUGIN_" .. pName then
 			v:Destroy()
 		end
@@ -1713,7 +1755,11 @@ function LoadPlugin(val,startup)
 	if plugin ~= nil then
 		if not startup then
 			spawn(function()
-				notify("Loaded Plugin", "Name: " .. plugin["PluginName"])
+				if plugin["PluginDescription"] ~= ("" or " " or nil) then
+					bignotify("Loaded Plugin", "Name: " .. plugin["PluginName"] .. "\nDesc: " .. plugin["PluginDescription"])
+				else
+					notify("Loaded Plugin", "Name: " .. plugin["PluginName"])
+				end
 			end)
 		end
 		for i,v in pairs(plugin["Commands"]) do 
@@ -2581,7 +2627,7 @@ spawn(function()
 	end)
 end)
 spawn(function()
-	BrowserBtn("Owl Hub", "Owl Hub", "Load Owl Hub", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/owlhub.lua'))();")
+	BrowserBtn("Hub Loader", "Hub Loader", "Load Specific Hubs", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/hubloader.lua'))();")
 	BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\n~ Controls ~\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
 	BrowserBtn("Freecam", "Freecam", "Control your Camera in a Smooth way", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/freecam.lua'))();")
 	BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
