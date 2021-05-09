@@ -18,9 +18,6 @@ spawn(function()
 			end
 			if not isfolder("Dark Admin/Internal") then
 				makefolder("Dark Admin/Internal")
-				if not isfolder("Dark Admin/Internal/Scripts") then
-					makefolder("Dark Admin/Internal/Scripts")
-				end
 				if not isfolder("Dark Admin/Internal/Execution") then
 					makefolder("Dark Admin/Internal/Execution")
 					if not isfile("Dark Admin/Internal/Execution/Script.lua") then
@@ -37,9 +34,6 @@ spawn(function()
 		if isfolder("Dark Admin") then
 			if not isfolder("Dark Admin/Internal") then
 				makefolder("Dark Admin/Internal")
-				if not isfolder("Dark Admin/Internal/Scripts") then
-					makefolder("Dark Admin/Internal/Scripts")
-				end
 				if not isfolder("Dark Admin/Internal/Execution") then
 					makefolder("Dark Admin/Internal/Execution")
 					if not isfile("Dark Admin/Internal/Execution/Script.lua") then
