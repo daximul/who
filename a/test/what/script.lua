@@ -14,6 +14,13 @@ spawn(function()
 			if not isfolder("Dark Admin/Logs") then
 				makefolder("Dark Admin/Logs")
 			end
+		else
+			if not isfolder("Dark Admin/Plugins") then
+				makefolder("Dark Admin/Plugins")
+			end
+			if not isfolder("Dark Admin/Logs") then
+				makefolder("Dark Admin/Logs")
+			end
 		end
 	end
 end)
@@ -796,7 +803,7 @@ end
 
 function findCmd(cmd_name)
 	for i,v in pairs(cmds)do
-		if v.NAME:lower()==cmd_name:lower() or FindInTable(v.ALIAS,cmd_name:lower()) then
+		if v.NAME:lower() == cmd_name:lower() or FindInTable(v.ALIAS, cmd_name:lower()) then
 			return v
 		end
 	end
@@ -806,8 +813,8 @@ end
 function splitString(str,delim)
 	local broken = {}
 	if delim == nil then delim = "," end
-	for w in string.gmatch(str,"[^"..delim.."]+") do
-		table.insert(broken,w)
+	for w in string.gmatch(str, "[^" .. delim .. "]+") do
+		table.insert(broken, w)
 	end
 	return broken
 end
@@ -821,28 +828,28 @@ function execCmd(cmdStr,speaker,store)
 	cmdStr = cmdStr:gsub("%s+$","")
 	spawn(function()
 		local rawCmdStr = cmdStr
-		cmdStr = string.gsub(cmdStr,"\\\\","%%BackSlash%%")
-		local commandsToRun = splitString(cmdStr,"\\")
+		cmdStr = string.gsub(cmdStr, "\\\\", "%%BackSlash%%")
+		local commandsToRun = splitString(cmdStr, "\\")
 		for i,v in pairs(commandsToRun) do
-			v = string.gsub(v,"%%BackSlash%%","\\")
+			v = string.gsub(v, "%%BackSlash%%", "\\")
 			local x,y,num = v:find("^(%d+)%^")
 			local cmdDelay = 0
 			local infTimes = false
 			if num then
-				v = v:sub(y+1)
-				local x,y,del = v:find("^([%d%.]+)%^")
+				v = v:sub(y + 1)
+				local x, y, del = v:find("^([%d%.]+)%^")
 				if del then
-					v = v:sub(y+1)
+					v = v:sub(y + 1)
 					cmdDelay = tonumber(del) or 0
 				end
 			else
 				local x,y = v:find("^inf%^")
 				if x then
 					infTimes = true
-					v = v:sub(y+1)
-					local x,y,del = v:find("^([%d%.]+)%^")
+					v = v:sub(y + 1)
+					local x, y, del = v:find("^([%d%.]+)%^")
 					if del then
-						v = v:sub(y+1)
+						v = v:sub(y + 1)
 						del = tonumber(del) or 1
 						cmdDelay = (del > 0 and del or 1)
 					else
@@ -853,7 +860,7 @@ function execCmd(cmdStr,speaker,store)
 			num = tonumber(num or 1)
 
 			if v:sub(1,1) == "!" then
-				local chunks = splitString(v:sub(2),split)
+				local chunks = splitString(v:sub(2), split)
 				if chunks[1] and lastCmds[chunks[1]] then v = lastCmds[chunks[1]] end
 			end
 
@@ -861,13 +868,13 @@ function execCmd(cmdStr,speaker,store)
 			local cmdName = args[1]
 			local cmd = findCmd(cmdName)
 			if cmd then
-				table.remove(args,1)
+				table.remove(args, 1)
 				cargs = args
 				if not speaker then speaker = Players.LocalPlayer end
 				if store then
 					if speaker == Players.LocalPlayer then
 						if cmdHistory[1] ~= rawCmdStr and rawCmdStr:sub(1,11) ~= "lastcommand" and rawCmdStr:sub(1,7) ~= "lastcmd" then
-							table.insert(cmdHistory,1,rawCmdStr)
+							table.insert(cmdHistory, 1, rawCmdStr)
 						end
 					end
 					if #cmdHistory > 30 then table.remove(cmdHistory) end
@@ -877,7 +884,7 @@ function execCmd(cmdStr,speaker,store)
 				local cmdStartTime = tick()
 				if infTimes then
 					while lastBreakTime < cmdStartTime do
-						local success,err = pcall(cmd.FUNC,args, speaker)
+						local success,err = pcall(cmd.FUNC, args, speaker)
 						if not success and DEBUG then
 							warn("Command Error:", cmdName, err)
 						end
@@ -886,7 +893,7 @@ function execCmd(cmdStr,speaker,store)
 				else
 					for rep = 1,num do
 						if lastBreakTime > cmdStartTime then break end
-						local success,err = pcall(function()
+						local success, err = pcall(function()
 							cmd.FUNC(args, speaker)
 						end)
 						if not success and DEBUG then
@@ -901,7 +908,7 @@ function execCmd(cmdStr,speaker,store)
 end
 
 function getstring(begin)
-	local start = begin-1
+	local start = begin - 1
 	local AA = "" for i,v in pairs(cargs) do
 		if i > start then
 			if AA ~= "" then
@@ -914,8 +921,8 @@ function getstring(begin)
 	return AA
 end
 
-function addcmd(name,alias,func,plgn)
-	cmds[#cmds+1]=
+function addcmd(name, alias, func, plgn)
+	cmds[#cmds + 1]=
 		{
 			NAME=name;
 			ALIAS=alias or {};
@@ -1008,7 +1015,7 @@ local SpecialPlayerCases = {
 		return plrs
 	end,
 	["me"] = function(speaker) return {speaker} end,
-	["#(%d+)"] = function(speaker,args,currentList)
+	["#(%d+)"] = function(speaker, args, currentList)
 		local returns = {}
 		local randAmount = tonumber(args[1])
 		local players = {unpack(currentList)}
@@ -1020,14 +1027,14 @@ local SpecialPlayerCases = {
 		end
 		return returns
 	end,
-	["random"] = function(speaker,args,currentList)
+	["random"] = function(speaker, args, currentList)
 		local players = currentList
 		return {players[math.random(1,#players)]}
 	end,
-	["%%(.+)"] = function(speaker,args)
+	["%%(.+)"] = function(speaker, args)
 		local returns = {}
 		local team = args[1]
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Team and string.sub(string.lower(plr.Team.Name),1,#team) == string.lower(team) then
 				table.insert(returns,plr)
 			end
@@ -1037,7 +1044,7 @@ local SpecialPlayerCases = {
 	["allies"] = function(speaker)
 		local returns = {}
 		local team = speaker.Team
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Team == team then
 				table.insert(returns,plr)
 			end
@@ -1047,7 +1054,7 @@ local SpecialPlayerCases = {
 	["enemies"] = function(speaker)
 		local returns = {}
 		local team = speaker.Team
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Team ~= team then
 				table.insert(returns,plr)
 			end
@@ -1057,7 +1064,7 @@ local SpecialPlayerCases = {
 	["team"] = function(speaker)
 		local returns = {}
 		local team = speaker.Team
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Team == team then
 				table.insert(returns,plr)
 			end
@@ -1067,61 +1074,61 @@ local SpecialPlayerCases = {
 	["nonteam"] = function(speaker)
 		local returns = {}
 		local team = speaker.Team
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Team ~= team then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["friends"] = function(speaker,args)
+	["friends"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr:IsFriendsWith(speaker.UserId) and plr ~= speaker then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["nonfriends"] = function(speaker,args)
+	["nonfriends"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if not plr:IsFriendsWith(speaker.UserId) and plr ~= speaker then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["guests"] = function(speaker,args)
+	["guests"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Guest then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["bacons"] = function(speaker,args)
+	["bacons"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Character:FindFirstChild("Pal Hair") or plr.Character:FindFirstChild("Kate Hair") then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["age(%d+)"] = function(speaker,args)
+	["age(%d+)"] = function(speaker, args)
 		local returns = {}
 		local age = tonumber(args[1])
 		if not age == nil then return end
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.AccountAge <= age then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["nearest"] = function(speaker,args,currentList)
+	["nearest"] = function(speaker, args, currentList)
 		local speakerChar = speaker.Character
 		if not speakerChar or not getRoot(speakerChar) then return end
 		local lowest = math.huge
@@ -1137,7 +1144,7 @@ local SpecialPlayerCases = {
 		end
 		return NearestPlayer
 	end,
-	["farthest"] = function(speaker,args,currentList)
+	["farthest"] = function(speaker, args, currentList)
 		local speakerChar = speaker.Character
 		if not speakerChar or not getRoot(speakerChar) then return end
 		local highest = 0
@@ -1153,40 +1160,40 @@ local SpecialPlayerCases = {
 		end
 		return Farthest
 	end,
-	["group(%d+)"] = function(speaker,args)
+	["group(%d+)"] = function(speaker, args)
 		local returns = {}
 		local groupID = tonumber(args[1])
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr:IsInGroup(groupID) then  
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["alive"] = function(speaker,args)
+	["alive"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["dead"] = function(speaker,args)
+	["dead"] = function(speaker, args)
 		local returns = {}
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if (not plr.Character or not plr.Character:FindFirstChildOfClass("Humanoid")) or plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0 then
 				table.insert(returns,plr)
 			end
 		end
 		return returns
 	end,
-	["rad(%d+)"] = function(speaker,args)
+	["rad(%d+)"] = function(speaker, args)
 		local returns = {}
 		local radius = tonumber(args[1])
 		local speakerChar = speaker.Character
 		if not speakerChar or not getRoot(speakerChar) then return end
-		for _,plr in pairs(game.Players:GetPlayers()) do
+		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.Character and getRoot(plr.Character) then
 				local magnitude = (getRoot(plr.Character).Position-getRoot(speakerChar).Position).magnitude
 				if magnitude <= radius then table.insert(returns,plr) end
@@ -3238,10 +3245,17 @@ newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
 end)
 
 newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
-	if args[1] and string.lower(args[1]) == ("sentinel" or "sen") then
-		notify("Loading", "Hold on a sec")
-		wait(0.2)
-		loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua")))();
+	if args[1] then
+		local opt = string.lower(args[1])
+		if opt == "sentinel" then
+			notify("Loading", "Hold on a sec")
+			wait(0.2)
+			loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua")))();
+		elseif opt == "sen" then
+			notify("Loading", "Hold on a sec")
+			wait(0.2)
+			loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/sentinel_dex.lua")))();
+		end
 	else
 		if (not is_sirhurt_closure) and syn then
 			notify("Loading", "Hold on a sec")
@@ -4274,7 +4288,7 @@ newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)",
 
 		char.Head:Destroy()
 		wait(5)
-		game.Players.LocalPlayer.Character = char
+		Players.LocalPlayer.Character = char
 
 		local hum2 = Instance.new("Humanoid")
 		hum2.Parent = char
