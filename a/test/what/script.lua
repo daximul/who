@@ -72,6 +72,8 @@ local Settings = {
 	KeepDA = false,
 	AutoNet = true,
 	cmdautorj = false,
+	cframeflyspeed = 1,
+	gyroflyspeed = 3,
 }
 
 local cmds = {}
@@ -133,6 +135,8 @@ local QEfly = true
 local invisRunning = false
 local spinhats = nil
 local BubbleChatFix = nil
+local CflyCon = nil
+local Keys = {}
 
 --// End of Command Variables \\--
 
@@ -188,6 +192,20 @@ PromptOverlay.DescendantAdded:Connect(function(Overlay)
 			end)
 		end
 	end
+end)
+
+game:GetService("UserInputService").InputBegan:Connect(function(Input, GameProccesed)
+    if GameProccesed then return end
+    local KeyCode = tostring(Input.KeyCode):split(".")[3]
+    Keys[KeyCode] = true
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(Input, GameProccesed)
+    if GameProccesed then return end
+    local KeyCode = tostring(Input.KeyCode):split(".")[3]
+    if Keys[KeyCode] then
+        Keys[KeyCode] = false
+    end
 end)
 
 local function Time()
@@ -1608,6 +1626,8 @@ function saves()
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
 					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = true end
 					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
+					if json.cframeflyspeed ~= nil then Settings.cframeflyspeed = json.cframeflyspeed else Settings.cframeflyspeed = 1 end
+					if json.gyroflyspeed ~= nil then Settings.gyroflyspeed = json.gyroflyspeed else Settings.gyroflyspeed = 3 end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1637,6 +1657,8 @@ function saves()
 				Settings.KeepDA = false
 				Settings.AutoNet = true
 				Settings.cmdautorj = false
+				Settings.cframeflyspeed = 1
+				Settings.gyroflyspeed = 3
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
@@ -1651,6 +1673,8 @@ function saves()
 		Settings.KeepDA = false
 		Settings.AutoNet = true
 		Settings.cmdautorj = false
+		Settings.cframeflyspeed = 1
+		Settings.gyroflyspeed = 3
 	end
 end
 
@@ -1670,6 +1694,8 @@ function updatesaves()
 			KeepDA = Settings.KeepDA;
 			AutoNet = Settings.AutoNet;
 			cmdautorj = Settings.cmdautorj;
+			cframeflyspeed = Settings.cframeflyspeed;
+			gyroflyspeed = Settings.gyroflyspeed;
 		}
 		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
 	end
@@ -2885,7 +2911,7 @@ newCmd("fly", {}, "fly [number]", "Be Able to Fly", function(args, speaker)
 	wait()
 	sFLY()
 	if args[1] and isNumber(args[1]) then
-		Settings.daflyspeed = args[1]
+		Settings.daflyspeed = tonumber(args[1])
 		updatesaves()
 	end
 end)
@@ -2895,29 +2921,150 @@ newCmd("vfly", {"vehiclefly"}, "vfly / vehiclefly [number]", "Be Able to Make Ve
 	wait()
 	sFLY(true)
 	if args[1] and isNumber(args[1]) then
-		Settings.vehicleflyspeed = args[1]
+		Settings.vehicleflyspeed = tonumber(args[1])
 		updatesaves()
 	end
 end)
 
 newCmd("flyspeed", {"flysp"}, "flyspeed / flysp", "Change your Flyspeed", function(args, speaker)
 	local speed = args[1] or 1
-	if isNumber(speed) then
-		Settings.daflyspeed = speed
+	if args[1] and isNumber(speed) then
+		Settings.daflyspeed = tonumber(speed)
 		updatesaves()
 	end
 end)
 
 newCmd("vflyspeed", {"vflysp"}, "vflyspeed / vflysp", "Change your Vehicle Flyspeed", function(args, speaker)
 	local speed = args[1] or 1
-	if isNumber(speed) then
-		Settings.vehicleflyspeed = speed
+	if args[1] and isNumber(speed) then
+		Settings.vehicleflyspeed = tonumber(speed)
 		updatesaves()
 	end
 end)
 
 newCmd("unfly", {"unvfly"}, "unfly / unvfly", "Stop Flying", function(args, speaker)
 	NOFLY()
+end)
+
+newCmd("cframefly", {"cfly"}, "cframefly / cfly [speed]", "Makes you Fly (Bypasses Some Anti Cheats)", function(args, speaker)
+	if args[1] and isNumber(args[1]) then
+		Settings.cframeflyspeed = tonumber(args[1])
+		updatesaves()
+	end
+	local UIS = game:GetService("UserInputService")
+	local RunService = game:GetService("RunService")
+	local GC = getconnections or get_signal_cons
+	local Keys = Enum.KeyCode
+	local v3 = Vector3.new()
+	local cf = CFrame.new()
+	CflyCon = RunService.Heartbeat:Connect(function()
+		local Camera = workspace.CurrentCamera
+		local Cache = {}
+		local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+		local HRP = Human and Human.RootPart or speaker.Character.PrimaryPart
+		if not speaker.Character or not Human or not HRP or not Camera then
+			return 
+		end
+		local Cache = {}
+		local Cons = {game.ItemChanged, Human.StateChanged, Human.Changed, speaker.Character.Changed}
+		for _, v in ipairs(speaker.Character:GetChildren()) do
+			if v:IsA("BasePart") then
+				Cons[#Cons + 1] = v.Changed
+				Cons[#Cons + 1] = v:GetPropertyChangedSignal("CFrame")
+			end
+		end
+		for _, v in ipairs(Cons) do
+			for _, v1 in ipairs(GC(v)) do
+				if not rawget(v1, "__OBJECT_ENABLED") then
+					Cache[#Cache + 1] = v1
+					v1:Disable()
+				end
+			end
+		end
+		Human:ChangeState(11)
+		HRP.CFrame = CFrame.new(HRP.Position, HRP.Position + Camera.CFrame.LookVector) * (UIS:GetFocusedTextBox() and cf or CFrame.new((UIS:IsKeyDown(Keys.D) and Settings.cframeflyspeed) or (UIS:IsKeyDown(Keys.A) and -Settings.cframeflyspeed) or 0, (UIS:IsKeyDown(Keys.E) and Settings.cframeflyspeed / 2) or (UIS:IsKeyDown(Keys.Q) and -Settings.cframeflyspeed / 2) or 0, (UIS:IsKeyDown(Keys.S) and Settings.cframeflyspeed) or (UIS:IsKeyDown(Keys.W) and -Settings.cframeflyspeed) or 0))
+		for _, v in ipairs(Cache) do
+			v:Enable()
+		end
+	end)
+end)
+
+newCmd("cframeflyspeed", {"cflyspeed"}, "cframeflyspeed / cflyspeed [num]", "Sets CFrame Fly Speed", function(args, speaker)
+	if args[1] and isNumber(args[1]) then
+		Settings.cframeflyspeed = tonumber(args[1])
+		updatesaves()
+	end
+end)
+
+newCmd("uncframefly", {"uncfly"}, "uncframefly / uncfly", "Disables CFrame Fly", function(args, speaker)
+	if CflyCon then
+		CflyCon:Disconnect()
+	end
+end)
+
+newCmd("gyrofly", {}, "gyrofly [speed]", "Make your Character Fly Using Body Gyros", function(args, speaker)
+	if args[1] and isNumber(args[1]) then
+		Settings.gyroflyspeed = tonumber(args[1])
+		updatesaves()
+	end
+	for i, v in next, getRoot(speaker.Character):GetChildren() do
+        if v:IsA("BodyPosition") or v:IsA("BodyGyro") then
+            v:Destroy()
+        end
+    end
+    local BodyPos = Instance.new("BodyPosition", getRoot(speaker.Character))
+    local BodyGyro = Instance.new("BodyGyro", getRoot(speaker.Character))
+    local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    BodyGyro.maxTorque = Vector3.new(1, 1, 1) * 9e9
+    BodyGyro.CFrame = getRoot(speaker.Character).CFrame
+    BodyPos.maxForce = Vector3.new(1, 1, 1) * math.huge
+    Human.PlatformStand = true
+    coroutine.wrap(function()
+        BodyPos.Position = getRoot(speaker.Character).Position
+        while wait() do
+            local NewPos = (BodyGyro.CFrame - (BodyGyro.CFrame).Position) + BodyPos.Position
+            local CoordinateFrame = workspace.CurrentCamera.CoordinateFrame
+            if Keys["W"] then
+                NewPos = NewPos + CoordinateFrame.lookVector * Settings.gyroflyspeed
+                BodyPos.Position = (getRoot(speaker.Character).CFrame * CFrame.new(0, 0, -Settings.gyroflyspeed)).Position
+                BodyGyro.CFrame = CoordinateFrame * CFrame.Angles(-math.rad(Settings.gyroflyspeed * 15), 0, 0)
+            end
+            if Keys["A"] then
+                NewPos = NewPos * CFrame.new(-Settings.gyroflyspeed, 0, 0)
+            end
+            if Keys["S"] then
+                NewPos = NewPos - CoordinateFrame.lookVector * Settings.gyroflyspeed
+                BodyPos.Position = (getRoot(speaker.Character).CFrame * CFrame.new(0, 0, Settings.gyroflyspeed)).Position
+                BodyGyro.CFrame = CoordinateFrame * CFrame.Angles(-math.rad(Settings.gyroflyspeed * 15), 0, 0)
+            end
+            if Keys["D"] then
+                NewPos = NewPos * CFrame.new(Settings.gyroflyspeed, 0, 0)
+            end
+            BodyPos.Position = NewPos.Position
+            BodyGyro.CFrame = CoordinateFrame
+        end
+        Human.PlatformStand = false
+    end)()
+    notify("Gyro Fly", "Enabled")
+end)
+
+newCmd("ungyrofly", {}, "ungyrofly", "Disables Gyro Fly", function(args, speaker)
+	local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	for i,v in next, getRoot(speaker.Character):GetChildren() do
+		if v:IsA("BodyPosition") or v:IsA("BodyGyro") then
+			v:Destroy()
+		end
+	end
+	Human.PlatformStand = false
+	notify("Gyro Fly", "Disabled")
+end)
+
+newCmd("gyroflyspeed", {"gflyspeed"}, "gyroflyspeed / gflyspeed [num]", "Sets Gyro Fly Speed", function(args, speaker)
+	local speed = args[1] or 3
+	if args[1] and isNumber(args[1]) then
+		Settings.gyroflyspeed = tonumber(speed)
+		updatesaves()
+	end
 end)
 
 newCmd("anchor", {}, "anchor", "Anchor your RootPart", function(args, speaker)
