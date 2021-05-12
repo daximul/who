@@ -64,21 +64,23 @@ local setsimulation = setsimulationradius or set_simulation_radius
 
 local Settings = {
 	Prefix = "\\",
+	PluginsTable = {},
 	daflyspeed = 1,
 	vehicleflyspeed = 1,
-	PluginsTable = {},
+	cframeflyspeed = 1,
+	gyroflyspeed = 3,
 	ChatLogs = false,
 	JoinLogs = false,
 	KeepDA = false,
 	AutoNet = true,
 	cmdautorj = false,
-	cframeflyspeed = 1,
-	gyroflyspeed = 3,
 }
 
 local cmds = {}
 local customAlias = {}
 local DEBUG = false
+local Settings_Path = "Dark Admin/Settings.json"
+local wfile_cooldown = false
 local tabComplete = nil
 local Network_Loop = nil
 local superinternal = false
@@ -103,7 +105,7 @@ local origsettings = {
 	},
 }
 function randomString()
-	local length = math.random(10,20)
+	local length = math.random(10, 20)
 	local array = {}
 	for i = 1, length do
 		array[i] = string.char(math.random(32, 126))
@@ -130,6 +132,7 @@ local fcRunning = false
 local ESPenabled = false
 local Floating = false
 local swimming = false
+local cmdflinging = false
 local floatName = randomString()
 local QEfly = true
 local invisRunning = false
@@ -147,6 +150,12 @@ spawn(function()
 		end
 	end)
 end)
+
+local function Queue_Admin()
+	if (syn and syn.queue_on_teleport) and (Settings.KeepDA == false) then
+		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+	end
+end
 
 local function RestartEffects()
 	NOFLY()
@@ -182,10 +191,12 @@ PromptOverlay.DescendantAdded:Connect(function(Overlay)
 			Overlay:GetPropertyChangedSignal("Text"):Connect(function()
 				if Overlay.Text:sub(0, 12) == "Disconnected" then
 					if #Players:GetPlayers() <= 1 then
+						Queue_Admin()
 						Players.LocalPlayer:Kick("\nRejoining...")
 						wait()
 						game:GetService("TeleportService"):Teleport(game.PlaceId, Players.LocalPlayer)
 					else
+						Queue_Admin()
 						game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 					end
 				end
@@ -212,12 +223,12 @@ local function Time()
 	local HOUR = math.floor((tick() % 86400) / 3600)
 	local MINUTE = math.floor((tick() % 3600) / 60)
 	local SECOND = math.floor(tick() % 60)
-	local AP = HOUR > 11 and 'PM' or 'AM'
+	local AP = HOUR > 11 and "PM" or "AM"
 	HOUR = (HOUR % 12 == 0 and 12 or HOUR % 12)
-	HOUR = HOUR < 10 and '0' .. HOUR or HOUR
-	MINUTE = MINUTE < 10 and '0' .. MINUTE or MINUTE
-	SECOND = SECOND < 10 and '0' .. SECOND or SECOND
-	return HOUR .. ':' .. MINUTE .. ':' .. SECOND .. ' ' .. AP
+	HOUR = HOUR < 10 and "0" .. HOUR or HOUR
+	MINUTE = MINUTE < 10 and "0" .. MINUTE or MINUTE
+	SECOND = SECOND < 10 and "0" .. SECOND or SECOND
+	return HOUR .. ":" .. MINUTE .. ":" .. SECOND .. " " .. AP
 end
 
 local function LogChat(plr)
@@ -1002,18 +1013,38 @@ function replacecmd(cmd, func)
 end
 
 function gethum(ch)
-	return ch:FindFirstChildWhichIsA("Humanoid") or Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+	return (ch and ch:FindFirstChildWhichIsA("Humanoid")) or (Players.LocalPlayer and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid"))
 end
 
 function findhum(ch)
 	if ch ~= nil then
-		if ch:FindFirstChildWhichIsA("Humanoid") then
+		if ch and ch:FindFirstChildWhichIsA("Humanoid") then
 			return true
 		else
 			return false
 		end
 	else
-		if Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+		if Players.LocalPlayer and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+			return true
+		else
+			return false
+		end
+	end
+end
+
+function getbp(ch)
+	return (ch and ch:FindFirstChildWhichIsA("Backpack")) or (Players.LocalPlayer and Players.LocalPlayer:FindFirstChildWhichIsA("Backpack"))
+end
+
+function findbp(ch)
+	if ch ~= nil then
+		if ch and ch:FindFirstChildWhichIsA("Backpack") then
+			return true
+		else
+			return false
+		end
+	else
+		if Players.LocalPlayer and Players.LocalPlayer:FindFirstChildWhichIsA("Backpack") then
 			return true
 		else
 			return false
@@ -1590,91 +1621,87 @@ function readfileExploit()
 	end
 end
 
-local cooldown = false
 function writefileCooldown(name,data)
 	spawn(function()
-		if not cooldown then
-			cooldown = true
+		if not wfile_cooldown then
+			wfile_cooldown = true
 			writefile(name, data)
 		else
-			repeat wait() until cooldown == false
-			writefileCooldown(name,data)
+			repeat wait() until wfile_cooldown == false
+			writefileCooldown(name, data)
 		end
 		wait(3)
-		cooldown = false
+		wfile_cooldown = false
 	end)
 end
 
-local Settings_FileName = ("Dark Admin/Settings.json");
-defaults = game:GetService("HttpService"):JSONEncode(Settings)
-
-nosaves = false
-
+local Defaults = game:GetService("HttpService"):JSONEncode(Settings)
+local nosaves = false
 local loadedEventData = nil
 function saves()
 	if writefileExploit() then
-		if pcall(function() readfile(Settings_FileName) end) then
-			if readfile(Settings_FileName) ~= nil then
+		if pcall(function() readfile(Settings_Path) end) then
+			if readfile(Settings_Path) ~= nil then
 				local success, response = pcall(function()
-					local json = game:GetService("HttpService"):JSONDecode(readfile(Settings_FileName))
+					local json = game:GetService("HttpService"):JSONDecode(readfile(Settings_Path))
 					if json.Prefix ~= nil then Settings.Prefix = json.Prefix else Settings.Prefix = '\\' end
+					if json.PluginsTable ~= nil then Settings.PluginsTable = json.PluginsTable else Settings.PluginsTable = {} end
 					if json.daflyspeed ~= nil then Settings.daflyspeed = json.daflyspeed else Settings.daflyspeed = 1 end
 					if json.vehicleflyspeed ~= nil then Settings.vehicleflyspeed = json.vehicleflyspeed else Settings.vehicleflyspeed = 1 end
-					if json.PluginsTable ~= nil then Settings.PluginsTable = json.PluginsTable else Settings.PluginsTable = {} end
+					if json.cframeflyspeed ~= nil then Settings.cframeflyspeed = json.cframeflyspeed else Settings.cframeflyspeed = 1 end
+					if json.gyroflyspeed ~= nil then Settings.gyroflyspeed = json.gyroflyspeed else Settings.gyroflyspeed = 3 end
 					if json.ChatLogs ~= nil then Settings.ChatLogs = json.ChatLogs else Settings.ChatLogs = false end
 					if json.JoinLogs ~= nil then Settings.JoinLogs = json.JoinLogs else Settings.JoinLogs = false end
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
 					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = true end
 					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
-					if json.cframeflyspeed ~= nil then Settings.cframeflyspeed = json.cframeflyspeed else Settings.cframeflyspeed = 1 end
-					if json.gyroflyspeed ~= nil then Settings.gyroflyspeed = json.gyroflyspeed else Settings.gyroflyspeed = 3 end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
 					warn("Overwriting Save File")
-					writefileCooldown(Settings_FileName, defaults)
+					writefileCooldown(Settings_Path, Defaults)
 					wait()
 					saves()
 				end
 			else
-				writefileCooldown(Settings_FileName, defaults)
+				writefileCooldown(Settings_Path, Defaults)
 				wait()
 				saves()
 			end
 		else
-			writefileCooldown(Settings_FileName, defaults)
+			writefileCooldown(Settings_Path, Defaults)
 			wait()
-			if pcall(function() readfile(Settings_FileName) end) then
+			if pcall(function() readfile(Settings_Path) end) then
 				saves()
 			else
 				nosaves = true
 				Settings.Prefix = "\\"
+				Settings.PluginsTable = {}
 				Settings.daflyspeed = 1
 				Settings.vehicleflyspeed = 1
-				Settings.PluginsTable = {}
+				Settings.cframeflyspeed = 1
+				Settings.gyroflyspeed = 3
 				Settings.ChatLogs = false
 				Settings.JoinLogs = false
 				Settings.KeepDA = false
 				Settings.AutoNet = true
 				Settings.cmdautorj = false
-				Settings.cframeflyspeed = 1
-				Settings.gyroflyspeed = 3
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
 		end
 	else
 		Settings.Prefix = "\\"
+		Settings.PluginsTable = {}
 		Settings.daflyspeed = 1
 		Settings.vehicleflyspeed = 1
-		Settings.PluginsTable = {}
+		Settings.cframeflyspeed = 1
+		Settings.gyroflyspeed = 3
 		Settings.ChatLogs = false
 		Settings.JoinLogs = false
 		Settings.KeepDA = false
 		Settings.AutoNet = true
 		Settings.cmdautorj = false
-		Settings.cframeflyspeed = 1
-		Settings.gyroflyspeed = 3
 	end
 end
 
@@ -1686,18 +1713,18 @@ function updatesaves()
 	if nosaves == false and writefileExploit() then
 		local update = {
 			Prefix = Settings.Prefix;
+			PluginsTable = Settings.PluginsTable;
 			daflyspeed = Settings.daflyspeed;
 			vehicleflyspeed = Settings.vehicleflyspeed;
-			PluginsTable = Settings.PluginsTable;
+			cframeflyspeed = Settings.cframeflyspeed;
+			gyroflyspeed = Settings.gyroflyspeed;
 			ChatLogs = Settings.ChatLogs;
 			JoinLogs = Settings.JoinLogs;
 			KeepDA = Settings.KeepDA;
 			AutoNet = Settings.AutoNet;
 			cmdautorj = Settings.cmdautorj;
-			cframeflyspeed = Settings.cframeflyspeed;
-			gyroflyspeed = Settings.gyroflyspeed;
 		}
-		writefileCooldown(Settings_FileName, game:GetService("HttpService"):JSONEncode(update))
+		writefileCooldown(Settings_Path, game:GetService("HttpService"):JSONEncode(update))
 	end
 end
 
@@ -2717,10 +2744,12 @@ end)
 
 newCmd("rejoin", {"rj"}, "rejoin / rj", "Rejoin the server", function(args, speaker)
 	if #Players:GetPlayers() <= 1 then
+		Queue_Admin()
 		Players.LocalPlayer:Kick("\nRejoining...")
 		wait()
 		game:GetService('TeleportService'):Teleport(game.PlaceId, Players.LocalPlayer)
 	else
+		Queue_Admin()
 		game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 	end
 end)
@@ -3381,10 +3410,15 @@ newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't Get Kicked for Bein
 end)
 
 newCmd("btools", {}, "btools", "Building Tools", function(args, speaker)
-	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 1
-	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 2
-	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 3
-	Instance.new("HopperBin", speaker:FindFirstChildOfClass("Backpack")).BinType = 4
+	if findbp() then
+		for i = 1, 4 do
+			local Bin = Instance.new("HopperBin")
+			Bin.BinType = i
+			Bin.Parent = getbp()
+		end
+	else
+		notify("Command Error", "Missing Backpack")
+	end
 end)
 
 newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
@@ -4131,7 +4165,6 @@ newCmd("unspin", {}, "unspin", "Disables Spin", function(args, speaker)
 	end
 end)
 
-cmdflinging = false
 newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
 	for _, child in pairs(speaker.Character:GetDescendants()) do
 		if child:IsA("BasePart") then
