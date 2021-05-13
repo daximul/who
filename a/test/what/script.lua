@@ -1,6 +1,6 @@
-pcall(function() if (not game) and (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end end)
+if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["notify"]("Dark Admin", "Already Running!") end
 
-if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["notify"]("", "Already Running!") end
+pcall(function() if (not game) and (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end end)
 
 local StartingTick = StartingTick or tick() or os.clock()
 
@@ -448,7 +448,10 @@ end
 function CaptureCmdBar()
 	Cmdbar:CaptureFocus()
 	spawn(function()
-		repeat Cmdbar.Text = "" until Cmdbar.Text == ""
+		coroutine.wrap(function()
+			wait()
+			Cmdbar.Text = ""
+		end)()
 	end)
 	spawn(function()
 		CmdBarStatus(true)
@@ -478,18 +481,6 @@ local function SetSimulationRadius()
 			end)
 		end)
 	end)
-end
-
-function CmdListStatus(bool)
-	local Gui_Pos = {
-		Shown = UDim2.new(0.694, -75, 0.656, -105),
-		Hidden = UDim2.new(0.694, -75, 10, -105),
-	}
-	if bool == true then
-		CommandsGui:TweenPosition(Gui_Pos.Shown, "InOut", "Sine", 0.3, true, nil)
-	else
-		CommandsGui:TweenPosition(Gui_Pos.Hidden, "InOut", "Sine", 0.5, true, nil)
-	end
 end
 
 function TweenObj(Object, Style, Direction, Time, Goal)
@@ -604,27 +595,39 @@ function CmdBarStatus(bool)
 	end
 end
 
-function PlugBrowseStatus(bool)
-	local GuiPos = {
-		Shown = UDim2.new(0.42, -75, 0.512, -105),
-		Hidden = UDim2.new(0.42, -75, 2, -105),
-	}
+function CmdListStatus(bool)
 	if bool == true then
-		PluginBrowser:TweenPosition(GuiPos.Shown, "InOut", "Sine", 0.3, true, nil)
+		TweenObj(CommandsGui, "Quint", "Out", .3, {
+			Position = UDim2.new(0.694, -75, 0.656, -105)
+		})
 	else
-		PluginBrowser:TweenPosition(GuiPos.Hidden, "InOut", "Sine", 0.5, true, nil)
+		TweenObj(CommandsGui, "Quint", "Out", .5, {
+			Position = UDim2.new(0.694, -75, 10, -105)
+		})
+	end
+end
+
+function PlugBrowseStatus(bool)
+	if bool == true then
+		TweenObj(PluginBrowser, "Quint", "Out", .3, {
+			Position = UDim2.new(0.42, -75, 0.512, -105)
+		})
+	else
+		TweenObj(PluginBrowser, "Quint", "Out", .5, {
+			Position = UDim2.new(0.42, -75, 2, -105)
+		})
 	end
 end
 
 function DaUiStatus(bool)
-	local GuiPoz = {
-		Shown = UDim2.new(0.42, -75, 0.512, -105),
-		Hidden = UDim2.new(0.42, -75, 2, -105),
-	}
 	if bool == true then
-		DaUi:TweenPosition(GuiPoz.Shown, "InOut", "Sine", 0.3, true, nil)
+		TweenObj(DaUi, "Quint", "Out", .3, {
+			Position = UDim2.new(0.42, -75, 0.512, -105)
+		})
 	else
-		DaUi:TweenPosition(GuiPoz.Hidden, "InOut", "Sine", 0.5, true, nil)
+		TweenObj(DaUi, "Quint", "Out", .5, {
+			Position = UDim2.new(0.42, -75, 2, -105)
+		})
 	end
 end
 
@@ -1476,74 +1479,6 @@ Cmdbar.Focused:Connect(function()
 	end)
 end)
 
-local function Cmdbar_Search()
-	local InputText = string.lower(Cmdbar.Text)
-	for _, button in pairs(CMDsF:GetChildren()) do
-		if button:IsA("TextButton") then
-			local chunks = {}
-			if InputText:sub(#InputText, #InputText) == "\\" then InputText = "" end
-			for w in string.gmatch(InputText, "[^\\]+") do
-				table.insert(chunks, w)
-			end
-			if #chunks > 0 then InputText = chunks[#chunks] end
-			if Match(string.lower(button.Label.Text), InputText) then
-				button.Visible = true
-			else
-				button.Visible = false
-			end
-		end
-	end
-end
-local function DaUi_Search()
-	local InputText = string.lower(DaUi.CmdSearch.Box.Text)
-	for _, button in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
-		if button:IsA("TextButton") then
-			local chunks = {}
-			if InputText:sub(#InputText, #InputText) == "\\" then InputText = "" end
-			for w in string.gmatch(InputText, "[^\\]+") do
-				table.insert(chunks, w)
-			end
-			if #chunks > 0 then InputText = chunks[#chunks] end
-			if Match(string.lower(button.Label.Text), InputText) then
-				button.Visible = true
-				break
-			else
-				button.Visible = false
-				break
-			end
-		end
-	end
-end
-Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
-	Cmdbar_Search()
-end)
-DaUi.CmdSearch.Box:GetPropertyChangedSignal("Text"):Connect(function()
-	DaUi_Search()
-end)
-spawn(function()
-	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
-	PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-	DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-end)
-CMDsF.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
-end)
-PluginBrowser.Area.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-end)
-DaUi.ChatLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-	DaUi.ChatLogsArea.ScrollingFrame.CanvasPosition = Vector2.new(0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-end)
-DaUi.JoinLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-end)
-DaUi.CmdArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
-end)
-
 function addcmdareatext(name, cmdname, aliases, desc, plug)
 	local nametextlabel = string.lower(name)
 	local cmdNamePicked = nil
@@ -2327,6 +2262,10 @@ end
 
 local function BrowserBtn(name, plugname, plugdesc, source)
 	local PlugAreaTemplate = Assets.PlugAreaTemplate:Clone()
+	local PlugName = PlugAreaTemplate.PlugName
+	local PlugDesc = PlugAreaTemplate.PlugDesc
+	local PlugAdd = PlugAreaTemplate.PlugAdd
+	local PlugRemove = PlugAreaTemplate.PlugRemove
 	local BrowserLabel = Assets.BrowserLabel:Clone()
 	local OldFileName = string.lower(name)
 	local NewFileName = string.gsub(OldFileName, " ", "")
@@ -2334,8 +2273,8 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 	PlugAreaTemplate.Parent = PluginBrowser.Container
 	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
 	BrowserLabel.Visible = true
-	PlugAreaTemplate.PlugName.Text = ("Plugin Name: " .. name)
-	PlugAreaTemplate.PlugDesc.Text = ("Plugin Description:\n" .. plugdesc)
+	PlugName.Text = ("Plugin Name: " .. name)
+	PlugDesc.Text = ("Plugin Description:\n" .. plugdesc)
 	BrowserLabel.Label.Text = name
 	BrowserLabel.MouseButton1Down:Connect(function()
 		for idk,okay in pairs(PluginBrowser.Container:GetChildren()) do
@@ -2344,7 +2283,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 			PlugAreaTemplate.Visible = true
 		end
 	end)
-	PlugAreaTemplate.PlugAdd.MouseButton1Down:Connect(function()
+	PlugAdd.MouseButton1Down:Connect(function()
 		if not isfile(ExtensionFile) then
 			writefile(ExtensionFile, source)
 			wait(0.2)
@@ -2355,7 +2294,7 @@ local function BrowserBtn(name, plugname, plugdesc, source)
 			updatesaves()
 		end
 	end)
-	PlugAreaTemplate.PlugRemove.MouseButton1Down:Connect(function()
+	PlugRemove.MouseButton1Down:Connect(function()
 		deletePlugin(NewFileName)
 		updatesaves()
 	end)
@@ -2462,11 +2401,60 @@ spawn(function()
 		SmoothDrag(CommandsGui)
 		SmoothDrag(PluginBrowser)
 		SmoothDrag(DaUi)
+		local pb_scroll = PluginBrowser.Area.ScrollingFrame
+		local du_scroll = DaUi.CmdArea.ScrollingFrame
+		local du_scroll2 = DaUi.ChatLogsArea.ScrollingFrame
+		local du_scroll3 = DaUi.JoinLogsArea.ScrollingFrame
 		SmoothScroll(CMDsF, 0.14)
-		SmoothScroll(PluginBrowser.Area.ScrollingFrame, 0.14)
-		SmoothScroll(DaUi.CmdArea.ScrollingFrame, 0.14)
-		SmoothScroll(DaUi.ChatLogsArea.ScrollingFrame, 0.14)
-		SmoothScroll(DaUi.JoinLogsArea.ScrollingFrame, 0.14)
+		SmoothScroll(pb_scroll, 0.14)
+		SmoothScroll(du_scroll, 0.14)
+		SmoothScroll(du_scroll2, 0.14)
+		SmoothScroll(du_scroll3, 0.14)
+	end)
+	spawn(function()
+		Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
+			local Text = string.lower(Cmdbar.Text)
+			for _, v in next, CMDsF:GetChildren() do
+				if v:IsA("TextButton") then
+					local Command = v.Label.Text
+					v.Visible = string.find(string.lower(Command), Text, 1, true)
+				end
+			end
+		end)
+		DaUi.CmdSearch.Box:GetPropertyChangedSignal("Text"):Connect(function()
+			local Text = string.lower(DaUi.CmdSearch.Box.Text)
+			for _, v in next, DaUi.CmdArea.ScrollingFrame:GetChildren() do
+				if v:IsA("TextButton") then
+					local Command = v.Label.Text
+					v.Visible = string.find(string.lower(Command), Text, 1, true)
+				end
+			end
+		end)
+	end)
+	spawn(function()
+		CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
+		PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+	end)
+	spawn(function()
+		CMDsF.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			CMDsF.CanvasSize = UDim2.new(0, 0, 0, CMDsF.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		PluginBrowser.Area.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		DaUi.ChatLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			DaUi.ChatLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+			DaUi.ChatLogsArea.ScrollingFrame.CanvasPosition = Vector2.new(0, DaUi.ChatLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		DaUi.JoinLogsArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			DaUi.JoinLogsArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.JoinLogsArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		DaUi.CmdArea.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			DaUi.CmdArea.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, DaUi.CmdArea.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		end)
 	end)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
 		CmdListStatus(false)
@@ -3031,7 +3019,7 @@ newCmd("uncframefly", {"uncfly"}, "uncframefly / uncfly", "Disables CFrame Fly",
 	end
 end)
 
-newCmd("gyrofly", {}, "gyrofly [speed]", "Make your Character Fly Using Body Gyros", function(args, speaker)
+newCmd("gyrofly", {"gfly"}, "gyrofly / gfly [speed]", "Make your Character Fly Using Body Gyros", function(args, speaker)
 	if args[1] and isNumber(args[1]) then
 		Settings.gyroflyspeed = tonumber(args[1])
 		updatesaves()
@@ -3077,7 +3065,7 @@ newCmd("gyrofly", {}, "gyrofly [speed]", "Make your Character Fly Using Body Gyr
     notify("Gyro Fly", "Enabled")
 end)
 
-newCmd("ungyrofly", {}, "ungyrofly", "Disables Gyro Fly", function(args, speaker)
+newCmd("ungyrofly", {"ungfly"}, "ungyrofly / ungfly", "Disables Gyro Fly", function(args, speaker)
 	local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	for i,v in next, getRoot(speaker.Character):GetChildren() do
 		if v:IsA("BodyPosition") or v:IsA("BodyGyro") then
