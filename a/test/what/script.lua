@@ -57,6 +57,7 @@ local DaUi = GUI.DaUi
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
@@ -127,10 +128,13 @@ local walkto = false
 local HumanModCons = {}
 local StareLoop = nil
 local FLYING = false
+local GYROFLYING = false
+local Floating = false
+local Noclipping = nil
+local Clip = true
 local viewing = nil
 local fcRunning = false
 local ESPenabled = false
-local Floating = false
 local swimming = false
 local cmdflinging = false
 local floatName = randomString()
@@ -159,8 +163,10 @@ end
 
 local function RestartEffects()
 	NOFLY()
-	Floating = false
 	FLYING = false
+	GYROFLYING = false
+	Floating = false
+	Clip = true
 	invisRunning = false
 	
 	repeat wait() until getRoot(Players.LocalPlayer.Character)
@@ -185,22 +191,21 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	RestartEffects()
 end)
 
-PromptOverlay.DescendantAdded:Connect(function(Overlay)
+CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChildWhichIsA("Frame").DescendantAdded:Connect(function(Overlay)
 	if cmdautorj == true then
 		if Overlay.Name == "ErrorTitle" then
-			Overlay:GetPropertyChangedSignal("Text"):Connect(function()
-				if Overlay.Text:sub(0, 12) == "Disconnected" then
-					if #Players:GetPlayers() <= 1 then
-						Queue_Admin()
-						Players.LocalPlayer:Kick("\nRejoining...")
-						wait()
-						game:GetService("TeleportService"):Teleport(game.PlaceId, Players.LocalPlayer)
-					else
-						Queue_Admin()
-						game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
-					end
+			Overlay:GetPropertyChangedSignal("Text"):Wait()
+			if Overlay.Text == "Disconnected" then
+				if #Players:GetPlayers() <= 1 then
+					Queue_Admin()
+					Players.LocalPlayer:Kick("\nRejoining...")
+					wait()
+					TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+				else
+					Queue_Admin()
+					TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 				end
-			end)
+			end
 		end
 	end
 end)
@@ -856,8 +861,8 @@ local lastCmds = {}
 local historyCount = 0
 local split=" "
 local lastBreakTime = 0
-function execCmd(cmdStr,speaker,store)
-	cmdStr = cmdStr:gsub("%s+$","")
+function execCmd(cmdStr, speaker, store)
+	cmdStr = cmdStr:gsub("%s+$", "")
 	spawn(function()
 		local rawCmdStr = cmdStr
 		cmdStr = string.gsub(cmdStr, "\\\\", "%%BackSlash%%")
@@ -956,10 +961,10 @@ end
 function addcmd(name, alias, func, plgn)
 	cmds[#cmds + 1]=
 		{
-			NAME=name;
-			ALIAS=alias or {};
-			FUNC=func;
-			PLUGIN=plgn;
+			NAME = name;
+			ALIAS = alias or {};
+			FUNC = func;
+			PLUGIN = plgn;
 		}
 end
 
@@ -969,7 +974,7 @@ local function removecmd_cmdarea(cmd)
 			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
 				table.remove(cmds, i)
 				for a,c in pairs(DaUi.CmdArea.ScrollingFrame:GetChildren()) do
-					if string.find(c.Text, "^"..cmd.."$") or string.find(c.Text, "^"..cmd.." ") or string.find(c.Text, " "..cmd.."$") or string.find(c.Text, " "..cmd.." ") then
+					if string.find(c.Text, "^" .. cmd .. "$") or string.find(c.Text, "^" .. cmd .. " ") or string.find(c.Text, " " .. cmd .. "$") or string.find(c.Text, " " .. cmd .. " ") then
 						c.TextTransparency = 0.7
 						c.MouseButton1Click:Connect(function()
 							notify(c.Text, "Disabled by you or a plugin")
@@ -2694,6 +2699,7 @@ spawn(function()
 	BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
 	BrowserBtn("Syn Net", "Syn Net [WARNING]", "Load Synttax's Net\n\nUpon adding this plugin, you sign the agreement of anything bad happening to you is not the fault of the DA Team.\n\nMake sure all your IY plugins are in a folder. Yes, they can be in a folder.\naddplugin IY/bruh", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/synnet.lua'))();")
 	BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
+	BrowserBtn("Keybinds", "Keybinds", "Set keys to activate specific commands", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/keybinds.lua'))();")
 end)
 --// End of Setup
 
@@ -2735,10 +2741,10 @@ newCmd("rejoin", {"rj"}, "rejoin / rj", "Rejoin the server", function(args, spea
 		Queue_Admin()
 		Players.LocalPlayer:Kick("\nRejoining...")
 		wait()
-		game:GetService('TeleportService'):Teleport(game.PlaceId, Players.LocalPlayer)
+		TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
 	else
 		Queue_Admin()
-		game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 	end
 end)
 
@@ -2896,7 +2902,6 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 	execCmd("breakvelocity")
 end)
 
-local Noclipping = nil
 newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 	Clip = false
 	wait(0.1)
@@ -2921,6 +2926,16 @@ newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args
 	Clip = true
 	if args[1] and args[1] == "nonotify" then return end
 	notify("Noclip", "Noclip Disabled")
+end)
+
+newCmd("togglenoclip", {}, "togglenoclip", "Toggle Noclip", function(args, speaker)
+	if Clip == true then
+		execCmd("clip nonotify")
+		wait()
+		execCmd("noclip")
+	elseif Clip == false then
+		execCmd("clip")
+	end
 end)
 
 newCmd("fly", {}, "fly [number]", "Be Able to Fly", function(args, speaker)
@@ -3062,6 +3077,7 @@ newCmd("gyrofly", {"gfly"}, "gyrofly / gfly [speed]", "Make your Character Fly U
         end
         Human.PlatformStand = false
     end)()
+    GYROFLYING = true
     notify("Gyro Fly", "Enabled")
 end)
 
@@ -3073,6 +3089,8 @@ newCmd("ungyrofly", {"ungfly"}, "ungyrofly / ungfly", "Disables Gyro Fly", funct
 		end
 	end
 	Human.PlatformStand = false
+	GYROFLYING = false
+	if args[1] and args[1] == "nonotify" then return end
 	notify("Gyro Fly", "Disabled")
 end)
 
@@ -3084,12 +3102,32 @@ newCmd("gyroflyspeed", {"gflyspeed"}, "gyroflyspeed / gflyspeed [num]", "Sets Gy
 	end
 end)
 
+newCmd("togglefly", {}, "togglefly", "Toggle Fly", function(args, speaker)
+	if FLYING == true then
+		NOFLY()
+	elseif FLYING == false then
+		sFLY()
+	end
+end)
+
+newCmd("togglegyrofly", {"togglegfly"}, "togglegyrofly / togglegfly", "Toggle Gyro Fly", function(args, speaker)
+	if GYROFLYING == true then
+		execCmd("ungyrofly")
+	elseif GYROFLYING == false then
+		execCmd("gyrofly")
+	end
+end)
+
 newCmd("anchor", {}, "anchor", "Anchor your RootPart", function(args, speaker)
-	speaker.Character.HumanoidRootPart.Anchored = true
+	if getRoot(speaker.Character) then
+		getRoot(speaker.Character).Anchored = true
+	end
 end)
 
 newCmd("unanchor", {}, "unanchor", "Makes your Player Movable Again", function(args, speaker)
-	speaker.Character.HumanoidRootPart.Anchored = false
+	if getRoot(speaker.Character) then
+		getRoot(speaker.Character).Anchored = false
+	end
 end)
 
 newCmd("reset", {}, "reset", "Reset your Character", function(args, speaker)
