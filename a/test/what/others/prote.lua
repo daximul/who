@@ -5,6 +5,7 @@ local spec = {
     getcons = getconnections or get_signal_cons;
     getnamecall = getnamecallmethod or get_namecall_method;
     makereadonly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end);
+    newclose = newcclosure or protect_function;
 }
 
 local ProtectedInstances = {}
@@ -38,7 +39,7 @@ local __Namecall = OldMetaMethods.__namecall
 local __Index = OldMetaMethods.__index
 local __NewIndex = OldMetaMethods.__newindex
 
-mt.__namecall = newcclosure(function(self, ...)
+mt.__namecall = newclose(function(self, ...)
     if (checkcaller()) then
         return __Namecall(self, ...)
     end
@@ -57,7 +58,7 @@ mt.__namecall = newcclosure(function(self, ...)
     return __Namecall(self, ...)
 end)
 
-mt.__index = newcclosure(function(Instance_, Index)
+mt.__index = newclose(function(Instance_, Index)
     if (checkcaller()) then
         return __Index(Instance_, Index)
     end
@@ -92,7 +93,7 @@ mt.__index = newcclosure(function(Instance_, Index)
     return __Index(Instance_, Index)
 end)
 
-mt.__newindex = newcclosure(function(Instance_, Index, Value)
+mt.__newindex = newclose(function(Instance_, Index, Value)
     if (checkcaller()) then
         return __NewIndex(Instance_, Index, Value)
     end
