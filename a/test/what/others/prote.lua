@@ -5,7 +5,7 @@ local spec = {
     getcons = getconnections or get_signal_cons;
     getnamecall = getnamecallmethod or get_namecall_method;
     makereadonly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end);
-    newclose = newcclosure or protect_function;
+    newclose = newcclosure or protect_function or function(f) return f end;
 }
 
 local ProtectedInstances = {}
