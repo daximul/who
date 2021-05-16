@@ -58,6 +58,7 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
+local Prote = Import("prote.lua")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
@@ -105,13 +106,16 @@ local origsettings = {
 		Fov = workspace.CurrentCamera.FieldOfView
 	},
 }
-function randomString()
+local function randomString()
+	--[[
 	local length = math.random(10, 20)
 	local array = {}
 	for i = 1, length do
 		array[i] = string.char(math.random(32, 126))
 	end
 	return table.concat(array)
+	]]--
+	return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 end
 
 --// Start of Command Variables \\--
@@ -1840,20 +1844,22 @@ local function GetHandleTools(p)
 end
 
 function sFLY(vfly)
-	repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChild('Humanoid')
+	repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid')
 	repeat wait() until DAMouse
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-
-	local T = getRoot(Players.LocalPlayer.Character)
+	
 	local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 	local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 	local SPEED = 0
 
 	local function FLY()
 		FLYING = true
-		local BG = Instance.new("BodyGyro")
-		local BV = Instance.new("BodyVelocity")
+		local BG = Instance.new("BodyGyro", getRoot(Players.LocalPlayer.Character))
+		local BV = Instance.new("BodyVelocity", getRoot(Players.LocalPlayer.Character))
+		Prote.Protect(BG)
+                Prote.Protect(BV)
 		BG.P = 9e4
+		local T = getRoot(Players.LocalPlayer.Character)
 		BG.Parent = T
 		BV.Parent = T
 		BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
@@ -1862,8 +1868,8 @@ function sFLY(vfly)
 		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
 		spawn(function()
 			repeat wait()
-				if not vfly and Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-					Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+				if not vfly and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+					Players.LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid').PlatformStand = true
 				end
 				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
 					SPEED = 50
@@ -1885,39 +1891,39 @@ function sFLY(vfly)
 			SPEED = 0
 			BG:Destroy()
 			BV:Destroy()
-			if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-				Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+			if Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+				Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
 			end
 		end)
 	end
 	flyKeyDown = DAMouse.KeyDown:Connect(function(KEY)
-		if KEY:lower() == 'w' then
+		if KEY:lower() == "w" then
 			CONTROL.F = (vfly and Settings.vehicleflyspeed or Settings.daflyspeed)
-		elseif KEY:lower() == 's' then
+		elseif KEY:lower() == "s" then
 			CONTROL.B = - (vfly and Settings.vehicleflyspeed or Settings.daflyspeed)
-		elseif KEY:lower() == 'a' then
+		elseif KEY:lower() == "a" then
 			CONTROL.L = - (vfly and Settings.vehicleflyspeed or Settings.daflyspeed)
-		elseif KEY:lower() == 'd' then 
+		elseif KEY:lower() == "d" then 
 			CONTROL.R = (vfly and Settings.vehicleflyspeed or Settings.daflyspeed)
-		elseif QEfly and KEY:lower() == 'e' then
-			CONTROL.Q = (vfly and Settings.vehicleflyspeed or Settings.daflyspeed)*2
-		elseif QEfly and KEY:lower() == 'q' then
-			CONTROL.E = -(vfly and Settings.vehicleflyspeed or Settings.daflyspeed)*2
+		elseif QEfly and KEY:lower() == "e" then
+			CONTROL.Q = (vfly and Settings.vehicleflyspeed or Settings.daflyspeed) * 2
+		elseif QEfly and KEY:lower() == "q" then
+			CONTROL.E = - (vfly and Settings.vehicleflyspeed or Settings.daflyspeed) * 2
 		end
 		pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
 	end)
 	flyKeyUp = DAMouse.KeyUp:Connect(function(KEY)
-		if KEY:lower() == 'w' then
+		if KEY:lower() == "w" then
 			CONTROL.F = 0
-		elseif KEY:lower() == 's' then
+		elseif KEY:lower() == "s" then
 			CONTROL.B = 0
-		elseif KEY:lower() == 'a' then
+		elseif KEY:lower() == "a" then
 			CONTROL.L = 0
-		elseif KEY:lower() == 'd' then
+		elseif KEY:lower() == "d" then
 			CONTROL.R = 0
-		elseif KEY:lower() == 'e' then
+		elseif KEY:lower() == "e" then
 			CONTROL.Q = 0
-		elseif KEY:lower() == 'q' then
+		elseif KEY:lower() == "q" then
 			CONTROL.E = 0
 		end
 	end)
@@ -1927,20 +1933,20 @@ end
 function NOFLY()
 	FLYING = false
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-	if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-		Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	if Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+		Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
 	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 end
 
-function RoundNumber(Number, Divider)
+local RoundNumber = function(Number, Divider)
 	Divider = Divider or 1
-	return (math.floor((Number/Divider)+0.5)*Divider)
+	return (math.floor((Number/Divider) + 0.5) * Divider)
 end
 
 function r15(speaker)
-	local Humanoid = speaker.Character:FindFirstChildOfClass("Humanoid")
-	if (Humanoid.RigType == Enum.HumanoidRigType.R15) then
+	local Humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	if Humanoid.RigType == Enum.HumanoidRigType.R15 then
 		return true
 	else
 		return false
@@ -1950,7 +1956,7 @@ end
 function respawn(plr)
 	local char = plr.Character
 	char:ClearAllChildren()
-	local newChar = Instance.new("Model",workspace)
+	local newChar = Instance.new("Model", workspace)
 	plr.Character = newChar
 	wait()
 	plr.Character = char
@@ -1964,7 +1970,7 @@ function refresh(plr)
 		wait()
 		respawn(plr)
 		wait()
-		repeat wait() until plr.Character and plr.Character:FindFirstChild('HumanoidRootPart')
+		repeat wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 		wait(.1)
 		if rpos then
 			plr.Character:MoveTo(rpos)
@@ -1974,7 +1980,7 @@ function refresh(plr)
 	end)
 end
 
-function attach(speaker,target)
+function attach(speaker, target)
 	if tools(speaker) then
 		local chara = speaker.Character
 		local tchar = target.Character
@@ -2192,7 +2198,7 @@ function Locate(plr)
 	end)
 end
 
-function kill(speaker,target,fast)
+function kill(speaker, target, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = speaker.Character.HumanoidRootPart.CFrame
@@ -2216,7 +2222,7 @@ function kill(speaker,target,fast)
 	end
 end
 
-function bring(speaker,target,fast)
+function bring(speaker, target, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = getRoot(speaker.Character).CFrame
@@ -2240,7 +2246,7 @@ function bring(speaker,target,fast)
 	end
 end
 
-function teleport(speaker,target,target2,fast)
+function teleport(speaker, target, target2, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = getRoot(speaker.Character).CFrame
@@ -2823,8 +2829,8 @@ end)
 
 newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", function(args, speaker)
 	local wspeed = args[1]
-	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") and wspeed and isNumber(wspeed) then
-		speaker.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = wspeed
+	if speaker and speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid") and wspeed and isNumber(wspeed) then
+		speaker.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed = wspeed
 	end
 end)
 
@@ -2858,8 +2864,8 @@ end)
 
 newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "Change your JumpPower", function(args, speaker)
 	local jpower = args[1]
-	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") and jpower and isNumber(jpower) then
-		speaker.Character:FindFirstChildOfClass("Humanoid").JumpPower = jpower
+	if speaker and speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid") and jpower and isNumber(jpower) then
+		speaker.Character:FindFirstChildWhichIsA("Humanoid").JumpPower = jpower
 	end
 end)
 
@@ -2892,11 +2898,11 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users) do
 		if Players[v].Character ~= nil then
-			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
-				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+			if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
+				speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
 				wait(.1)
 			end
-			getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3,1,0)
+			getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3, 1, 0)
 		end
 	end
 	execCmd("breakvelocity")
@@ -3046,10 +3052,12 @@ newCmd("gyrofly", {"gfly"}, "gyrofly / gfly [speed]", "Make your Character Fly U
     end
     local BodyPos = Instance.new("BodyPosition", getRoot(speaker.Character))
     local BodyGyro = Instance.new("BodyGyro", getRoot(speaker.Character))
-    local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    Prote.Protect(BodyPos)
+    Prote.Protect(BodyGyro)
     BodyGyro.maxTorque = Vector3.new(1, 1, 1) * 9e9
     BodyGyro.CFrame = getRoot(speaker.Character).CFrame
     BodyPos.maxForce = Vector3.new(1, 1, 1) * math.huge
+    local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
     Human.PlatformStand = true
     coroutine.wrap(function()
         BodyPos.Position = getRoot(speaker.Character).Position
@@ -3245,39 +3253,41 @@ end)
 newCmd("float", {}, "float", "Walk On An Invisible Part to Look Like You Are Floating", function(args, speaker)
 	Floating = true
 	local pchar = speaker.Character
+	local Human = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	if pchar and not pchar:FindFirstChild(floatName) then
 		spawn(function()
-			local Float = Instance.new('Part')
+			local Float = Instance.new("Part")
 			Float.Name = floatName
 			Float.Parent = pchar
+			Prote.Protect(Float)
 			Float.Transparency = 1
-			Float.Size = Vector3.new(6,1,6)
+			Float.Size = Vector3.new(6, 1, 6)
 			Float.Anchored = true
 			local FloatValue = -3.5
 			if r15(speaker) then FloatValue = -3.65 end
-			Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0,FloatValue,0)
+			Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0, FloatValue, 0)
 			notify("Float", "Float Enabled (Q = Down & E = Up)")
 			qUp = DAMouse.KeyUp:Connect(function(KEY)
-				if KEY == 'q' then
+				if KEY == "q" then
 					FloatValue = FloatValue + 0.5
 				end
 			end)
 			eUp = DAMouse.KeyUp:Connect(function(KEY)
-				if KEY == 'e' then
+				if KEY == "e" then
 					FloatValue = FloatValue - 0.5
 				end
 			end)
 			qDown = DAMouse.KeyDown:Connect(function(KEY)
-				if KEY == 'q' then
+				if KEY == "q" then
 					FloatValue = FloatValue - 0.5
 				end
 			end)
 			eDown = DAMouse.KeyDown:Connect(function(KEY)
-				if KEY == 'e' then
+				if KEY == "e" then
 					FloatValue = FloatValue + 0.5
 				end
 			end)
-			floatDied = speaker.Character:FindFirstChildOfClass'Humanoid'.Died:Connect(function()
+			floatDied = speaker.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 				FloatingFunc:Disconnect()
 				Float:Destroy()
 				qUp:Disconnect()
@@ -3288,7 +3298,7 @@ newCmd("float", {}, "float", "Walk On An Invisible Part to Look Like You Are Flo
 			end)
 			local function FloatPadLoop()
 				if pchar:FindFirstChild(floatName) and getRoot(pchar) then
-					Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0,FloatValue,0)
+					Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0, FloatValue, 0)
 				else
 					FloatingFunc:Disconnect()
 					Float:Destroy()
@@ -3299,7 +3309,7 @@ newCmd("float", {}, "float", "Walk On An Invisible Part to Look Like You Are Flo
 					floatDied:Disconnect()
 				end
 			end			
-			FloatingFunc = game:GetService('RunService').Heartbeat:Connect(FloatPadLoop)
+			FloatingFunc = game:GetService("RunService").Heartbeat:Connect(FloatPadLoop)
 		end)
 	end
 end)
