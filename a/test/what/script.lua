@@ -117,6 +117,9 @@ local function randomString()
 	]]--
 	return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 end
+local clientsidebypass = {
+	goto = false;
+}
 
 --// Start of Command Variables \\--
 
@@ -2895,17 +2898,30 @@ newCmd("unloopjumppower", {"unloopjp"}, "unloopjumppower / unloopjp", "Disable L
 end)
 
 newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args, speaker)
-	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		if Players[v].Character ~= nil then
-			if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
-				speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
-				wait(.1)
+	if clientsidebypass.goto == false then
+		local users = getPlayer(args[1], speaker)
+		for i,v in pairs(users) do
+			if Players[v].Character ~= nil then
+				if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
+					speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
+					wait(.1)
+				end
+				getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3, 1, 0)
 			end
-			getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3, 1, 0)
+		end
+		execCmd("breakvelocity")
+	else
+		local users = getPlayer(args[1], speaker)
+		for i,v in pairs(users) do
+			if Players[v].Character ~= nil then
+				if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
+					speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
+					wait(.1)
+				end
+				game:GetService("TweenService"):Create(getRoot(speaker.Character), TweenInfo.new(2), {CFrame = getRoot(Players[v].Character).CFrame}):Play()
+			end
 		end
 	end
-	execCmd("breakvelocity")
 end)
 
 newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
@@ -5419,6 +5435,23 @@ newCmd("classicchat", {"clchat"}, "classicchat / clchat", "Enable Roblox's Class
 		PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible = true
 		PlayerGui.Chat.Frame.ChatChannelParentFrame.Size = UDim2.new(1, 0, 1, -46)	
 	end
+end)
+
+newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass Certain Anticheats", function(args, speaker)
+	Players.LocalPlayer.CharacterAdded:Connect(function()
+		repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+		wait(0.4)
+		local Human = Players.LocalPlayer and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") or Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+		Prote.Spoof(Human)
+		Prote.Spoof(getRoot(Players.LocalPlayer.Character), Players.LocalPlayer.Character.Torso)
+		Prote.Protect(getRoot(Players.LocalPlayer.Character))
+		Prote.Protect(Human)
+	end)
+	Players.LocalPlayer.Character:BreakJoints()
+	for vari in pairs(clientsidebypass) do
+		clientsidebypass[vari] = true
+	end
+	notify("Client Bypass", "Enabled")
 end)
 
 
