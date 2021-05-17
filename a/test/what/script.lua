@@ -1832,6 +1832,7 @@ local xrayobjects = function(bool)
 		for i, v in next, workspace:GetDescendants() do
 			if v:IsA("Part") and v.Transparency <= 0.3 then
 				Prote.SpoofProperty(v, "Transparency")
+				Prote.SpoofProperty(v, "LocalTransparencyModifier")
 				v.LocalTransparencyModifier = 0.3
 			end
 		end
@@ -1839,6 +1840,7 @@ local xrayobjects = function(bool)
 		for i, v in next, workspace:GetDescendants() do
 			if v:IsA("Part") and v.Transparency <= 0.3 then
 				Prote.SpoofProperty(v, "Transparency")
+				Prote.SpoofProperty(v, "LocalTransparencyModifier")
 				v.LocalTransparencyModifier = 0
 			end
 		end
