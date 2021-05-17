@@ -1,4 +1,7 @@
-local Prot = {}
+--//                                  Prote API                                       \\--
+--// Protect Instances, Spoof Instances, and Spoof Properties with incredible accuracy \\--
+
+local Prote = {}
 
 local spec = {
     getrawmt = (debug and debug.getmetatable) or getrawmetatable;
@@ -140,7 +143,7 @@ end)
 
 spec.makereadonly(mt, true)
 
-Prot.ProtectInstance = function(Instance_)
+Prote.ProtectInstance = function(Instance_)
     if not ProtectedInstances[Instance_] then
         ProtectedInstances[#ProtectedInstances + 1] = Instance_
         if syn and syn.protect_gui then
@@ -149,13 +152,13 @@ Prot.ProtectInstance = function(Instance_)
     end
 end
 
-Prot.SpoofInstance = function(Instance_, Instance2)
+Prote.SpoofInstance = function(Instance_, Instance2)
     if not SpoofedInstances[Instance_] then
         SpoofedInstances[Instance_] = Instance2 and Instance2 or Instance_:Clone()
     end
 end
 
-Prot.SpoofProperty = function(Instance_, Property, Value)
+Prote.SpoofProperty = function(Instance_, Property, Value)
     if SpoofedProperties[Instance_] then
         local Properties = tblmap(SpoofedProperties[Instance_], function(i, v)
             return v.Property
@@ -174,4 +177,4 @@ Prot.SpoofProperty = function(Instance_, Property, Value)
     }}
 end
 
-return Prot
+return Prote
