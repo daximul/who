@@ -1890,11 +1890,11 @@ sFLY = function(vfly)
 		BG.cframe = T.CFrame
 		BV.velocity = Vector3.new(0, 0, 0)
 		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+		Prote.SpoofProperty(gethum(), "PlatformStand")
 		spawn(function()
 			repeat wait()
 				if not vfly and findhum() then
 					local Human = gethum()
-					Prote.SpoofProperty(Human, "PlatformStand")
 					Human.PlatformStand = true
 				end
 				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
@@ -1919,7 +1919,6 @@ sFLY = function(vfly)
 			BV:Destroy()
 			if findhum() then
 				local Human = gethum()
-				Prote.SpoofProperty(Human, "PlatformStand")
 				Human.PlatformStand = true
 			end
 		end)
@@ -1966,6 +1965,8 @@ NOFLY = function()
 		Human.PlatformStand = false
 	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
+	local Human = gethum()
+	Human.PlatformStand = false
 end
 
 local RoundNumber = function(Number, Divider)
