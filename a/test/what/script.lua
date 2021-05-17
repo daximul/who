@@ -1967,6 +1967,8 @@ NOFLY = function()
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 	local Human = gethum()
 	Human.PlatformStand = false
+	wait(0.1)
+	execCmd("unstun")
 end
 
 local RoundNumber = function(Number, Divider)
