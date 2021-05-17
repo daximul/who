@@ -1960,14 +1960,8 @@ end
 NOFLY = function()
 	FLYING = false
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-	if findhum() then
-		local Human = gethum()
-		Human.PlatformStand = false
-	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
-	local Human = gethum()
-	Human.PlatformStand = false
-	wait(0.1)
+	wait()
 	execCmd("unstun")
 end
 
