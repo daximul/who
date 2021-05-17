@@ -3636,7 +3636,7 @@ end)
 
 newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
 	local FOV = tonumber(args[1]) or origsettings.Camera.Fov or 70
-	Prote.SpoofInstance(workspace.CurrentCamera, "FieldOfView")
+	Prote.SpoofProperty(workspace.CurrentCamera, "FieldOfView")
 	workspace.CurrentCamera.FieldOfView = FOV
 end)
 
@@ -4175,7 +4175,7 @@ newCmd("noclip", {}, "noclip", "Go Through Objects", function(args, speaker)
 		if CmdClip == false and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
 				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
-					Prote.SpoofInstance(child, "CanCollide")
+					Prote.SpoofProperty(child, "CanCollide")
 					child.CanCollide = false
 				end
 			end
