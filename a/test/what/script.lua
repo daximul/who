@@ -443,10 +443,7 @@ end
 CaptureCmdBar = function()
 	Cmdbar:CaptureFocus()
 	spawn(function()
-		coroutine.wrap(function()
-			wait()
-			Cmdbar.Text = ""
-		end)()
+		repeat Cmdbar.Text = "" until Cmdbar.Text == ""
 	end)
 	spawn(function()
 		CmdBarStatus(true)
