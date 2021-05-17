@@ -136,7 +136,7 @@ local Keys = {}
 --// End of Command Variables \\--
 
 spawn(function()
-	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+	Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 		if getRoot(Players.LocalPlayer.Character) then
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
@@ -168,7 +168,7 @@ local RestartEffects = function()
 		end
 	end)
 	
-	Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+	Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 		if getRoot(Players.LocalPlayer.Character) then
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
 		end
@@ -1894,7 +1894,7 @@ sFLY = function(vfly)
 			repeat wait()
 				if not vfly and findhum() then
 					local Human = gethum()
-					Prote.SpoofProperty(gethum(), "PlatformStand")
+					Prote.SpoofProperty(Human, "PlatformStand")
 					Human.PlatformStand = true
 				end
 				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
@@ -1919,7 +1919,7 @@ sFLY = function(vfly)
 			BV:Destroy()
 			if findhum() then
 				local Human = gethum()
-				Prote.SpoofProperty(gethum(), "PlatformStand")
+				Prote.SpoofProperty(Human, "PlatformStand")
 				Human.PlatformStand = true
 			end
 		end)
@@ -1963,7 +1963,6 @@ NOFLY = function()
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
 	if findhum() then
 		local Human = gethum()
-		Prote.SpoofProperty(gethum(), "PlatformStand")
 		Human.PlatformStand = false
 	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
