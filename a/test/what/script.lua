@@ -124,6 +124,7 @@ local ESPenabled = false
 local swimming = false
 local cmdflinging = false
 local floatName = randomString()
+local spinName = randomString()
 local QEfly = true
 local invisRunning = false
 local spinhats = nil
@@ -836,6 +837,7 @@ tools = function(plr)
 	if plr:FindFirstChildOfClass("Backpack"):FindFirstChildOfClass("Tool") or plr.Character:FindFirstChildOfClass("Tool") then
 		return true
 	else
+		notify("Command Error", "Tool Required to Run Command.")
 		return false
 	end
 end
@@ -2031,8 +2033,6 @@ attach = function(speaker, target)
 			n = n + 1
 			hrp.CFrame = hrp2.CFrame
 		until (tool.Parent ~= chara or not hrp or not hrp2 or not hrp.Parent or not hrp2.Parent or n > 250) and n > 2
-	else
-		notify("", "Tool Required to use this command!")
 	end
 end
 
@@ -2244,8 +2244,6 @@ kill = function(speaker, target, fast)
 			wait(3)
 			speaker.CharacterAdded:Wait():WaitForChild("HumanoidRootPart").CFrame = NormPos
 		end
-	else
-		notify("", "Tool Required to use this command!")
 	end
 end
 
@@ -2268,8 +2266,6 @@ bring = function(speaker, target, fast)
 			wait(1)
 			speaker.CharacterAdded:Wait():WaitForChild("HumanoidRootPart").CFrame = NormPos
 		end
-	else
-		notify("", "Tool Required to use this command!")
 	end
 end
 
@@ -2293,8 +2289,6 @@ teleport = function(speaker, target, target2, fast)
 			wait(1)
 			speaker.CharacterAdded:Wait():WaitForChild("HumanoidRootPart").CFrame = NormPos
 		end
-	else
-		notify("Tool Required", "You need to have an item in your inventory")
 	end
 end
 
@@ -4212,7 +4206,7 @@ newCmd("unlag", {}, "unlag", "Stop the fake lag", function(args, speaker)
 	notify("Fake Lag", "Disabled")
 	wait(0.3)
 	Prote.SpoofProperty(getRoot(speaker.Character), "Anchored")
-	speaker.Character.HumanoidRootPart.Anchored = false
+	getRoot(speaker.Character).Anchored = false
 end)
 
 newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speaker)
@@ -4227,14 +4221,14 @@ newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speak
 	end
 	local Spin = Instance.new("BodyAngularVelocity", getRoot(Players.LocalPlayer.Character))
 	Prote.ProtectInstance(Spin)
-	Spin.Name = "Spinning"
+	Spin.Name = spinName
 	Spin.MaxTorque = Vector3.new(0, math.huge, 0)
 	Spin.AngularVelocity = Vector3.new(0, spinSpeed, 0)
 end)
 
 newCmd("unspin", {}, "unspin", "Disables Spin", function(args, speaker)
 	for i,v in pairs(getRoot(speaker.Character):GetChildren()) do
-		if v.Name == "Spinning" then
+		if v.Name == spinName then
 			v:Destroy()
 		end
 	end
