@@ -1,8 +1,8 @@
 if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end
 
-Salenox = Salenox or false
-if not Salenox and not game:IsLoaded() then game["Loaded"]:Wait() end
-if game:IsLoaded() and Salenox and syn then
+_UnD = _UnD or false
+if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
+if game:IsLoaded() and _UnD and syn then
 	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
 end
@@ -44,7 +44,7 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-local Prote = Import("prote.lua")
+Prote = Import("prote.lua")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
@@ -125,6 +125,7 @@ local swimming = false
 local cmdflinging = false
 local floatName = randomString()
 local spinName = randomString()
+local selectionBoxName = randomString()
 local QEfly = true
 local invisRunning = false
 local spinhats = nil
@@ -333,6 +334,7 @@ Players.PlayerRemoving:Connect(function(player)
 		end
 	end
 	if viewing ~= nil and player == viewing then
+		Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
 		workspace.CurrentCamera.CameraSubject = Players.LocalPlayer.Character
 		viewing = nil
 		if viewDied then
@@ -2041,7 +2043,7 @@ iRound = function(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
-ESP = function(plr)
+local ESP = function(plr)
 	spawn(function()
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == plr.Name .. "_ESP" then
@@ -2050,13 +2052,14 @@ ESP = function(plr)
 		end
 		wait()
 		if plr.Character and plr.Name ~= Players.LocalPlayer.Name and not CoreGui:FindFirstChild(plr.Name .. "_ESP") then
-			local ESPholder = Instance.new("Folder")
+			local ESPholder = Instance.new("Folder", CoreGui)
+			Prote.ProtectInstance(ESPholder)
 			ESPholder.Name = plr.Name .. "_ESP"
-			ESPholder.Parent = CoreGui
 			repeat wait(1) until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 			for b,n in pairs (plr.Character:GetChildren()) do
 				if (n:IsA("BasePart")) then
 					local a = Instance.new("BoxHandleAdornment")
+					Prote.ProtectInstance(a)
 					a.Name = plr.Name
 					a.Parent = ESPholder
 					a.Adornee = n
@@ -2069,6 +2072,7 @@ ESP = function(plr)
 			end
 			if plr.Character and plr.Character:FindFirstChild("Head") then
 				local BillboardGui = Instance.new("BillboardGui")
+				Prote.ProtectInstance(BillboardGui)
 				local TextLabel = Instance.new("TextLabel")
 				BillboardGui.Adornee = plr.Character.Head
 				BillboardGui.Name = plr.Name
@@ -2133,7 +2137,7 @@ ESP = function(plr)
 	end)
 end
 
-function Locate(plr)
+local Locate = function(plr)
 	spawn(function()
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == plr.Name .. "_LC" then
@@ -2142,13 +2146,14 @@ function Locate(plr)
 		end
 		wait()
 		if plr.Character and plr.Name ~= Players.LocalPlayer.Name and not CoreGui:FindFirstChild(plr.Name .. "_LC") then
-			local ESPholder = Instance.new("Folder")
+			local ESPholder = Instance.new("Folder", CoreGui)
+			Prote.ProtectInstance(ESPholder)
 			ESPholder.Name = plr.Name .. "_LC"
-			ESPholder.Parent = CoreGui
 			repeat wait(1) until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 			for b,n in pairs (plr.Character:GetChildren()) do
 				if (n:IsA("BasePart")) then
 					local a = Instance.new("BoxHandleAdornment")
+					Prote.ProtectInstance(a)
 					a.Name = plr.Name
 					a.Parent = ESPholder
 					a.Adornee = n
@@ -2161,6 +2166,7 @@ function Locate(plr)
 			end
 			if plr.Character and plr.Character:FindFirstChild("Head") then
 				local BillboardGui = Instance.new("BillboardGui")
+				Prote.ProtectInstance(BillboardGui)
 				local TextLabel = Instance.new("TextLabel")
 				BillboardGui.Adornee = plr.Character.Head
 				BillboardGui.Name = plr.Name
@@ -2225,7 +2231,7 @@ function Locate(plr)
 	end)
 end
 
-kill = function(speaker, target, fast)
+local kill = function(speaker, target, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = speaker.Character.HumanoidRootPart.CFrame
@@ -2247,7 +2253,7 @@ kill = function(speaker, target, fast)
 	end
 end
 
-bring = function(speaker, target, fast)
+local bring = function(speaker, target, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = getRoot(speaker.Character).CFrame
@@ -2269,7 +2275,7 @@ bring = function(speaker, target, fast)
 	end
 end
 
-teleport = function(speaker, target, target2, fast)
+local teleport = function(speaker, target, target2, fast)
 	if tools(speaker) then
 		if target ~= nil then
 			local NormPos = getRoot(speaker.Character).CFrame
@@ -3362,20 +3368,26 @@ newCmd("sit", {}, "sit", "Make your Character Sit", function(args, speaker)
 end)
 
 newCmd("stun", {}, "stun", "Enable Platform Stand", function(args, speaker)
-	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
-		speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
+	if speaker and speaker.Character and findhum() then
+		local Human = gethum()
+		Prote.SpoofProperty(Human, "PlatformStand", false)
+		Human.PlatformStand = true
 	end
 end)
 
 newCmd("unstun", {}, "unstun", "Disable Platform Stand", function(args, speaker)
-	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
-		speaker.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+	if speaker and speaker.Character and findhum() then
+		local Human = gethum()
+		Prote.SpoofProperty(Human, "PlatformStand", false)
+		Human.PlatformStand = false
 	end
 end)
 
 newCmd("jump", {}, "jump", "Make your Character Jump", function(args, speaker)
-	if speaker and speaker.Character and speaker.Character:FindFirstChildOfClass("Humanoid") then
-		speaker.Character:FindFirstChildOfClass("Humanoid").Jump = true
+	if speaker and speaker.Character and findhum() then
+		local Human = gethum()
+		Prote.SpoofProperty(Human, "Jump", false)
+		Human.Jump = true
 	end
 end)
 
@@ -3409,6 +3421,7 @@ newCmd("grabknife", {"knife"}, "grabknife / knife", "Load Grab Knife (Works on C
 	Import("knif.lua")
 end)
 
+--[[
 newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Character", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
@@ -3420,6 +3433,7 @@ newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Char
 		end
 	end
 end)
+]]--
 
 newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Prevents LocalScripts From Kicking You", function(args, speaker)
 	local getrawmt = (debug and debug.getmetatable) or getrawmetatable
@@ -3454,9 +3468,9 @@ newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Pr
 end)
 
 newCmd("antiafk", {"antiidle"}, "antiafk / antiidle", "Don't Get Kicked for Being AFK", function(args, speaker)
-	local GC = getconnections or get_signal_cons
-	if GC then
-		for i,v in pairs(GC(Players.LocalPlayer.Idled)) do
+	local getcons = getconnections or get_signal_cons
+	if getcons then
+		for i,v in pairs(getcons(Players.LocalPlayer.Idled)) do
 			if v["Disable"] then
 				v["Disable"](v)
 			elseif v["Disconnect"] then
@@ -3570,15 +3584,15 @@ end)
 
 newCmd("creeper", {}, "creeper", "Become a Creeper", function(args, speaker)
 	if r15(speaker) then
-		speaker.Character.Head:FindFirstChildOfClass("SpecialMesh"):Destroy()
+		speaker.Character.Head:FindFirstChildWhichIsA("SpecialMesh"):Destroy()
 		speaker.Character.LeftUpperArm:Destroy()
 		speaker.Character.RightUpperArm:Destroy()
-		speaker.Character:FindFirstChildOfClass("Humanoid"):RemoveAccessories()
+		speaker.Character:FindFirstChildWhichIsA("Humanoid"):RemoveAccessories()
 	else
-		speaker.Character.Head:FindFirstChildOfClass("SpecialMesh"):Destroy()
+		speaker.Character.Head:FindFirstChildWhichIsA("SpecialMesh"):Destroy()
 		speaker.Character["Left Arm"]:Destroy()
 		speaker.Character["Right Arm"]:Destroy()
-		speaker.Character:FindFirstChildOfClass("Humanoid"):RemoveAccessories()
+		speaker.Character:FindFirstChildWhichIsA("Humanoid"):RemoveAccessories()
 	end
 end)
 
@@ -3593,7 +3607,8 @@ newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/
 				currentToolSize = v.Handle.Size
 				currentGripPos = v.GripPos
 				local a = Instance.new("SelectionBox")
-				a.Name = "SelectionBoxCreated"
+				Prote.ProtectInstance(a)
+				a.Name = selectionBoxName
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
@@ -3606,7 +3621,8 @@ newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/
 				currentToolSize = v.Handle.Size
 				currentGripPos = v.GripPos
 				local a = Instance.new("SelectionBox")
-				a.Name = "SelectionBoxCreated"
+				Prote.ProtectInstance(a)
+				a.Name = selectionBoxName
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
@@ -3623,7 +3639,9 @@ newCmd("unreach", {"noreach"}, "unreach / noreach", "Disable Reach", function(ar
 		if v:IsA("Tool") then
 			v.Handle.Size = currentToolSize
 			v.GripPos = currentGripPos
-			v.Handle.SelectionBoxCreated:Destroy()
+			if v.Handle:FindFirstChild(selectionBoxName) then
+				v.Handle[selectionBoxName]:Destroy()
+			end
 		end
 	end
 end)
@@ -3652,7 +3670,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	local invisFix = game:GetService("RunService").Stepped:Connect(function()
 	    pcall(function()
 	        local IsInteger
-	        if tostring(Void):find'-' then
+	        if tostring(Void):find("-") then
 	            IsInteger = true
 	        else
 	            IsInteger = false
@@ -3678,8 +3696,10 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	for i,v in pairs(InvisibleCharacter:GetDescendants())do
 	    if v:IsA("BasePart") then
 	        if v.Name == "HumanoidRootPart" then
+	        	Prote.SpoofProperty(v, "HumanoidRootPart")
 	            v.Transparency = 1
 	        else
+	        	Prote.SpoofProperty(v, "HumanoidRootPart")
 	            v.Transparency = 0.5
 	        end
 	    end
@@ -3787,17 +3807,17 @@ newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", funct
 		end
 		viewing = Players[v]
 		Prote.SpoofProperty(workspace.Camera, "CameraSubject")
-		workspace.CurrentCamera.CameraSubject = viewing.Character
+		workspace.Camera.CameraSubject = viewing.Character
 		notify("Spectating", Players[v].Name)
 		local function viewDiedFunc()
 			repeat wait() until Players[v].Character ~= nil and getRoot(Players[v].Character)
-			workspace.CurrentCamera.CameraSubject = viewing.Character
+			workspace.Camera.CameraSubject = viewing.Character
 		end
 		viewDied = Players[v].CharacterAdded:Connect(viewDiedFunc)
 		local function viewChangedFunc()
-			workspace.CurrentCamera.CameraSubject = viewing.Character
+			workspace.Camera.CameraSubject = viewing.Character
 		end
-		viewChanged = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(viewChangedFunc)
+		viewChanged = workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(viewChangedFunc)
 	end
 end)
 
@@ -3810,7 +3830,7 @@ newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Pl
 		viewDied:Disconnect()
 		viewChanged:Disconnect()
 	end
-	workspace.CurrentCamera.CameraSubject = speaker.Character
+	workspace.Camera.CameraSubject = Players.LocalPlayer.Character
 end)
 
 newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker)
@@ -3818,12 +3838,14 @@ newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker
 	workspace.CurrentCamera:remove()
 	wait(0.1)
 	repeat wait() until speaker.Character ~= nil
+	Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
 	workspace.CurrentCamera.CameraSubject = speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	workspace.CurrentCamera.CameraType = "Custom"
 	speaker.CameraMinZoomDistance = 0.5
 	speaker.CameraMaxZoomDistance = 400
 	speaker.CameraMode = "Classic"
 	if speaker.Character:FindFirstChild("Head") then
+		Prote.SpoofProperty(speaker.Character.Head, "Anchored")
 		speaker.Character.Head.Anchored = false
 	end
 end)
@@ -3886,10 +3908,12 @@ newCmd("enableshiftlock", {"enablesl"}, "enableshiftlock / enablesl", "Enable Sh
 end)
 
 newCmd("firstp", {}, "firstp", "First Person", function(args, speaker)
+	Prote.SpoofProperty(speaker.CameraMode, "LockFirstPerson")
 	speaker.CameraMode = "LockFirstPerson"
 end)
 
 newCmd("thirdp", {}, "thirdp", "Third Person", function(args, speaker)
+	Prote.SpoofProperty(speaker.CameraMode, "Classic")
 	speaker.CameraMode = "Classic"
 end)
 
@@ -3929,6 +3953,7 @@ newCmd("droppabletools", {}, "droppabletools", "Make Undroppable Tools Droppable
 	if speaker and speaker.Character then
 		for _,obj in pairs(speaker.Character:GetChildren()) do
 			if obj:IsA("Tool") then
+				Prote.SpoofProperty(obj, "CanBeDropped")
 				obj.CanBeDropped = true
 			end
 		end
@@ -3936,6 +3961,7 @@ newCmd("droppabletools", {}, "droppabletools", "Make Undroppable Tools Droppable
 	if speaker and speaker:FindFirstChildOfClass("Backpack") then
 		for _,obj in pairs(speaker:FindFirstChildOfClass("Backpack"):GetChildren()) do
 			if obj:IsA("Tool") then
+				Prote.SpoofProperty(obj, "CanBeDropped")
 				obj.CanBeDropped = true
 			end
 		end
@@ -3998,7 +4024,8 @@ newCmd("swim", {}, "swim", "Become fish", function(args, speaker)
 		swimming = false
 	end
 	local Human = gethum(speaker.Character)
-	gravReset = speaker.Character:FindFirstChildOfClass("Humanoid").Died:Connect(swimDied)
+	Prote.SpoofInstance(Human)
+	gravReset = Human.Died:Connect(swimDied)
 	Human:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
 	Human:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 	Human:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
@@ -4019,32 +4046,36 @@ newCmd("swim", {}, "swim", "Become fish", function(args, speaker)
 end)
 
 newCmd("unswim", {}, "unswim", "Reject fish become human", function(args, speaker)
+	Prote.SpoofProperty(workspace, "Gravity")
 	workspace.Gravity = 198.2
 	swimming = false
 	if gravReset then
 		gravReset:Disconnect()
 	end
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Climbing,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.FallingDown,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Flying,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.GettingUp,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Jumping,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Landed,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Physics,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Ragdoll,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Running,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Seated,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Swimming,true)
-	speaker.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+	local Human = gethum(speaker.Character)
+	Prote.SpoofInstance(Human)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Flying, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Landed, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, true)
+	Human:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
+	Human:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
 end)
 
 newCmd("unlockws", {}, "unlockws", "Unlock Workspace", function(args, speaker)
 	for i,v in pairs(workspace:GetDescendants()) do
 		if v:IsA("BasePart") then
+			Prote.SpoofProperty(v, "Locked")
 			v.Locked = false
 		end
 	end
@@ -4066,12 +4097,14 @@ end)
 
 newCmd("nilchar", {}, "nilchar", "Makes your Character's parent Nil", function(args, speaker)
 	if speaker and speaker.Character ~= nil then
+		Prote.SpoofProperty(speaker.Character, "Parent")
 		speaker.Character.Parent = nil
 	end
 end)
 
 newCmd("unnilchar", {}, "unnilchar", "Makes your Character's parent Workspace", function(args, speaker)
 	if speaker and speaker.Character ~= nil then
+		Prote.SpoofProperty(speaker.Character, "Parent")
 		speaker.Character.Parent = workspace
 	end
 end)
@@ -4093,8 +4126,10 @@ end)
 
 newCmd("flashback", {}, "flashback", "Go back to where you last died", function(args, speaker)
 	if LastDeathPos ~= nil then
-		if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
-			speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
+		if findhum(speaker.Character) and gethum(speaker.Character).SeatPart then
+			local Human = gethum(speaker.Character)
+			Prote.SpoofProperty(Human, "Sit")
+			Human.Sit = false
 			wait(.1)
 		end
 		getRoot(speaker.Character).CFrame = LastDeathPos
@@ -4215,7 +4250,7 @@ newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speak
 		spinSpeed = args[1]
 	end
 	for i,v in pairs(getRoot(speaker.Character):GetChildren()) do
-		if v.Name == "Spinning" then
+		if v.Name == spinName then
 			v:Destroy()
 		end
 	end
