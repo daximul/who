@@ -1,29 +1,13 @@
-if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["notify"]("Dark Admin", "Already Running!") end
+if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end
 
-pcall(function() if (not game) and (not game:IsLoaded()) then repeat wait() until game:IsLoaded() end end)
+Salenox = Salenox or false
+if not Salenox and not game:IsLoaded() then game["Loaded"]:Wait() end
+if game:IsLoaded() and Salenox and syn then
+	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
+	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
+end
 
-local StartingTick = StartingTick or tick() or os.clock()
-
-spawn(function()
-	if isfolder and makefolder and isfile and writefile then
-		if not isfolder("Dark Admin") then
-			makefolder("Dark Admin")
-			if not isfolder("Dark Admin/Plugins") then
-				makefolder("Dark Admin/Plugins")
-			end
-			if not isfolder("Dark Admin/Logs") then
-				makefolder("Dark Admin/Logs")
-			end
-		else
-			if not isfolder("Dark Admin/Plugins") then
-				makefolder("Dark Admin/Plugins")
-			end
-			if not isfolder("Dark Admin/Logs") then
-				makefolder("Dark Admin/Logs")
-			end
-		end
-	end
-end)
+local StarterTick = StarterTick or tick() or os.clock()
 
 local Import = function(Asset)
 	if (type(Asset) == "number") then
@@ -42,6 +26,8 @@ local Import = function(Asset)
 		end
 	end
 end
+
+Import("asset_creator.lua")
 
 local GUI = Import("interface.lua")
 local Main = GUI.Main
@@ -112,7 +98,6 @@ local origsettings = {
 local randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
 local clientsidebypass = {
 	to = false;
-	spin = false;
 }
 
 --// Start of Command Variables \\--
@@ -158,7 +143,7 @@ end)
 
 local Queue_Admin = function()
 	if (syn and syn.queue_on_teleport) and (Settings.KeepDA == false) then
-		syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+		syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	end
 end
 
@@ -212,17 +197,17 @@ CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChildWhichIsA("Frame").Descen
 end)
 
 game:GetService("UserInputService").InputBegan:Connect(function(Input, GameProccesed)
-    if GameProccesed then return end
-    local KeyCode = tostring(Input.KeyCode):split(".")[3]
-    Keys[KeyCode] = true
+	if GameProccesed then return end
+	local KeyCode = tostring(Input.KeyCode):split(".")[3]
+	Keys[KeyCode] = true
 end)
 
 game:GetService("UserInputService").InputEnded:Connect(function(Input, GameProccesed)
-    if GameProccesed then return end
-    local KeyCode = tostring(Input.KeyCode):split(".")[3]
-    if Keys[KeyCode] then
-        Keys[KeyCode] = false
-    end
+	if GameProccesed then return end
+	local KeyCode = tostring(Input.KeyCode):split(".")[3]
+	if Keys[KeyCode] then
+		Keys[KeyCode] = false
+	end
 end)
 
 local Time = function()
@@ -817,6 +802,25 @@ end
 getRoot = function(char)
 	local rootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
 	return rootPart
+end
+
+SetLocalAnimate = function(ch, val)
+	if val == nil then val = false end
+	if ch ~= nil then
+		local AnimateScript = ch["Animate"]
+		AnimateScript = AnimateScript:IsA("LocalScript") and AnimateScript or nil
+		if AnimateScript then
+			Prote.SpoofProperty(AnimateScript, "Disabled")
+			AnimateScript.Disabled = val
+		end
+	else
+		local AnimateScript = Players.LocalPlayer.Character["Animate"]
+		AnimateScript = AnimateScript:IsA("LocalScript") and AnimateScript or nil
+		if AnimateScript then
+			Prote.SpoofProperty(AnimateScript, "Disabled")
+			AnimateScript.Disabled = val
+		end
+	end
 end
 
 r15 = function(speaker)
@@ -2409,15 +2413,10 @@ local VirtualEnvironment = function()
 	Space.BrowserBtn = BrowserBtn
 	Space.build_key = randomString()
 	Space.notify = notify
-	Space.getcmds = function()
-		return cmds
-	end
-	Space.internal = function(bool)
-		superinternal = bool
-	end
-	Space.disablecmdbar = function()
-		Cmdbar.Visible = false
-	end
+	Space.getcmds = function() return cmds end
+	Space.internal = function(bool) superinternal = bool end
+	Space.disablecmdbar = function() Cmdbar.Visible = false end
+	Space.running_error = function() notify("Dark Admin", "Already Running!") end
 	Space.matchsearch = MatchSearch
 	Space.execCmd = execCmd
 	Space.events = {}
@@ -3733,8 +3732,8 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	InvisibleCharacter.HumanoidRootPart.CFrame = CF_1
 	Player.Character = InvisibleCharacter
 	fixcam(Player)
-	Player.Character.Animate.Disabled = true
-	Player.Character.Animate.Disabled = false
+	SetLocalAnimate(Player.Character, true)
+	SetLocalAnimate(Player.Character, false)
 	
 	function TurnVisible()
 	    if IsInvis == false then return end
@@ -3748,8 +3747,8 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	    Player.Character = Character
 	    Character.Parent = workspace
 	    IsInvis = false
-	    Player.Character.Animate.Disabled = true
-	    Player.Character.Animate.Disabled = false
+	    SetLocalAnimate(Player.Character, true)
+	    SetLocalAnimate(Player.Character, false)
 		invisDied = Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
 		    Respawn()
 			invisDied:Disconnect()
@@ -4550,9 +4549,9 @@ newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)",
 		char:FindFirstChildOfClass("Humanoid").Jump = true
 
 		humanoidanimation.Animator.Parent = hum2
-		char.Animate.Disabled = true
+		SetLocalAnimate(char, true)
 		wait()
-		char.Animate.Disabled = false
+		SetLocalAnimate(char, false)
 		wait()
 
 		if rig == 1 then
@@ -5521,6 +5520,6 @@ spawn(function()
 		FindPlugins(Settings.PluginsTable)
 	end
 end)
-notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StartingTick))
+notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
 notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
