@@ -44,6 +44,7 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
+local WelcomePlayer = Import("welcome.lua")
 Prote = Import("prote.lua")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
@@ -75,7 +76,6 @@ local tabComplete = nil
 local Network_Loop = nil
 local ClientByp = nil
 local superinternal = false
-local PromptOverlay = CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 local origsettings = {
 	Lighting = {
 		abt = game:GetService("Lighting").Ambient,
@@ -88,16 +88,16 @@ local origsettings = {
 	},
 	Player = {
 		Id = Players.LocalPlayer.UserId,
-		Ws = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed,
-		Jp = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower,
+		Ws = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed,
+		Jp = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").JumpPower,
 	},
 	Camera = {
-		Fov = workspace.CurrentCamera.FieldOfView
+		Fov = workspace.CurrentCamera.FieldOfView,
 	},
 }
-local randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
+randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
 local clientsidebypass = {
-	to = false;
+	to = false,
 }
 
 --// Start of Command Variables \\--
@@ -377,7 +377,7 @@ local SmoothDrag = function(frame)
 	end
 end
 
-local ParentGui = function(Gui)
+ParentGui = function(Gui)
 	Gui.Name = randomString()
 	if (not is_sirhurt_closure) and (syn and syn.protect_gui) then
 		syn.protect_gui(Gui)
@@ -5545,5 +5545,6 @@ spawn(function()
 	end
 end)
 notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
-notify("Dark Admin", "Prefix is " .. Settings.Prefix)
+WelcomePlayer.Load(Settings)
+-- notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
