@@ -51,7 +51,7 @@ local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
 local setsimulation = setsimulationradius or set_simulation_radius
 
 local Settings = {
-	Prefix = "\\",
+	Prefix = ";",
 	PluginsTable = {},
 	daflyspeed = 1,
 	vehicleflyspeed = 1,
