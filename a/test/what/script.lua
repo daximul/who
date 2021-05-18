@@ -44,7 +44,6 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-local WelcomePlayer = Import("welcome.lua")
 Prote = Import("prote.lua")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
@@ -69,6 +68,8 @@ local cmds = {}
 local customAlias = {}
 local DEBUG = false
 local Settings_Path = "Dark Admin/Settings.json"
+local CommandsLoaded = false
+local CommandsAreaLoaded = false
 local PluginCache = nil
 local wfile_cooldown = false
 local topCommand = nil
@@ -993,11 +994,13 @@ getstring = function(begin)
 	return AA
 end
 
-addcmd = function(name, alias, func, plgn)
+addcmd = function(name, alias, title, desc, func, plgn)
 	cmds[#cmds + 1]=
 		{
 			NAME = name;
 			ALIAS = alias or {};
+			TITLE = title;
+			DESC = desc;
 			FUNC = func;
 			PLUGIN = plgn;
 		}
@@ -1800,18 +1803,39 @@ LoadPlugin = function(val, startup)
 				end
 			end
 			handleNames()
-			addcmd(cmdName, v["Aliases"], v["Function"], val)
 			if v["ListName"] then
-				local newName = v.ListName
-				local cmdNames = {i, unpack(v.Aliases)}
+				local newName = v["ListName"]
+				local cmdNames = {i, unpack(v["Aliases"])}
 				for i,v in pairs(cmdNames) do
 					newName = newName:gsub(v, v .. cmdExt)
 				end
-				addcmdtext(newName, val, v["Description"], true)
-				addcmdareatext(cmdName, newName, v["Aliases"], v["Description"], true)
+				addcmd(cmdName, v["Aliases"], newName, v["Description"], true)
 			else
-				addcmdtext(cmdName,val,v["Description"],true)
-				addcmdareatext(cmdName, cmdName, v["Aliases"], v["Description"], true)
+				addcmd(cmdName, v["Aliases"], cmdName, v["Description"], true)
+			end
+			if CommandsLoaded then
+				if v["ListName"] then
+					local newName = v["ListName"]
+					local cmdNames = {i, unpack(v["Aliases"])}
+					for i,v in pairs(cmdNames) do
+						newName = newName:gsub(v, v .. cmdExt)
+					end
+					addcmdtext(newName, val, v["Description"], true)
+				else
+					addcmdtext(cmdName, val, v["Description"], true)
+				end
+			end
+			if CommandsAreaLoaded then
+				if v["ListName"] then
+					local newName = v["ListName"]
+					local cmdNames = {i, unpack(v["Aliases"])}
+					for i,v in pairs(cmdNames) do
+						newName = newName:gsub(v, v .. cmdExt)
+					end
+					addcmdareatext(cmdName, newName, v["Aliases"], v["Description"], true)
+				else
+					addcmdareatext(cmdName, cmdName, v["Aliases"], v["Description"], true)
+				end
 			end
 		end
 		IndexContents("")
@@ -2386,18 +2410,7 @@ DaUi.SettingsArea.PrefixBox.Box.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
-local newCmd = function(name, aliases, title, description, func)
-	addcmdtext(title, name, description)
-	addcmdareatext(name, title, aliases, description)
-
-	local id = #cmds + 1
-
-	cmds[id] = {
-		NAME = name,
-		ALIAS = aliases or {},
-		FUNC = func
-	}
-end
+local newCmd = function(name, aliases, title, description, func) addcmd(name, aliases, title, description, func) end
 
 local VirtualEnvironment = function()
 	if not getgenv then return end
@@ -2539,6 +2552,12 @@ spawn(function()
 		DaUi.JoinLogsArea.Visible = true
 	end)
 	DaUi.CmdsBtn.MouseButton1Down:Connect(function()
+		if not CommandsAreaLoaded then
+			CommandsAreaLoaded = true
+			for _, v in next, cmds do
+				addcmdareatext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"])
+			end
+		end
 		DaUi.CmdFrames.CmdFrame.Visible = false
 		DaUi.SettingsArea.Visible = false
 		DaUi.GoBack.Visible = false
@@ -2731,6 +2750,12 @@ spawn(function()
 --// Commands
 
 newCmd("commands", {"cmds"}, "commands / cmds", "Open a List of Commands", function(args, speaker)
+	if not CommandsLoaded then
+		CommandsLoaded = true
+		for _, v in next, cmds do
+			addcmdtext(v["TITLE"], v["NAME"], v["DESC"])
+		end
+	end
 	CmdListStatus(true)
 end)
 
@@ -3409,24 +3434,10 @@ newCmd("reloadplugin", {}, "reloadplugin [string]", "Reload a Plugin", function(
 	addPlugin(pluginName)
 end)
 
-newCmd("grabknife", {"knife"}, "grabknife / knife", "Load Grab Knife (Works on Claimed Players)", function(args, speaker)
+newCmd("grabknife", {"knife"}, "grabknife / knife", "Load Grab Knife (Works on Players/Characters you have ownership over)", function(args, speaker)
 	notify("", "Loaded Grab Knife", 2)
 	Import("knif.lua")
 end)
-
---[[
-newCmd("control", {"control"}, "control [plr]", "Control a Claimed Player's Character", function(args, speaker)
-	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
-		if Target and Target.Character and Target.Character:FindFirstChild("-Claimed") then
-			Target.Character.HumanoidRootPart.Parent = speaker.Character
-			speaker.Character.HumanoidRootPart.Anchored = true
-		else
-			notify("", "Couldn't Control Player")
-		end
-	end
-end)
-]]--
 
 newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Prevents LocalScripts From Kicking You", function(args, speaker)
 	local getrawmt = (debug and debug.getmetatable) or getrawmetatable
@@ -5545,6 +5556,5 @@ spawn(function()
 	end
 end)
 notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
-WelcomePlayer.Load(Settings)
--- notify("Dark Admin", "Prefix is " .. Settings.Prefix)
+notify("Dark Admin", "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
