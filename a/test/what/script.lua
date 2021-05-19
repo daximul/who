@@ -1609,7 +1609,7 @@ saves = function()
 			if readfile(Settings_Path) ~= nil then
 				local success, response = pcall(function()
 					local json = game:GetService("HttpService"):JSONDecode(readfile(Settings_Path))
-					if json.Prefix ~= nil then Settings.Prefix = json.Prefix else Settings.Prefix = '\\' end
+					if json.Prefix ~= nil then Settings.Prefix = json.Prefix else Settings.Prefix = ";" end
 					if json.PluginsTable ~= nil then Settings.PluginsTable = json.PluginsTable else Settings.PluginsTable = {} end
 					if json.daflyspeed ~= nil then Settings.daflyspeed = json.daflyspeed else Settings.daflyspeed = 1 end
 					if json.vehicleflyspeed ~= nil then Settings.vehicleflyspeed = json.vehicleflyspeed else Settings.vehicleflyspeed = 1 end
@@ -1640,7 +1640,7 @@ saves = function()
 				saves()
 			else
 				nosaves = true
-				Settings.Prefix = "\\"
+				Settings.Prefix = ";"
 				Settings.PluginsTable = {}
 				Settings.daflyspeed = 1
 				Settings.vehicleflyspeed = 1
@@ -1656,7 +1656,7 @@ saves = function()
 			end
 		end
 	else
-		Settings.Prefix = "\\"
+		Settings.Prefix = ";"
 		Settings.PluginsTable = {}
 		Settings.daflyspeed = 1
 		Settings.vehicleflyspeed = 1
