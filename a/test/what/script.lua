@@ -5064,7 +5064,7 @@ newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value
 		setReadOnly(GameMt, false)
 		
 		GameMt.__index = newcclosure(function(Self, Key)
-			if Key == args[1] then
+			if string.lower(tostring(Key)) == string.lower(tostring(args[1])) then
 				return getstring(2)
 			end
 			return OldIndex(Self, Key)
