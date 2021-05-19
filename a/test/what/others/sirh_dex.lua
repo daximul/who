@@ -6,9 +6,10 @@ local coregui = game:GetService("CoreGui");
 local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
 local setthreadcontext = setthreadcontext or (syn and syn.set_thread_identity) or setthreadidentity;
+local ProtectionService = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/prote.lua"))();
 local function ParentGui(Gui)
-	local CoreGui = game:GetService("CoreGui")
 	local HttpService = game:GetService("HttpService")
+	local CoreGui = game:GetService("CoreGui")
 	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
 	if (not is_sirhurt_closure) and (syn and syn.protect_gui) then
 		syn.protect_gui(Gui)
@@ -21,6 +22,7 @@ local function ParentGui(Gui)
 	else
 		Gui.Parent = CoreGui
 	end
+	ProtectionService.ProtectInstance(Gui)
 end
 local function RandomCharacters(length)
 	local STR = "";
