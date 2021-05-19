@@ -5515,7 +5515,7 @@ newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass 
 			repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and findhum()
 			wait(0.4)
 			Prote.SpoofInstance(gethum())
-			Prote.SpoofInstance(getRoot(Players.LocalPlayer.Character), Players.LocalPlayer.Character.Torso)
+			Prote.SpoofInstance(getRoot(Players.LocalPlayer.Character), r15(Players.LocalPlayer) and Players.LocalPlayer.Character.UpperTorso or Players.LocalPlayer.Character.Torso)
 			Prote.ProtectInstance(getRoot(Players.LocalPlayer.Character))
 			Prote.ProtectInstance(gethum())
 		end)
