@@ -1384,10 +1384,34 @@ MatchSearch = function(str1, str2)
 	return str1 == string.sub(str2, 1, #str1)
 end
 
-local autoComplete = function(str,curText)
+StringFind = function(tbl, str)
+	if tbl == nil then return end
+	if type(tbl) == "table" then
+		for _, v in ipairs(tbl) do
+			if MatchSearch(str, v) then
+				return v
+			end
+		end
+	end
+end
+
+local PlayerArgs = function(argument)
+	local arg = string.lower(argument)
+	local SpecialCases = {"all", "others", "random", "me", "nearest", "farthest", "allies", "enemies", "team", "nonteam", "friends", "nonfriends", "bacons", "nearest", "farthest", "alive", "dead"}
+	return StringFind(SpecialCases, arg) or (function()
+		for _, v in ipairs(Players:GetPlayers()) do
+			local Name = string.lower(v.Name)
+			if MatchSearch(arg, Name) then
+				return Name
+			end
+		end
+	end)()
+end
+
+local autoComplete = function(str, curText)
 	local endingChar = {"[", "/", "(", " "}
 	local stop = 0
-	for i=1,#str do
+	for i = 1, #str do
 		local c = str:sub(i, i)
 		if table.find(endingChar, c) then
 			stop = i
@@ -1400,13 +1424,13 @@ local autoComplete = function(str,curText)
 	local findRes = string.find(curText, "\\", pos)
 	while findRes do
 		subPos = findRes
-		pos = findRes+1
+		pos = findRes + 1
 		findRes = string.find(curText, "\\", pos)
 	end
-	if curText:sub(subPos+1,subPos+1) == "!" then subPos = subPos + 1 end
-	Cmdbar.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1) .. " "
+	if curText:sub(subPos + 1, subPos + 1) == "!" then subPos = subPos + 1 end
+	Cmdbar.Text = curText:sub(1, subPos) .. str:sub(1, stop - 1) .. " "
 	wait()
-	Cmdbar.Text = Cmdbar.Text:gsub( "\t", "" )
+	Cmdbar.Text = Cmdbar.Text:gsub("\t", "")
 	Cmdbar.CursorPosition = #Cmdbar.Text + 1
 end
 
@@ -1418,9 +1442,9 @@ end
 IndexContents = function(str)
 	topCommand = nil
 	local chunks = {}
-	if str:sub(#str,#str) == "\\" then str = "" end
-	for w in string.gmatch(str,"[^\\]+") do
-		table.insert(chunks,w)
+	if str:sub(#str, #str) == "\\" then str = "" end
+	for w in string.gmatch(str, "[^\\]+") do
+		table.insert(chunks, w)
 	end
 	if #chunks > 0 then str = chunks[#chunks] end
 	for i,v in next, CMDsF:GetChildren() do
@@ -1464,27 +1488,47 @@ Cmdbar.FocusLost:Connect(function(enterPressed)
 end)
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
-	if Cmdbar:IsFocused() then
-		IndexContents(Cmdbar.Text)
-		CmdSu.Text = ""
-		local InputText = string.lower(Cmdbar.Text)
-		if InputText == "" then return end
-		if InputText == " " then return end
-		for _, v in next, cmds do
-			local Name = v.NAME
-			local Aliases = v.ALIAS
-			local FoundAlias = false
-			if MatchSearch(InputText, Name) then
-				CmdSu.Text = Name
+	Cmdbar.Text = string.lower(Cmdbar.Text)
+	IndexContents(Cmdbar.Text)
+	CmdSu.Text = ""
+	local InputText = Cmdbar.Text
+	local Args = string.split(InputText, " ")
+	local CmdArgs = cargs or {}
+	if InputText == "" then return end
+	for _, v in next, cmds do
+		local Name = v.NAME
+		local Aliases = v.ALIAS
+		local FoundAlias = false
+		if MatchSearch(InputText, Name) then
+			CmdSu.Text = Name
+			break
+		end
+		for _, v2 in next, Aliases do
+			if MatchSearch(InputText, v2) then
+				FoundAlias = true
+				CmdSu.Text = v2
 				break
 			end
-			for _, v2 in next, Aliases do
-				if MatchSearch(InputText, v2) then
-					FoundAlias = true
-					CmdSu.Text = v2
-					break
+			if FoundAlias then break end
+		end
+	end
+	for i,v in next, Args do
+		if i > 1 and v ~= "" then
+			local Predict = ""
+			if #CmdArgs >= 1 then
+				Predict = PlayerArgs(v) or Predict
+			else
+				Predict = PlayerArgs(v) or Predict
+			end
+			CmdSu.Text = string.sub(InputText, 1, #InputText - #Args[#Args]) .. Predict
+			local split = v:split(",")
+			if next(split) then
+				for i2, v2 in next, split do
+					if i2 > 1 and v2 ~= "" then
+						local PlayerName = PlayerArgs(v2)
+						CmdSu.Text = string.sub(InputText, 1, #InputText - #split[#split]) .. (PlayerName or "")
+					end
 				end
-				if FoundAlias then break end
 			end
 		end
 	end
@@ -1500,7 +1544,17 @@ Cmdbar.Focused:Connect(function()
 				elseif CmdSu.Text == " " then
 					autoComplete("commands")
 				else
-					autoComplete(CmdSu.Text)
+					if string.match(CmdSu.Text, " ") then
+						Cmdbar.Text = CmdSu.Text
+						wait()
+						Cmdbar.Text = Cmdbar.Text:gsub("\t", "")
+						Cmdbar.CursorPosition = #Cmdbar.Text + 1
+					else
+						Cmdbar.Text = CmdSu.Text .. " "
+						wait()
+						Cmdbar.Text = Cmdbar.Text:gsub("\t", "")
+						Cmdbar.CursorPosition = #Cmdbar.Text + 1
+					end
 				end
 			end
 		else
@@ -1603,7 +1657,7 @@ end
 local Defaults = game:GetService("HttpService"):JSONEncode(Settings)
 local nosaves = false
 local loadedEventData = nil
-saves = function()
+local LoadSettings = function()
 	if writefileExploit() then
 		if pcall(function() readfile(Settings_Path) end) then
 			if readfile(Settings_Path) ~= nil then
@@ -1626,18 +1680,18 @@ saves = function()
 					warn("Overwriting Save File")
 					writefileCooldown(Settings_Path, Defaults)
 					wait()
-					saves()
+					LoadSettings()
 				end
 			else
 				writefileCooldown(Settings_Path, Defaults)
 				wait()
-				saves()
+				LoadSettings()
 			end
 		else
 			writefileCooldown(Settings_Path, Defaults)
 			wait()
 			if pcall(function() readfile(Settings_Path) end) then
-				saves()
+				LoadSettings()
 			else
 				nosaves = true
 				Settings.Prefix = ";"
@@ -1669,10 +1723,6 @@ saves = function()
 		Settings.cmdautorj = false
 	end
 end
-
-spawn(function()
-	saves()
-end)
 
 updatesaves = function()
 	if nosaves == false and writefileExploit() then
@@ -5546,11 +5596,12 @@ end)
 
 
 
+VirtualEnvironment()
+LoadSettings()
+if Settings.AutoNet then
+	SetSimulationRadius()
+end
 spawn(function()
-	VirtualEnvironment()
-	if Settings.AutoNet then
-		SetSimulationRadius()
-	end
 	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
 		FindPlugins(Settings.PluginsTable)
 	end
