@@ -4535,7 +4535,7 @@ newCmd("unspawnpoint", {}, "unspawnpoint", "Removes your custom spawnpoint", fun
 	notify("Spawn Point", "Removed Spawn Point")
 end)
 
-newCmd("naked", {}, "naked", "Removes your Clothing", function(args, speaker)
+newCmd("removeclothes", {"naked"}, "removeclothes / naked", "Removes your Clothing", function(args, speaker)
 	for i,v in pairs(speaker.Character:GetDescendants()) do
 		if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
 			v:Destroy()
@@ -4545,7 +4545,7 @@ end)
 
 newCmd("noface", {}, "noface", "Removes your Face", function(args, speaker)
 	for i,v in pairs(speaker.Character:GetDescendants()) do
-		if v:IsA("Decal") and v.Name == 'face' then
+		if v:IsA("Decal") and string.lower(v.Name) == "face" then
 			v:Destroy()
 		end
 	end
