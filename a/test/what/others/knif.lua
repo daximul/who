@@ -1,5 +1,6 @@
-local KnifeAccessory
+local KnifeAccessory = "Waiting"
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 
@@ -9,21 +10,20 @@ else
     KnifeAccessory = LocalPlayer.Character:FindFirstChildOfClass("Accessory")
 end
 
-game:GetService("RunService").Heartbeat:Connect(function()
-    LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge) * math.huge
-    pcall(function() sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
+if (KnifeAccessory == "Waiting") then return end
 
+RunService.Heartbeat:Connect(function()
+    pcall(function() LocalPlayer.MaximumSimulationRadius = (math.pow(math.huge, math.huge) * math.huge) end)
+    pcall(function() sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
     for i, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer then
-            LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge) * math.huge
-            pcall(function() settings().Physics.AllowSleep = false ; sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
-            LocalPlayer.ReplicationFocus = workspace
+            pcall(function() LocalPlayer.MaximumSimulationRadius = (math.pow(math.huge, math.huge) * math.huge) end)
+            pcall(function() settings().Physics.AllowSleep = (false) end)
+            pcall(function() sethidden(LocalPlayer, "SimulationRadius", math.pow(math.huge, math.huge) * math.huge) end)
+            pcall(function() LocalPlayer.ReplicationFocus = (workspace) end)
         end
     end
 end)
-
-
-
 
 local LeftArm = LocalPlayer.Character["Left Arm"]:Clone()
 LeftArm.Parent = LocalPlayer.Character
@@ -53,8 +53,6 @@ end
 if LocalPlayer.Character:FindFirstChild("GrabKnifeRA") then
     LocalPlayer.Character:FindFirstChild("GrabKnifeRA"):Destroy()
 end
-
-
 
 local LA
 local RA
@@ -103,7 +101,6 @@ Rot.Parent = LocalPlayer.Character.Torso
 Rot.RigidityEnabled = true
 Rot.Attachment0, Rot.Attachment1 = Attach0, Attach1
 
-
 local Knife = Instance.new("Part")
 Knife.Name = "-GrabKnife"
 Knife.Parent = LocalPlayer.Character
@@ -134,7 +131,6 @@ local Rot = Instance.new("AlignOrientation")
 Rot.Parent = Knife
 Rot.RigidityEnabled = true
 Rot.Attachment0, Rot.Attachment1 = Attach0, Attach1
-
 
 Stuff.Events.ModeChangeEvent = game:GetService("UserInputService").InputBegan:Connect(function(Key)
     if Key.KeyCode == Enum.KeyCode.Q then
@@ -280,7 +276,6 @@ Stuff.Events.Button1DownEvent = LocalPlayer:GetMouse().Button1Down:Connect(funct
     end
 end)
 
-
 repeat
     if Stuff.PlrHeld ~= nil and Stuff.PlrHeld.ClassName == "Player" and Stuff.PlrHeld.Character and Stuff.PlrHeld.Character.PrimaryPart and Stuff.PlrHeld.Character:FindFirstChildOfClass("Humanoid") and Stuff.PlrHeld.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
         if LA == nil then
@@ -322,6 +317,7 @@ if LA ~= nil then
     LA:Destroy()
     LA = nil
 end
+
 if RA ~= nil then
     RA:Destroy() 
     RA = nil
@@ -331,6 +327,6 @@ for i, v in pairs(Stuff.Events) do
     v:Disconnect() 
 end
 
-if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-    LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+    LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Health = 0
 end
