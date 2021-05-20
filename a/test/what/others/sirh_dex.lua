@@ -7,7 +7,7 @@ local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
 local setthreadcontext = setthreadcontext or (syn and syn.set_thread_identity) or setthreadidentity;
 local ProtectionService = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/prote.lua"))();
-local function ParentGui(Gui)
+local SecureParentGui = function(Gui)
 	local HttpService = game:GetService("HttpService")
 	local CoreGui = game:GetService("CoreGui")
 	Gui.Name = HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30))
@@ -24,7 +24,7 @@ local function ParentGui(Gui)
 	end
 	ProtectionService.ProtectInstance(Gui)
 end
-local function RandomCharacters(length)
+local RandomCharacters = function(length)
 	local STR = "";
 	for i = 1, length do
 		STR = STR .. string.char(math.random(65,90));
@@ -101,7 +101,7 @@ local dlogs, logs = {}, {};
 local syntaxHighlight, transformPath, dumpTable, ValueToReadable;
 local textYSize = scriptsBox.TextSize;
 dexSpy.Enabled = false;
-ParentGui(dexSpy)
+SecureParentGui(dexSpy)
 
 local function draggable(obj)
 	spawn(function()
@@ -599,7 +599,7 @@ local clearBtn = mainFrame.clearBtn;
 local copyBtn = mainFrame.copyBtn;
 local currentButton;
 scriptDumper.Enabled = false;
-ParentGui(scriptDumper);
+SecureParentGui(scriptDumper);
 
 do --// UI Setup
 	draggable(mainFrame);
@@ -2566,7 +2566,7 @@ local function CreateGui()
 end
 
 local D_E_X = CreateGui()
-ParentGui(D_E_X)
+SecureParentGui(D_E_X)
 
 spawn(function()
 
@@ -10112,11 +10112,11 @@ openScript(scr5)
 	scrollBar:Update()
 	scrollBarH:Update()
 end)
-function ScrambleNames(A)
+ScrambleNames = function(A)
 	for i,v in pairs(A:GetDescendants()) do
 		v.Name = RandomCharacters(math.random(16, 64));
 	end
 end
 wait(0.25)
-ParentGui(D_E_X)
+SecureParentGui(D_E_X)
 end)
