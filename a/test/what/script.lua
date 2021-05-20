@@ -2998,7 +2998,9 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 		for i,v in pairs(users) do
 			if Players[v].Character ~= nil then
 				if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
-					speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
+					local Human = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+					Prote.SpoofProperty(Human, "Sit")
+					Human.Sit = false
 					wait(.1)
 				end
 				getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3, 1, 0)
@@ -3010,7 +3012,9 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 		for i,v in pairs(users) do
 			if Players[v].Character ~= nil then
 				if speaker.Character:FindFirstChildWhichIsA("Humanoid") and speaker.Character:FindFirstChildWhichIsA("Humanoid").SeatPart then
-					speaker.Character:FindFirstChildWhichIsA("Humanoid").Sit = false
+					local Human = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+					Prote.SpoofProperty(Human, "Sit")
+					Human.Sit = false
 					wait(.1)
 				end
 				game:GetService("TweenService"):Create(getRoot(speaker.Character), TweenInfo.new(2), {CFrame = getRoot(Players[v].Character).CFrame}):Play()
@@ -3022,10 +3026,11 @@ end)
 newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 	Clip = false
 	wait(0.1)
-	local function NoclipLoop()
+	local NoclipLoop = function()
 		if Clip == false and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
 				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+					Prote.SpoofProperty(child, "CanCollide")
 					child.CanCollide = false
 				end
 			end
