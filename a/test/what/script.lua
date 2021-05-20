@@ -2920,10 +2920,14 @@ end)
 newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", function(args, speaker)
 	if args[1] == nil then return notify("WalkSpeed", "Argument Missing") end
 	local wspeed = args[1]
-	if speaker and speaker.Character and findhum() and isNumber(wspeed) then
-		local Human = gethum()
-		Prote.SpoofProperty(Human, "WalkSpeed")
-		Human.WalkSpeed = wspeed
+	if speaker and speaker.Character and findhum() then
+		if isNumber(wspeed) then
+			local Human = gethum()
+			Prote.SpoofProperty(Human, "WalkSpeed")
+			Human.WalkSpeed = wspeed
+		else
+			notify("WalkSpeed", "Number Required")
+		end
 	end
 end)
 
@@ -2959,10 +2963,14 @@ end)
 newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "Change your JumpPower", function(args, speaker)
 	if args[1] == nil then return notify("JumpPower", "Argument Missing") end
 	local jppower = args[1]
-	if speaker and speaker.Character and findhum() and isNumber(jppower) then
-		local Human = gethum()
-		Prote.SpoofProperty(Human, "JumpPower")
-		Human.JumpPower = jppower
+	if speaker and speaker.Character and findhum() then
+		if isNumber(jppower) then
+			local Human = gethum()
+			Prote.SpoofProperty(Human, "JumpPower")
+			Human.JumpPower = jppower
+		else
+			notify("JumpPower", "Number Required")
+		end
 	end
 end)
 
