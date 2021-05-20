@@ -1859,9 +1859,9 @@ LoadPlugin = function(val, startup)
 				for i,v in pairs(cmdNames) do
 					newName = newName:gsub(v, v .. cmdExt)
 				end
-				addcmd(cmdName, v["Aliases"], newName, v["Description"], true)
+				addcmd(cmdName, v["Aliases"], newName, v["Description"], v["Function"], true)
 			else
-				addcmd(cmdName, v["Aliases"], cmdName, v["Description"], true)
+				addcmd(cmdName, v["Aliases"], cmdName, v["Description"], v["Function"], true)
 			end
 			if CommandsLoaded then
 				if v["ListName"] then
