@@ -5593,7 +5593,7 @@ end)
 newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", "Disable the Client-Sided Bypass", function(args, speaker)
 	ClientByp:Disconnect()
 	wait()
-	ClientByp = "none"
+	ClientByp = nil
 	SetTableContents(clientsidebypass, false)
 	Players.LocalPlayer.Character:BreakJoints()
 	notify("Client Bypass", "Disabled")
