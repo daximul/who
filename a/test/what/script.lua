@@ -5599,6 +5599,62 @@ newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", 
 	notify("Client Bypass", "Disabled")
 end)
 
+newCmd("joinplayer", {"jplr"}, "joinplayer / jplr [user / id] [place id]", "Join a Specific Player's Server", function(args, speaker)
+	if args[1] == nil then return notify("Join Player", "Missing Argument") end
+	local retries = 0
+	JoinServer = function(User, PlaceId)	
+		if args[2] == nil then PlaceId = game.PlaceId end
+		if not pcall(function()
+				local FoundUser, UserId = pcall(function()
+					if tonumber(User) then
+						return tonumber(User)
+					end
+
+					return Players:GetUserIdFromNameAsync(User)
+				end)
+				if not FoundUser then
+					notify("Join Error", "Username / UserID does not exist")
+				else
+					notify("Join Player", "Loading servers. Hold on a second.")
+					local URL2 = ("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
+					local Http = HttpService:JSONDecode(game:HttpGet(URL2))
+					local GUID
+
+					tablelength = function(T)
+						local count = 0
+						for _ in pairs(T) do count = count + 1 end
+						return count
+					end
+
+					for i = 1, tonumber(tablelength(Http.data)) do
+						for j,k in pairs(Http.data[i].playerIds) do
+							if k == UserId then
+								GUID = Http.data[i].id
+							end
+						end
+					end
+
+					if GUID ~= nil then
+						notify("Join Player", "Joining " .. User)
+						TeleportService:TeleportToPlaceInstance(PlaceId, GUID, Players.LocalPlayer)
+					else
+						notify("Join Error", "Unable to join user.")
+					end
+				end
+			end)
+		then
+			if retries < 3 then
+				retries = retries + 1
+				notify("Join Error", "Error while trying to join. Retrying " .. retries .. "/3")
+				JoinServer(User, PlaceId)
+			else
+				notify("Join Error", "Error While Joining")
+			end
+		end
+	end
+	JoinServer(args[1], args[2])
+end)
+
 
 
 end)
