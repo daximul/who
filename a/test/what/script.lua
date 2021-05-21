@@ -75,7 +75,7 @@ local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
 local Network_Loop = nil
-local ClientByp = "none"
+local ClientByp = nil
 local superinternal = false
 local origsettings = {
 	Lighting = {
@@ -5573,34 +5573,30 @@ newCmd("classicchat", {"clchat"}, "classicchat / clchat", "Enable Roblox's Class
 end)
 
 newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass Certain Anticheats", function(args, speaker)
-	if ClientByp ~= "none" then
-		ClientByp = Players.LocalPlayer.CharacterAdded:Connect(function()
-			repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and findhum()
-			wait(0.4)
-			Prote.SpoofInstance(gethum())
-			Prote.SpoofInstance(getRoot(Players.LocalPlayer.Character), r15(Players.LocalPlayer) and Players.LocalPlayer.Character.UpperTorso or Players.LocalPlayer.Character.Torso)
-			Prote.ProtectInstance(getRoot(Players.LocalPlayer.Character))
-			Prote.ProtectInstance(gethum())
-		end)
-		SetTableContents(clientsidebypass, true)
-		Players.LocalPlayer.Character:BreakJoints()
-		notify("Client Bypass", "Enabled")
-	else
-		notify("Client Bypass", "Already Enabled")
-	end
+	ClientByp = Players.LocalPlayer.CharacterAdded:Connect(function()
+		repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and findhum()
+		wait(0.4)
+		Prote.SpoofInstance(gethum())
+		if r15(Players.LocalPlayer) then
+			Prote.SpoofInstance(getRoot(Players.LocalPlayer.Character), Players.LocalPlayer.Character.UpperTorso)
+		else
+			Prote.SpoofInstance(getRoot(Players.LocalPlayer.Character), Players.LocalPlayer.Character.Torso)
+		end
+		Prote.ProtectInstance(getRoot(Players.LocalPlayer.Character))
+		Prote.ProtectInstance(gethum())
+	end)
+	SetTableContents(clientsidebypass, true)
+	Players.LocalPlayer.Character:BreakJoints()
+	notify("Client Bypass", "Enabled")
 end)
 
 newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", "Disable the Client-Sided Bypass", function(args, speaker)
-	if ClientByp ~= "none" then
-		ClientByp:Disconnect()
-		wait()
-		ClientByp = "none"
-		SetTableContents(clientsidebypass, false)
-		Players.LocalPlayer.Character:BreakJoints()
-		notify("Client Bypass", "Disabled")
-	else
-		notify("Client Bypass", "Already Disabled")
-	end
+	ClientByp:Disconnect()
+	wait()
+	ClientByp = "none"
+	SetTableContents(clientsidebypass, false)
+	Players.LocalPlayer.Character:BreakJoints()
+	notify("Client Bypass", "Disabled")
 end)
 
 
