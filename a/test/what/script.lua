@@ -75,7 +75,7 @@ local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
 local Network_Loop = nil
-local ClientByp = nil
+local ClientByp = "none"
 local superinternal = false
 local origsettings = {
 	Lighting = {
@@ -5573,7 +5573,7 @@ newCmd("classicchat", {"clchat"}, "classicchat / clchat", "Enable Roblox's Class
 end)
 
 newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass Certain Anticheats", function(args, speaker)
-	if ClientByp ~= nil then
+	if ClientByp ~= "none" then
 		ClientByp = Players.LocalPlayer.CharacterAdded:Connect(function()
 			repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and findhum()
 			wait(0.4)
@@ -5591,10 +5591,10 @@ newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass 
 end)
 
 newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", "Disable the Client-Sided Bypass", function(args, speaker)
-	if ClientByp ~= nil then
+	if ClientByp ~= "none" then
 		ClientByp:Disconnect()
 		wait()
-		ClientByp = nil
+		ClientByp = "none"
 		SetTableContents(clientsidebypass, false)
 		Players.LocalPlayer.Character:BreakJoints()
 		notify("Client Bypass", "Disabled")
