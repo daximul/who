@@ -4185,6 +4185,8 @@ newCmd("breakvelocity", {}, "breakvelocity", "Break your Velocity", function(arg
 	while not BeenASecond do
 		for _, v in ipairs(speaker.Character:GetDescendants()) do
 			if v.IsA(v, "BasePart") then
+				Prote.SpoofProperty(v, "Velocity")
+				Prote.SpoofProperty(v, "RotVelocity")
 				v.Velocity, v.RotVelocity = V3, V3
 			end
 		end
@@ -4211,6 +4213,7 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory
 	for i = 1, LOOP_NUM do
 		local Human = gethum()
 		wait(.1, Human.Parent:MoveTo(TempPos))
+		Prote.SpoofProperty(Human.RootPart, "Anchored")
 		Human.RootPart.Anchored = speaker:ClearCharacterAppearance(wait(.1)) or true
 		local t = GetHandleTools(speaker)
 		while #t > 0 do
@@ -4243,6 +4246,8 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory
 				for _, v in ipairs(Tools) do
 					coroutine.wrap(function()
 						local x = v.CanCollide
+						Prote.SpoofProperty(v, "CanCollide")
+						Prote.SpoofProperty(v, "Anchored")
 						v.CanCollide = false
 						v.Anchored = false
 						for _ = 1, 10 do
@@ -4370,7 +4375,7 @@ newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
 	end
 	TouchingFloor = gethum():GetPropertyChangedSignal("FloorMaterial"):Connect(PauseFling)
 	cmdflinging = true
-	local function flingDied()
+	local flingDied = function()
 		execCmd("unfling")
 	end
 	TouchingFloorReset = gethum().Died:Connect(flingDied)
@@ -4395,6 +4400,7 @@ newCmd("unfling", {}, "unfling", "Disables the Fling Command", function(args, sp
 	end
 	for _, child in pairs(speakerChar:GetDescendants()) do
 		if child.ClassName == "Part" or child.ClassName == "MeshPart" then
+			Prote.SpoofProperty(child, "CustomPhysicalProperties")
 			child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
 		end
 	end
@@ -4403,17 +4409,21 @@ end)
 newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args, speaker)
 	local ch = speaker.Character
 	local prt=Instance.new("Model")
+	Prote.ProtectInstance(prt)
 	prt.Parent = speaker.Character
 	local z1 = Instance.new("Part")
+	Prote.ProtectInstance(z1)
 	z1.Name="Torso"
 	z1.CanCollide = false
 	z1.Anchored = true
 	local z2 = Instance.new("Part")
+	Prote.ProtectInstance(z2)
 	z2.Name="Head"
 	z2.Parent = prt
 	z2.Anchored = true
 	z2.CanCollide = false
 	local z3 =Instance.new("Humanoid")
+	Prote.ProtectInstance(z3)
 	z3.Name="Humanoid"
 	z3.Parent = prt
 	z1.Position = Vector3.new(0,9999,0)
@@ -4422,6 +4432,7 @@ newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args,
 	speaker.Character=ch
 	wait(3)
 	local Hum = Instance.new("Humanoid")
+	Prote.ProtectInstance(Hum)
 	z2:Clone()
 	Hum.Parent = speaker.Character
 	local root =  getRoot(speaker.Character)
@@ -4430,20 +4441,24 @@ newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args,
 			v:Destroy()
 		end
 	end
+	Prote.SpoofProperty(root, "Transparency")
+	Prote.SpoofProperty(root, "Color")
 	root.Transparency = 0
 	root.Color = Color3.new(1, 1, 1)
 	local invisflingStepped
-	invisflingStepped = game:GetService('RunService').Stepped:Connect(function()
+	invisflingStepped = game:GetService("RunService").Stepped:Connect(function()
 		if speaker.Character and getRoot(speaker.Character) then
+			Prote.SpoofProperty(getRoot(speaker.Character), "CanCollide")
 			getRoot(speaker.Character).CanCollide = false
 		else
 			invisflingStepped:Disconnect()
 		end
 	end)
 	sFLY()
+	Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
 	workspace.CurrentCamera.CameraSubject = root
-	local bambam = Instance.new("BodyThrust")
-	bambam.Parent = getRoot(speaker.Character)
+	local bambam = Instance.new("BodyThrust", getRoot(speaker.Character))
+	Prote.ProtectInstance(bambam)
 	bambam.Force = Vector3.new(99999,99999*10,99999)
 	bambam.Location = getRoot(speaker.Character).Position
 end)
@@ -4534,7 +4549,7 @@ newCmd("loopbring", {}, "loopbring [plr] [distance] [delay] (Client)", "Loop bri
 						if Players:FindFirstChild(v) then
 							pchar = Players[v].Character
 							if pchar~= nil and Players[v].Character ~= nil and getRoot(pchar) and speaker.Character ~= nil and getRoot(speaker.Character) then
-								getRoot(pchar).CFrame = getRoot(speaker.Character).CFrame + Vector3.new(distance,1,0)
+								getRoot(pchar).CFrame = getRoot(speaker.Character).CFrame + Vector3.new(distance, 1, 0)
 							end
 							wait(lDelay)
 						else 
@@ -4563,6 +4578,7 @@ newCmd("freeze", {"fr"}, "freeze / fr [plr] (Client)", "Freezes a Player", funct
 			spawn(function()
 				for i, x in next, Players[v].Character:GetDescendants() do
 					if x:IsA("BasePart") and not x.Anchored then
+						Prote.SpoofProperty(x, "Anchored")
 						x.Anchored = true
 					end
 				end
@@ -4578,6 +4594,7 @@ newCmd("thaw", {"unfr"}, "thaw / unfr [plr] (Client)", "Unfreezes a Player", fun
 			spawn(function()
 				for i, x in next, Players[v].Character:GetDescendants() do
 					if x:IsA("BasePart") and x.Anchored then
+						Prote.SpoofProperty(x, "Anchored")
 						x.Anchored = false
 					end
 				end
@@ -4601,7 +4618,10 @@ end)
 
 newCmd("removeclothes", {"naked"}, "removeclothes / naked", "Removes your Clothing", function(args, speaker)
 	for i,v in pairs(speaker.Character:GetDescendants()) do
-		if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
+		if v:IsA("Clothing") then
+			v:Destroy()
+		end
+		if v:IsA("ShirtGraphic") then
 			v:Destroy()
 		end
 	end
@@ -4609,8 +4629,10 @@ end)
 
 newCmd("noface", {}, "noface", "Removes your Face", function(args, speaker)
 	for i,v in pairs(speaker.Character:GetDescendants()) do
-		if v:IsA("Decal") and string.lower(v.Name) == "face" then
-			v:Destroy()
+		if v:IsA("Decal") then
+			if string.lower(v.Name) == "face" then
+				v:Destroy()
+			end
 		end
 	end
 end)
