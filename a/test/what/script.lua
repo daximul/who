@@ -126,6 +126,7 @@ local swimming = false
 local cmdflinging = false
 local floatName = randomString()
 local spinName = randomString()
+local pointLightName = randomString()
 local selectionBoxName = randomString()
 local QEfly = true
 local invisRunning = false
@@ -4720,12 +4721,18 @@ newCmd("loopfullbright", {"loopfb"}, "loopfullbright / loopfb", "Makes the map b
 	if brightLoop then
 		brightLoop:Disconnect()
 	end
-	local function brightFunc()
-		game:GetService("Lighting").Brightness = 2
-		game:GetService("Lighting").ClockTime = 14
-		game:GetService("Lighting").FogEnd = 100000
-		game:GetService("Lighting").GlobalShadows = false
-		game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "Brightness")
+	Prote.SpoofProperty(Lighting, "ClockTime")
+	Prote.SpoofProperty(Lighting, "FogEnd")
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
+	Prote.SpoofProperty(Lighting, "OutdoorAmbient")
+	local brightFunc = function()
+		Lighting.Brightness = 2
+		Lighting.ClockTime = 14
+		Lighting.FogEnd = 100000
+		Lighting.GlobalShadows = false
+		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
 	end
 	brightLoop = game:GetService("RunService").RenderStepped:Connect(brightFunc)
 end)
@@ -4737,61 +4744,89 @@ newCmd("unloopfullbright", {"unfb"}, "unloopfullbright / unloopfb", "Disable Loo
 end)
 
 newCmd("day", {}, "day (Client)", "Changes the time to day for the client", function(args, speaker)
-	game:GetService("Lighting").ClockTime = 14
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "ClockTime")
+	Lighting.ClockTime = 14
 end)
 
 newCmd("night", {}, "night (Client)", "Changes the time to night for the client", function(args, speaker)
-	game:GetService("Lighting").ClockTime = 0
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "ClockTime")
+	Lighting.ClockTime = 0
 end)
 
 newCmd("nofog", {}, "nofog (Client)", "Removes Fog", function(args, speaker)
-	game:GetService("Lighting").FogEnd = 100000
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "FogEnd")
+	Lighting.FogEnd = 100000
 end)
 
 newCmd("brightness", {}, "brightness [num] (Client)", "Changes the Brightness Lighting Property", function(args, speaker)
+	local Lighting = game:GetService("Lighting")
 	if args[1] then
-		game:GetService("Lighting").Brightness = args[1]
+		Prote.SpoofProperty(Lighting, "Brightness")
+		Lighting.Brightness = args[1]
 	else
-		game:GetService("Lighting").Brightness = origsettings.Lighting.brt
+		Prote.SpoofProperty(Lighting, "ClockTime")
+		Lighting.Brightness = origsettings.Lighting.brt
 	end
 end)
 
 newCmd("globalshadows", {"gshadows"}, "globalshadows / gshadows", "Enables Global Shadows", function(args, speaker)
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
 	game:GetService("Lighting").GlobalShadows = true
 end)
 
 newCmd("noglobalshadows", {"nogshadows"}, "noglobalshadows / nogshadows", "Disables Global Shadows", function(args, speaker)
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
 	game:GetService("Lighting").GlobalShadows = false
 end)
 
 newCmd("light", {}, "light [radius] [brightness] (Client)", "Gives your Player Dynamic Light", function(args, speaker)
-	local light = Instance.new("PointLight")
-	light.Parent = getRoot(speaker.Character)
-	light.Range = 30
-	if args[1] then
-		light.Brightness = args[2]
-		light.Range = args[1]
-	else
-		light.Brightness = 5
+	if speaker and speaker.Character and getRoot(speaker.Character) then
+		local light = Instance.new("PointLight", getRoot(speaker.Character))
+		Prote.SpoofInstance(light)
+		light.Name = pointLightName
+		light.Range = 30
+		if args[1] then
+			light.Brightness = args[2]
+			light.Range = args[1]
+		else
+			light.Brightness = 5
+		end
 	end
 end)
 
 newCmd("unlight", {}, "unlight", "Removes Dynamic Light from your Player", function(args, speaker)
-	for i,v in pairs(speaker.Character:GetDescendants()) do
-		if v.ClassName == "PointLight" then
-			v:Destroy()
+	if speaker and speaker.Character then
+		for i,v in pairs(speaker.Character:GetDescendants()) do
+			if v.ClassName == "PointLight" then
+				if v.Name == pointLightName then
+					v:Destroy()
+				end
+			end
 		end
 	end
 end)
 
 newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restores Lighting Properties", function(args, speaker)
-	game:GetService("Lighting").Ambient = origsettings.Lighting.abt
-	game:GetService("Lighting").OutdoorAmbient = origsettings.Lighting.oabt
-	game:GetService("Lighting").Brightness = origsettings.Lighting.brt
-	game:GetService("Lighting").ClockTime = origsettings.Lighting.time
-	game:GetService("Lighting").FogEnd = origsettings.Lighting.fe
-	game:GetService("Lighting").FogStart = origsettings.Lighting.fs
-	game:GetService("Lighting").GlobalShadows = origsettings.Lighting.gs
+	local Lighting = game:GetService("Lighting")
+	Prote.SpoofProperty(Lighting, "Ambient")
+	Prote.SpoofProperty(Lighting, "OutdoorAmbient")
+	Prote.SpoofProperty(Lighting, "Brightness")
+	Prote.SpoofProperty(Lighting, "ClockTime")
+	Prote.SpoofProperty(Lighting, "FogEnd")
+	Prote.SpoofProperty(Lighting, "FogStart")
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
+	Lighting.Ambient = origsettings.Lighting.abt
+	Lighting.OutdoorAmbient = origsettings.Lighting.oabt
+	Lighting.Brightness = origsettings.Lighting.brt
+	Lighting.ClockTime = origsettings.Lighting.time
+	Lighting.FogEnd = origsettings.Lighting.fe
+	Lighting.FogStart = origsettings.Lighting.fs
+	Lighting.GlobalShadows = origsettings.Lighting.gs
 end)
 
 newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for player heads (default is 1)", function(args, speaker)
@@ -4803,8 +4838,10 @@ newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for player heads
 			local Head = Players[v].Character:FindFirstChild("Head")
 			if Head:IsA("BasePart") then
 				if not args[2] or sizeArg == 1 then
+					Prote.ProtectInstance(Head)
 					Head.Size = Vector3.new(2, 1, 1)
 				else
+					Prote.ProtectInstance(Head)
 					Head.Size = Size
 				end
 			end
@@ -4843,28 +4880,43 @@ newCmd("noroot", {}, "noroot", "Removes your characters HumanoidRootPart", funct
 end)
 
 newCmd("boostfps", {}, "boostfps", "Lowers Game Quality to Boost FPS", function(args, speaker)
-	workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
-	workspace:FindFirstChildOfClass("Terrain").WaterWaveSpeed = 0
-	workspace:FindFirstChildOfClass("Terrain").WaterReflectance = 0
-	workspace:FindFirstChildOfClass("Terrain").WaterTransparency = 0
-	game:GetService("Lighting").GlobalShadows = false
-	game:GetService("Lighting").FogEnd = 9e9
+	local Lighting = game:GetService("Lighting")
+	local Terrain = workspace:FindFirstChildOfClass("Terrain")
+	Prote.SpoofProperty(Terrain, "WaterWaveSize")
+	Prote.SpoofProperty(Terrain, "WaterWaveSpeed")
+	Prote.SpoofProperty(Terrain, "WaterReflectance")
+	Prote.SpoofProperty(Terrain, "WaterTransparency")
+	Terrain.WaterWaveSize = 0
+	Terrain.WaterWaveSpeed = 0
+	Terrain.WaterReflectance = 0
+	Terrain.WaterTransparency = 0
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
+	Prote.SpoofProperty(Lighting, "FogEnd")
+	Lighting.GlobalShadows = false
+	Lighting.FogEnd = 9e9
 	settings().Rendering.QualityLevel = 1
 	for i,v in pairs(game:GetDescendants()) do
 		if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+			Prote.SpoofProperty(v, "Material")
+			Prote.SpoofProperty(v, "Reflectance")
 			v.Material = "Plastic"
 			v.Reflectance = 0
 		elseif v:IsA("Decal") then
+			Prote.SpoofProperty(v, "Transparency")
 			v.Transparency = 1
 		elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+			Prote.SpoofProperty(v, "Lifetime")
 			v.Lifetime = NumberRange.new(0)
 		elseif v:IsA("Explosion") then
+			Prote.SpoofProperty(v, "BlastPressure")
+			Prote.SpoofProperty(v, "BlastRadius")
 			v.BlastPressure = 1
 			v.BlastRadius = 1
 		end
 	end
-	for i,v in pairs(game:GetService("Lighting"):GetDescendants()) do
+	for i,v in pairs(Lighting:GetDescendants()) do
 		if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+			Prote.SpoofProperty(v, "Enabled")
 			v.Enabled = false
 		end
 	end
@@ -4886,20 +4938,28 @@ newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args,
 end)
 
 newCmd("tpposition", {"tppos"}, "tpposition / tppos [X] [Y] [Z]", "Teleports you to certain coordinates", function(args, speaker)
-	if #args < 3 then return end
-	local tpX,tpY,tpZ = tonumber(args[1]),tonumber(args[2]),tonumber(args[3])
+	if #args < 3 then return notify("Tp Position", "Missing Arguments (" .. #args .. "/3)") end
+	local Pos = {
+		X = tonumber(args[1]),
+		Y = tonumber(args[2]),
+		Z = tonumber(args[3]),
+	}
 	local char = speaker.Character
 	if char and getRoot(char) then
-		getRoot(char).CFrame = CFrame.new(tpX, tpY, tpZ)
+		getRoot(char).CFrame = CFrame.new(Pos.X, Pos.Y, Pos.Z)
 	end
 end)
 
 newCmd("tweentpposition", {"ttppos"}, "tweentpposition / ttppos [X] [Y] [Z]", "Tween to coordinates (bypasses some anti cheats)", function(args, speaker)
-	if #args < 3 then return end
-	local tpX,tpY,tpZ = tonumber(args[1]),tonumber(args[2]),tonumber(args[3])
+	if #args < 3 then return notify("TweenTp Position", "Missing Arguments (" .. #args .. "/3)") end
+	local Pos = {
+		X = tonumber(args[1]),
+		Y = tonumber(args[2]),
+		Z = tonumber(args[3]),
+	}
 	local char = speaker.Character
 	if char and getRoot(char) then
-		game:GetService("TweenService"):Create(getRoot(speaker.Character), TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear), {CFrame = CFrame.new(tpX, tpY, tpZ)}):Play()
+		game:GetService("TweenService"):Create(getRoot(speaker.Character), TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear), {CFrame = CFrame.new(Pos.X, Pos.Y, Pos.Z)}):Play()
 	end
 end)
 
@@ -4940,10 +5000,12 @@ newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows your Camera to go Th
 end)
 
 newCmd("maxzoom", {}, "maxzoom [number]", "Maximum Camera Zoom", function(args, speaker)
+	Prote.SpoofProperty(speaker, "CameraMaxZoomDistance")
 	speaker.CameraMaxZoomDistance = args[1]
 end)
 
 newCmd("minzoom", {}, "minzoom [number]", "Minimum Camera Zoom", function(args, speaker)
+	Prote.SpoofProperty(speaker, "CameraMinZoomDistance")
 	speaker.CameraMinZoomDistance = args[1]
 end)
 
@@ -4959,12 +5021,12 @@ newCmd("tpunanchored", {"tpua"}, "tpunanchored / tpua [plr]", "Teleports Unancho
 							c:Destroy()
 						end
 					end
-					local ForceInstance = Instance.new("BodyPosition")
-					ForceInstance.Parent = part
+					local ForceInstance = Instance.new("BodyPosition", part)
+					Prote.ProtectInstance(ForceInstance)
 					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 					table.insert(Forces, ForceInstance)
-					if not table.find(frozenParts,part) then
-						table.insert(frozenParts,part)
+					if not table.find(frozenParts, part) then
+						table.insert(frozenParts, part)
 					end
 				end
 			end
@@ -5003,7 +5065,7 @@ newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes
 			"Left Leg",
 			"HumanoidRootPart"
 		}
-		local function FREEZENOOB(v)
+		local FREEZENOOB = function(v)
 			if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
 				local BADD = false
 				for i = 1,#badnames do
@@ -5021,16 +5083,16 @@ newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes
 						end
 					end
 					SetSimulationRadius()
-					local bodypos = Instance.new("BodyPosition")
-					bodypos.Parent = v
+					local bodypos = Instance.new("BodyPosition", v)
+					Prote.ProtectInstance(bodypos)
 					bodypos.Position = v.Position
-					bodypos.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-					local bodygyro = Instance.new("BodyGyro")
-					bodygyro.Parent = v
+					bodypos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+					local bodygyro = Instance.new("BodyGyro", v)
+					Prote.ProtectInstance(bodygyro)
 					bodygyro.CFrame = v.CFrame
-					bodygyro.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-					if not table.find(frozenParts,v) then
-						table.insert(frozenParts,v)
+					bodygyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+					if not table.find(frozenParts, v) then
+						table.insert(frozenParts, v)
 					end
 				end
 			end
@@ -5116,18 +5178,24 @@ newCmd("copyemote", {}, "copyemote [plr]", "Copies a Player's Animation", functi
 end)
 
 newCmd("teleporttool", {"tptool"}, "teleporttool / tptool", "Gives You a Teleport Tool", function(args, speaker)
-	local TpTool = Instance.new("Tool")
-	TpTool.Name = "Teleport Tool"
-	TpTool.RequiresHandle = false
-	TpTool.Parent = speaker.Backpack
-	TpTool.Activated:Connect(function()
-		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
-		local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
-		if not Char or not HRP then
-			return notify("Error", "Failed to Find HumanoidRootPart")
-		end
-		HRP.CFrame = CFrame.new(DAMouse.Hit.X, DAMouse.Hit.Y + 3, DAMouse.Hit.Z, select(4, HRP.CFrame:components()))
-	end)
+	if findbp() then
+		local Backpack = getbp()
+		Prote.ProtectInstance(Backpack)
+		local TpTool = Instance.new("Tool", Backpack)
+		Prote.ProtectInstance(TpTool)
+		TpTool.Name = "Teleport Tool"
+		TpTool.RequiresHandle = false
+		TpTool.Activated:Connect(function()
+			local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
+			local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
+			if not Char or not HRP then
+				return notify("Error", "Failed to Find HumanoidRootPart")
+			end
+			HRP.CFrame = CFrame.new(DAMouse.Hit.X, DAMouse.Hit.Y + 3, DAMouse.Hit.Z, select(4, HRP.CFrame:components()))
+		end)
+	else
+		notify("Command Error", "Missing Backpack")
+	end
 end)
 
 newCmd("walltp", {}, "walltp", "Teleports You Above/Over Any Wall You Run Into", function(args, speaker)
@@ -5137,7 +5205,7 @@ newCmd("walltp", {}, "walltp", "Teleports You Above/Over Any Wall You Run Into",
 	else
 		Torso = speaker.Character.Torso
 	end
-	local function TouchedFunc(hit)
+	local TouchedFunc = function(hit)
 		local Root = getRoot(speaker.Character)
 		if hit:IsA("BasePart") and hit.Position.Y > Root.Position.Y - speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight then
 			local HitP = getRoot(hit.Parent)
@@ -5164,6 +5232,7 @@ newCmd("bang", {}, "bang [plr] [speed]", "I don't want to explain this", functio
 		local players = getPlayer(args[1], speaker)
 		for i,v in pairs(players) do
 			bangAnim = Instance.new("Animation")
+			Prote.ProtectInstance(bangAnim)
 			bangAnim.AnimationId = "rbxassetid://148840371"
 			bang = speaker.Character.Humanoid:LoadAnimation(bangAnim)
 			bang:Play(.1, 1, 1)
@@ -5173,7 +5242,7 @@ newCmd("bang", {}, "bang [plr] [speed]", "I don't want to explain this", functio
 				bang:AdjustSpeed(3)
 			end
 			local bangplr = Players[v].Name
-			bangDied = speaker.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+			bangDied = speaker.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 				bangLoop:Disconnect()
 				bang:Stop()
 				bangAnim:Destroy()
@@ -5206,11 +5275,12 @@ newCmd("carpet", {}, "carpet [plr]", "Become a Player's Carpet", function(args, 
 		local players = getPlayer(args[1], speaker)
 		for i,v in pairs(players) do
 			carpetAnim = Instance.new("Animation")
+			Prote.ProtectInstance(carpetAnim)
 			carpetAnim.AnimationId = "rbxassetid://282574440"
 			carpet = speaker.Character.Humanoid:LoadAnimation(carpetAnim)
 			carpet:Play(.1, 1, 1)
 			local carpetplr = Players[v].Name
-			carpetDied = speaker.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+			carpetDied = speaker.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 				carpetLoop:Disconnect()
 				carpet:Stop()
 				carpetAnim:Destroy()
@@ -5300,7 +5370,7 @@ newCmd("stare", {}, "stare [plr]", "Stare at a Player", function(args, speaker)
 			StareLoop:Disconnect()
 		end
 		if not Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and Players[v].Character:FindFirstChild("HumanoidRootPart") then return end
-		local function StareFunc()
+		local StareFunc = function()
 			if Players.LocalPlayer.Character.PrimaryPart and Players:FindFirstChild(v) and Players[v].Character ~= nil and Players[v].Character:FindFirstChild("HumanoidRootPart") then
 				local chrPos = Players.LocalPlayer.Character.PrimaryPart.Position
 				local tPos = Players[v].Character:FindFirstChild("HumanoidRootPart").Position
@@ -5322,8 +5392,9 @@ newCmd("unstare", {}, "unstare [plr]", "Disables Stare", function(args, speaker)
 end)
 
 newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set IncomingReplicationLag", function(args, speaker)
-	if tonumber(args[1]) then
-		settings():GetService("NetworkSettings").IncomingReplicationLag = args[1]
+	if args[1] then
+		local IRL = tonumber(args[1])
+		settings():GetService("NetworkSettings").IncomingReplicationLag = IRL
 	end
 end)
 
@@ -5365,19 +5436,19 @@ newCmd("clearhats", {}, "clearhats", "Clears Hats in the Workspace", function(ar
 				table.insert(Hats,x)
 			end
 		end
-		for _,getacc in next, Character:FindFirstChildOfClass("Humanoid"):GetAccessories() do
+		for _,getacc in next, Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories() do
 			getacc:Destroy()
 		end
 		for i = 1,#Hats do
-			repeat game:GetService("RunService").Heartbeat:wait() until Hats[i]
-			firetouchinterest(Hats[i].Handle,Character:FindFirstChild("HumanoidRootPart"),0)
-			repeat game:GetService("RunService").Heartbeat:wait() until Character:FindFirstChildOfClass("Accessory")
+			repeat game:GetService("RunService").Heartbeat:Wait() until Hats[i]
+			firetouchinterest(Hats[i].Handle, Character:FindFirstChild("HumanoidRootPart"), 0)
+			repeat game:GetService("RunService").Heartbeat:Wait() until Character:FindFirstChildOfClass("Accessory")
 			Character:FindFirstChildOfClass("Accessory"):Destroy()
-			repeat game:GetService("RunService").Heartbeat:wait() until not Character:FindFirstChildOfClass("Accessory")
+			repeat game:GetService("RunService").Heartbeat:Wait() until not Character:FindFirstChildOfClass("Accessory")
 		end
 		Character:BreakJoints()
 		Player.CharacterAdded:wait()
-		for i = 1,20 do game:GetService("RunService").Heartbeat:wait()
+		for i = 1,20 do game:GetService("RunService").Heartbeat:Wait()
 			if Player.Character:FindFirstChild("HumanoidRootPart") then
 				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = Old
 			end
@@ -5391,8 +5462,13 @@ newCmd("hatspin", {}, "hatspin", "Spins your Character's Accessories", function(
 	execCmd("unhatspin")
 	wait(.5)
 	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
-		local keep = Instance.new("BodyPosition") keep.Name = randomString() keep.Parent = v.Handle
-		local spin = Instance.new("BodyAngularVelocity") spin.Name = randomString() spin.Parent = v.Handle
+		local keep = Instance.new("BodyPosition", v.Handle)
+		Prote.ProtectInstance(keep)
+		keep.Name = randomString()
+		local spin = Instance.new("BodyAngularVelocity", v.Handle)
+		Prote.ProtectInstance(spin)
+		spin.Name = randomString()
+		spin.Parent = v.Handle
 		v.Handle:FindFirstChildOfClass("Weld"):Destroy()
 		if args[1] then
 			spin.AngularVelocity = Vector3.new(0, args[1], 0)
@@ -5415,7 +5491,7 @@ newCmd("unhatspin", {}, "unhatspin", "Disables Hatspin", function(args, speaker)
 	if spinhats and spinhats ~= nil then
 		spinhats:Disconnect()
 	end
-	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
+	for _,v in pairs(speaker.Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories()) do
 		v.Parent = workspace
 		for i,c in pairs(v.Handle) do
 			if c:IsA("BodyPosition") or c:IsA("BodyAngularVelocity") then
@@ -5429,12 +5505,13 @@ end)
 
 newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 	if setscriptable then
-		local function prep(plr)
+		local prep = function(plr)
 			if plr and plr.Character then
-				for _,char in pairs(plr.Character:GetChildren()) do
+				for _, char in pairs(plr.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
 						pcall(function()
 							if char:IsA("Part") or char:IsA("BasePart") then
+								Prote.SpoofProperty(char, "Velocity")
 								char.Velocity = Vector3.new(30, 0, 4)
 							end
 						end)
@@ -5447,10 +5524,11 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 				setscriptable(Players.LocalPlayer, "SimulationRadius", true)
 			end)
 			if Players.LocalPlayer and Players.LocalPlayer.Character then
-				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
+				for _, char in pairs(Players.LocalPlayer.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
 						pcall(function()
 							if char:IsA("Part") or char:IsA("BasePart") then
+								Prote.SpoofProperty(char, "Velocity")
 								char.Velocity = Vector3.new(30, 4, 0)
 							end
 						end)
@@ -5464,12 +5542,13 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 			end
 		end
 	else
-		local function prep(plr)
+		local prep = function(plr)
 			if plr and plr.Character then
-				for _,char in pairs(plr.Character:GetChildren()) do
+				for _, char in pairs(plr.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
 						pcall(function()
 							if char:IsA("Part") or char:IsA("BasePart") then
+								Prote.SpoofProperty(char, "Velocity")
 								char.Velocity = Vector3.new(30, 0, 4)
 							end
 						end)
@@ -5480,10 +5559,11 @@ newCmd("fixgyros", {}, "fixgyros", "Fix Body Gyros", function(args, speaker)
 		game:GetService("RunService").Heartbeat:Connect(function()
 			sethidden(Players.LocalPlayer, "SimulationRadius", true)
 			if Players.LocalPlayer and Players.LocalPlayer.Character then
-				for _,char in pairs(Players.LocalPlayer.Character:GetChildren()) do
+				for _, char in pairs(Players.LocalPlayer.Character:GetChildren()) do
 					game:GetService("RunService").RenderStepped:Connect(function()
 						pcall(function()
 							if char:IsA("Part") or char:IsA("BasePart") then
+								Prote.SpoofProperty(char, "Velocity")
 								char.Velocity = Vector3.new(30, 4, 0)
 							end
 						end)
@@ -5501,7 +5581,7 @@ end)
 
 newCmd("enable", {}, "enable [inventory/playerlist/chat/all]", "Toggles Visibility of CoreGui Items", function(args, speaker)
 	if args[1] then
-		local opt = string.lower(args[1])
+		local opt = string.lower(tostring(args[1]))
 		if opt == "inventory" or opt == "backpack" then
 			game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", true)
 		elseif opt == "playerlist" then
@@ -5518,7 +5598,7 @@ end)
 
 newCmd("disable", {}, "disable [inventory/playerlist/chat/all]", "Toggles Visibility of CoreGui Items", function(args, speaker)
 	if args[1] then
-		local opt = string.lower(args[1])
+		local opt = string.lower(tostring(args[1]))
 		if opt == "inventory" or opt == "backpack" then
 			game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", false)
 		elseif opt == "playerlist" then
@@ -5602,7 +5682,7 @@ end)
 newCmd("joinplayer", {"jplr"}, "joinplayer / jplr [user / id] [place id]", "Join a Specific Player's Server", function(args, speaker)
 	if args[1] == nil then return notify("Join Player", "Missing Argument") end
 	local retries = 0
-	JoinServer = function(User, PlaceId)	
+	JoinServer = function(User, PlaceId)
 		if args[2] == nil then PlaceId = game.PlaceId end
 		if not pcall(function()
 				local FoundUser, UserId = pcall(function()
