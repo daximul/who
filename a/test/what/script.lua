@@ -339,14 +339,12 @@ Players.PlayerRemoving:Connect(function(player)
 		end
 	end
 	if viewing ~= nil and player == viewing then
-		Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
-		workspace.CurrentCamera.CameraSubject = Players.LocalPlayer.Character
-		viewing = nil
-		if viewDied then
-			viewDied:Disconnect()
-			viewChanged:Disconnect()
+		if findhum() then
+			execCmd("unspectate nonotify")
+			notify("Spectate", "Disabled (Player Left)")
+		else
+			notify("Un-Spectate", "Missing Humanoid")
 		end
-		notify("Spectate", "Turned off (player left)")
 	end
 end)
 
@@ -383,6 +381,7 @@ local SmoothDrag = function(frame)
 end
 
 ParentGui = function(Gui)
+	Prote.ProtectInstance(Gui)
 	Gui.Name = randomString()
 	if (not is_sirhurt_closure) and (syn and syn.protect_gui) then
 		syn.protect_gui(Gui)
@@ -395,7 +394,6 @@ ParentGui = function(Gui)
 	else
 		Gui.Parent = CoreGui
 	end
-	Prote.ProtectInstance(Gui)
 end
 
 local SmoothScroll = function(content, SmoothingFactor)
@@ -3887,17 +3885,19 @@ newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", funct
 			viewDied:Disconnect()
 			viewChanged:Disconnect()
 		end
+		if not Players[v].Character then return notify("Spectate", "Target Missing Character") end
+		if not findhum(Players[v].Character) then return notify("Spectate", "Target Missing Humanoid") end
 		viewing = Players[v]
-		Prote.SpoofProperty(workspace.Camera, "CameraSubject")
-		workspace.Camera.CameraSubject = viewing.Character
+		local targethum = gethum(Players[v].Character)
+		workspace.Camera.CameraSubject = targethum
 		notify("Spectating", Players[v].Name)
 		local viewDiedFunc = function()
 			repeat wait() until Players[v].Character ~= nil and getRoot(Players[v].Character)
-			workspace.Camera.CameraSubject = viewing.Character
+			workspace.Camera.CameraSubject = targethum
 		end
 		viewDied = Players[v].CharacterAdded:Connect(viewDiedFunc)
 		local viewChangedFunc = function()
-			workspace.Camera.CameraSubject = viewing.Character
+			workspace.Camera.CameraSubject = targethum
 		end
 		viewChanged = workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(viewChangedFunc)
 	end
@@ -3906,13 +3906,21 @@ end)
 newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Player", function(args, speaker)
 	if viewing ~= nil then
 		viewing = nil
-		notify("Spectate", "Turned Off")
 	end
 	if viewDied then
 		viewDied:Disconnect()
 		viewChanged:Disconnect()
 	end
-	workspace.Camera.CameraSubject = Players.LocalPlayer.Character
+	if findhum() then
+		workspace.Camera.CameraSubject = gethum()
+		if tostring(args[1]) ~= "nonotify" then
+			notify("Spectate", "Disabled")
+		end
+	else
+		if tostring(args[1]) ~= "nonotify" then
+			notify("Un-Spectate", "Missing Humanoid")
+		end
+	end
 end)
 
 newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker)
@@ -3920,7 +3928,6 @@ newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker
 	workspace.CurrentCamera:remove()
 	wait(0.1)
 	repeat wait() until speaker.Character ~= nil
-	Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
 	Prote.SpoofProperty(workspace.CurrentCamera, "CameraType")
 	workspace.CurrentCamera.CameraSubject = speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	workspace.CurrentCamera.CameraType = "Custom"
