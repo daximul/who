@@ -29,6 +29,8 @@ end
 
 Import("asset_creator.lua")
 
+Prote = Import("prote.lua")
+
 local GUI = Import("interface.lua")
 local Main = GUI.Main
 local Cmdbar = Main.Box
@@ -46,7 +48,6 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-Prote = Import("prote.lua")
 local DAMouse = Players.LocalPlayer:GetMouse()
 local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
