@@ -666,7 +666,7 @@ notify = function(Title, Message, Duration)
 	end)
 end
 
-bignotify = function(Title, Message, Duration)
+local bignotify = function(Title, Message, Duration)
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
 		local Desc = tostring(Message)
@@ -749,7 +749,7 @@ CheckMouseMovement = function()
 			else
 				xP = x + 5
 			end
-			if DAMouse.Y > (DAMouse.ViewSizeY-96) then
+			if DAMouse.Y > (DAMouse.ViewSizeY - 96) then
 				yP = y - 20
 			else
 				yP = y
@@ -778,7 +778,7 @@ end
 
 FindInTable = function(tbl,val)
 	if tbl == nil then return false end
-	for _,v in pairs(tbl) do
+	for _, v in pairs(tbl) do
 		if v == val then return true end
 	end 
 	return false
@@ -865,7 +865,7 @@ GetInTable = function(Table, Name)
 	return false
 end
 
-fixcam = function(speaker)
+local fixcam = function(speaker)
 	workspace.CurrentCamera:remove()
 	wait(.1)
 	repeat wait() until speaker.Character ~= nil
@@ -4987,7 +4987,7 @@ newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args,
 end)
 
 newCmd("tpposition", {"tppos"}, "tpposition / tppos [X] [Y] [Z]", "Teleports you to certain coordinates", function(args, speaker)
-	if #args < 3 then return notify("Tp Position", "Missing Arguments (" .. #args .. "/3)") end
+	if #args < 3 then return notify("Arguments Required", #args .. " / 3") end
 	local Pos = {
 		X = tonumber(args[1]),
 		Y = tonumber(args[2]),
@@ -5000,7 +5000,7 @@ newCmd("tpposition", {"tppos"}, "tpposition / tppos [X] [Y] [Z]", "Teleports you
 end)
 
 newCmd("tweentpposition", {"ttppos"}, "tweentpposition / ttppos [X] [Y] [Z]", "Tween to coordinates (bypasses some anti cheats)", function(args, speaker)
-	if #args < 3 then return notify("TweenTp Position", "Missing Arguments (" .. #args .. "/3)") end
+	if #args < 3 then return notify("Arguments Required", #args .. " / 3") end
 	local Pos = {
 		X = tonumber(args[1]),
 		Y = tonumber(args[2]),
