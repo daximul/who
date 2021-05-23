@@ -32,6 +32,7 @@ Import("asset_creator.lua")
 local GUI = Import("interface.lua")
 local Main = GUI.Main
 local Cmdbar = Main.Box
+Prote.ProtectInstance(Cmdbar, true)
 local Assets = GUI.Assets
 local CMDsF = GUI.CMDS.Border.Frame.ScrollingFrame
 local NotificationTemplate = GUI.NotificationTemplate
@@ -39,6 +40,7 @@ local CommandsGui = GUI.CMDS
 local CmdSu = GUI.Main.cmdsu
 local PluginBrowser = GUI.PluginBrowser
 local DaUi = GUI.DaUi
+Prote.ProtectInstance(DaUi.CmdSearch, true)
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -1939,7 +1941,7 @@ local GetHandleTools = function(p)
 	return r
 end
 
-sFLY = function(vfly)
+local sFLY = function(vfly)
 	repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid')
 	repeat wait() until DAMouse
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
@@ -1948,12 +1950,14 @@ sFLY = function(vfly)
 	local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 	local SPEED = 0
 
-	local function FLY()
+	local FLY = function()
 		FLYING = true
-		local BG = Instance.new("BodyGyro", getRoot(Players.LocalPlayer.Character))
-		local BV = Instance.new("BodyVelocity", getRoot(Players.LocalPlayer.Character))
+		local BG = Instance.new("BodyGyro")
+		local BV = Instance.new("BodyVelocity")
 		Prote.ProtectInstance(BG)
 		Prote.ProtectInstance(BV)
+		BG.Parent = getRoot(Players.LocalPlayer.Character)
+		BV.Parent = getRoot(Players.LocalPlayer.Character)
 		BG.P = 9e4
 		local T = getRoot(Players.LocalPlayer.Character)
 		BG.Parent = T
@@ -2029,7 +2033,7 @@ sFLY = function(vfly)
 	FLY()
 end
 
-NOFLY = function()
+local NOFLY = function()
 	FLYING = false
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
@@ -2051,17 +2055,19 @@ r15 = function(speaker)
 	end
 end
 
-respawn = function(plr)
+local respawn = function(plr)
 	local char = plr.Character
 	char:ClearAllChildren()
-	local newChar = Instance.new("Model", workspace)
+	local newChar = Instance.new("Model")
+	Prote.ProtectInstance(newChar)
+	newChar.Parent = workspace
 	plr.Character = newChar
 	wait()
 	plr.Character = char
 	newChar:Destroy()
 end
 
-refresh = function(plr)
+local refresh = function(plr)
 	spawn(function()
 		refreshCmd = true
 		local rpos = plr.Character.HumanoidRootPart.Position
@@ -2078,7 +2084,7 @@ refresh = function(plr)
 	end)
 end
 
-attach = function(speaker, target)
+local attach = function(speaker, target)
 	if tools(speaker) then
 		local chara = speaker.Character
 		local tchar = target.Character
@@ -2281,7 +2287,7 @@ local Locate = function(plr)
 						teamChange:Disconnect()
 					end
 				end)
-				local function lcLoop()
+				local lcLoop = function()
 					if CoreGui:FindFirstChild(plr.Name .. "_LC") then
 						if plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid") and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 							local pos = math.floor((getRoot(Players.LocalPlayer.Character).Position - getRoot(plr.Character).Position).magnitude)
@@ -2940,7 +2946,7 @@ newCmd("loopspeed", {"loopws"}, "loopspeed / loopws [num]", "Loops your Walkspee
 	if isNumber(speed) then
 		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
 		local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
-		local function WalkSpeedChange()
+		local WalkSpeedChange = function()
 			if Char and Human then
 				Prote.SpoofProperty(Human, "WalkSpeed")
 				Human.WalkSpeed = speed
@@ -2980,7 +2986,7 @@ newCmd("loopjumppower", {"loopjp"}, "loopjumppower / loopjp [num]", "Loops your 
 	if isNumber(jpower) then
 		local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
 		local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
-		local function JumpPowerChange()
+		local JumpPowerChange = function()
 			if Char and Human then
 				Prote.SpoofProperty(Human, "JumpPower")
 				Human.JumpPower = jpower
@@ -3175,10 +3181,12 @@ newCmd("gyrofly", {"gfly"}, "gyrofly / gfly [speed]", "Make your Character Fly U
             v:Destroy()
         end
     end
-    local BodyPos = Instance.new("BodyPosition", getRoot(speaker.Character))
-    local BodyGyro = Instance.new("BodyGyro", getRoot(speaker.Character))
+    local BodyPos = Instance.new("BodyPosition")
+    local BodyGyro = Instance.new("BodyGyro")
     Prote.ProtectInstance(BodyPos)
     Prote.ProtectInstance(BodyGyro)
+    BodyPos.Parent = getRoot(speaker.Character)
+    BodyGyro.Parent = getRoot(speaker.Character)
     BodyGyro.maxTorque = Vector3.new(1, 1, 1) * 9e9
     BodyGyro.CFrame = getRoot(speaker.Character).CFrame
     BodyPos.maxForce = Vector3.new(1, 1, 1) * math.huge
@@ -3406,7 +3414,7 @@ newCmd("float", {}, "float", "Walk On An Invisible Part to Look Like You Are Flo
 				eDown:Disconnect()
 				floatDied:Disconnect()
 			end)
-			local function FloatPadLoop()
+			local FloatPadLoop = function()
 				if pchar:FindFirstChild(floatName) and getRoot(pchar) then
 					Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0, FloatValue, 0)
 				else
@@ -3554,9 +3562,9 @@ end)
 newCmd("btools", {}, "btools", "Building Tools", function(args, speaker)
 	if findbp() then
 		local Backpack = getbp()
-		Prote.ProtectInstance(Backpack)
 		for i = 1, 4 do
 			local Bin = Instance.new("HopperBin")
+			Prote.ProtectInstance(Bin)
 			Bin.BinType = i
 			Bin.Parent = Backpack
 		end
@@ -3575,8 +3583,8 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 		wait(0.2)
 		local Dex = game:GetObjects("rbxassetid://3567096419")[1]
 		ParentGui(Dex)
-		local function Load(Obj, Url)
-			local function GiveOwnGlobals(Func, Script)
+		local Load = function(Obj, Url)
+			local GiveOwnGlobals = function(Func, Script)
 				local Fenv = {}
 				local RealFenv = {script = Script}
 				local FenvMt = {}
@@ -3598,7 +3606,7 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 				setfenv(Func, Fenv)
 				return Func
 			end
-			local function LoadScripts(Script)
+			local LoadScripts = function(Script)
 				if Script.ClassName == "Script" or Script.ClassName == "LocalScript" then
 					spawn(function()
 						GiveOwnGlobals(loadstring(Script.Source, "=" .. Script:GetFullName()), Script)()
@@ -3670,8 +3678,6 @@ newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/
 	for i,v in pairs(speaker.Character:GetDescendants()) do
 		if v:IsA("Tool") then
 			if args[1] then
-				Prote.SpoofProperty(v.Handle, "Size")
-				Prote.SpoofProperty(v.Handle, "Massless")
 				currentToolSize = v.Handle.Size
 				currentGripPos = v.GripPos
 				local a = Instance.new("SelectionBox")
@@ -3679,13 +3685,13 @@ newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/
 				a.Name = selectionBoxName
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
+				Prote.SpoofProperty(v.Handle, "Size")
+				Prote.SpoofProperty(v.Handle, "Massless")
 				v.Handle.Massless = true
 				v.Handle.Size = Vector3.new(0.5, 0.5, args[1])
 				v.GripPos = Vector3.new(0, 0, 0)
 				gethum():UnequipTools()
 			else
-				Prote.SpoofProperty(v.Handle, "Size")
-				Prote.SpoofProperty(v.Handle, "Massless")
 				currentToolSize = v.Handle.Size
 				currentGripPos = v.GripPos
 				local a = Instance.new("SelectionBox")
@@ -3693,6 +3699,8 @@ newCmd("reach", {}, "reach [number]", "Put reach on the currently equipped tool/
 				a.Name = selectionBoxName
 				a.Parent = v.Handle
 				a.Adornee = v.Handle
+				Prote.SpoofProperty(v.Handle, "Size")
+				Prote.SpoofProperty(v.Handle, "Massless")
 				v.Handle.Massless = true
 				v.Handle.Size = Vector3.new(0.5, 0.5, 60)
 				v.GripPos = Vector3.new(0, 0, 0)
@@ -3715,7 +3723,12 @@ newCmd("unreach", {"noreach"}, "unreach / noreach", "Disable Reach", function(ar
 end)
 
 newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
-	local FOV = tonumber(args[1]) or origsettings.Camera.Fov or 70
+	local FOV = 0
+	if args[1] then
+		FOV = tonumber(args[1])
+	else
+		FOV = origsettings.Camera.Fov or 70
+	end
 	Prote.SpoofProperty(workspace.CurrentCamera, "FieldOfView")
 	workspace.CurrentCamera.FieldOfView = FOV
 end)
@@ -3773,7 +3786,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	    end
 	end
 	
-	function Respawn()
+	Respawn = function()
 	    IsRunning = false
 	    if IsInvis == true then
 	        pcall(function()
@@ -3819,7 +3832,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	SetLocalAnimate(Player.Character, true)
 	SetLocalAnimate(Player.Character, false)
 	
-	function TurnVisible()
+	TurnVisible = function()
 	    if IsInvis == false then return end
 		invisFix:Disconnect()
 		invisDied:Disconnect()
@@ -3877,12 +3890,12 @@ newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", funct
 		Prote.SpoofProperty(workspace.Camera, "CameraSubject")
 		workspace.Camera.CameraSubject = viewing.Character
 		notify("Spectating", Players[v].Name)
-		local function viewDiedFunc()
+		local viewDiedFunc = function()
 			repeat wait() until Players[v].Character ~= nil and getRoot(Players[v].Character)
 			workspace.Camera.CameraSubject = viewing.Character
 		end
 		viewDied = Players[v].CharacterAdded:Connect(viewDiedFunc)
-		local function viewChangedFunc()
+		local viewChangedFunc = function()
 			workspace.Camera.CameraSubject = viewing.Character
 		end
 		viewChanged = workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(viewChangedFunc)
@@ -3907,8 +3920,12 @@ newCmd("fixcam", {}, "fixcam", "Fix/Restore your Camera", function(args, speaker
 	wait(0.1)
 	repeat wait() until speaker.Character ~= nil
 	Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
+	Prote.SpoofProperty(workspace.CurrentCamera, "CameraType")
 	workspace.CurrentCamera.CameraSubject = speaker.Character:FindFirstChildWhichIsA("Humanoid")
 	workspace.CurrentCamera.CameraType = "Custom"
+	Prote.SpoofProperty(speaker, "CameraMinZoomDistance")
+	Prote.SpoofProperty(speaker, "CameraMaxZoomDistance")
+	Prote.SpoofProperty(speaker, "CameraMode")
 	speaker.CameraMinZoomDistance = 0.5
 	speaker.CameraMaxZoomDistance = 400
 	speaker.CameraMode = "Classic"
@@ -3971,6 +3988,7 @@ newCmd("unxray", {}, "unxray", "Restore transparency", function(args, speaker)
 end)
 
 newCmd("enableshiftlock", {"enablesl"}, "enableshiftlock / enablesl", "Enable Shiftlock", function(args, speaker)
+	Prote.SpoofProperty(speaker, "DevEnableMouseLock")
 	speaker.DevEnableMouseLock = true
 	notify("Shiftlock", "Shift Lock is now Available")
 end)
@@ -4056,7 +4074,7 @@ newCmd("printpos", {}, "printpos", "Print Current Position", function(args, spea
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
 	if not curpos then
-		return warn("Missing Character")
+		return notify("Position", "Missing Character")
 	end
 	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
 	print("Current Position: " .. curpos)
@@ -4066,7 +4084,7 @@ newCmd("notifypos", {}, "notifypos", "Notify Current Position", function(args, s
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
 	if not curpos then
-		return warn("Missing Character")
+		return notify("Position", "Missing Character")
 	end
 	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
 	notify("Current Position", curpos)
@@ -4076,7 +4094,7 @@ newCmd("copypos", {}, "copypos", "Copy Current Position to Clipboard", function(
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
 	if not curpos then
-		return warn("Missing Character")
+		return notify("Position", "Missing Character")
 	end
 	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
 	if toClipboard then
@@ -4087,7 +4105,7 @@ end)
 newCmd("swim", {}, "swim", "Become fish", function(args, speaker)
 	Prote.SpoofProperty(workspace, "Gravity")
 	workspace.Gravity = 0
-	local function swimDied()
+	local swimDied = function()
 		workspace.Gravity = 198.2
 		swimming = false
 	end
@@ -4273,7 +4291,7 @@ local CmdNoclipping = nil
 newCmd("noclip", {}, "noclip", "Go Through Objects", function(args, speaker)
 	CmdClip = false
 	wait(0.1)
-	local function NoclipLoop()
+	local NoclipLoop = function()
 		if CmdClip == false and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
 				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
@@ -4327,8 +4345,9 @@ newCmd("spin", {}, "spin [number]", "Spins your character", function(args, speak
 			v:Destroy()
 		end
 	end
-	local Spin = Instance.new("BodyAngularVelocity", getRoot(Players.LocalPlayer.Character))
+	local Spin = Instance.new("BodyAngularVelocity")
 	Prote.ProtectInstance(Spin)
+	Spin.Parent = getRoot(Players.LocalPlayer.Character)
 	Spin.Name = spinName
 	Spin.MaxTorque = Vector3.new(0, math.huge, 0)
 	Spin.AngularVelocity = Vector3.new(0, spinSpeed, 0)
@@ -4345,6 +4364,7 @@ end)
 newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
 	for _, child in pairs(speaker.Character:GetDescendants()) do
 		if child:IsA("BasePart") then
+			Prote.SpoofProperty(child, "CustomPhysicalProperties")
 			child.CustomPhysicalProperties = PhysicalProperties.new(2, 0.3, 0.5)
 		end
 	end
@@ -4352,13 +4372,14 @@ newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
 	wait(0.1)
 	Prote.SpoofProperty(getRoot(speaker.Character), "Velocity")
 	Prote.SpoofProperty(getRoot(speaker.Character), "Anchored")
-	local bambam = Instance.new("BodyAngularVelocity", getRoot(speaker.Character))
+	local bambam = Instance.new("BodyAngularVelocity")
 	Prote.ProtectInstance(bambam)
+	bambam.Parent = getRoot(speaker.Character)
 	bambam.Name = randomString()
 	bambam.AngularVelocity = Vector3.new(0, 311111, 0)
 	bambam.MaxTorque = Vector3.new(0, 311111, 0)
 	bambam.P = math.huge
-	local function PauseFling()
+	local PauseFling = function()
 		if findhum() then
 			if gethum().FloorMaterial == Enum.Material.Air then
 				bambam.AngularVelocity = Vector3.new(0, 0, 0)
@@ -4457,9 +4478,10 @@ newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args,
 	sFLY()
 	Prote.SpoofProperty(workspace.CurrentCamera, "CameraSubject")
 	workspace.CurrentCamera.CameraSubject = root
-	local bambam = Instance.new("BodyThrust", getRoot(speaker.Character))
+	local bambam = Instance.new("BodyThrust")
 	Prote.ProtectInstance(bambam)
-	bambam.Force = Vector3.new(99999,99999*10,99999)
+	bambam.Parent = getRoot(speaker.Character)
+	bambam.Force = Vector3.new(99999, 99999 * 10, 99999)
 	bambam.Location = getRoot(speaker.Character).Position
 end)
 
@@ -4648,9 +4670,13 @@ newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)",
 		sethidden(speaker, "SimulationRadius", math.huge)
 
 		local test = Instance.new("Model")
+		Prote.ProtectInstance(test)
 		local hum  = Instance.new("Humanoid")
+		Prote.ProtectInstance(hum)
 		local animation = Instance.new("Model")
+		Prote.ProtectInstance(animation)
 		local humanoidanimation = Instance.new("Humanoid")
+		Prote.ProtectInstance(humanoidanimation)
 		test.Parent = workspace
 		hum.Parent = test
 		animation.Parent = workspace
@@ -4666,6 +4692,7 @@ newCmd("headless", {}, "headless", "Removes your Head (Uses Simulation Radius)",
 		Players.LocalPlayer.Character = char
 
 		local hum2 = Instance.new("Humanoid")
+		Prote.ProtectInstance(hum2)
 		hum2.Parent = char
 		char:FindFirstChildOfClass("Humanoid").Jump = true
 
@@ -4885,9 +4912,9 @@ newCmd("god", {}, "god", "Makes your character difficult to kill in most games",
 	nHuman.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	local Script = Char.FindFirstChild(Char, "Animate")
 	if Script then
-		Script.Disabled = true
+		SetLocalAnimate(Char, true)
 		wait()
-		Script.Disabled = false
+		SetLocalAnimate(Char, false)
 	end
 	nHuman.Health = nHuman.MaxHealth
 end)
@@ -5011,10 +5038,10 @@ newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows your Camera to go Th
 	for _, v in pairs(getgc()) do
 		if type(v) == "function" and getfenv(v).script == pop then
 			for i, v1 in pairs(gc(v)) do
-				if tonumber(v1) == .25 then
+				if tonumber(v1) == 0.25 then
 					sc(v, i, 0)
 				elseif tonumber(v1) == 0 then
-					sc(v, i, .25)
+					sc(v, i, 0.25)
 				end
 			end
 		end
@@ -5036,15 +5063,16 @@ newCmd("tpunanchored", {"tpua"}, "tpunanchored / tpua [plr]", "Teleports Unancho
 		local players = getPlayer(args[1], speaker)
 		for i,v in pairs(players) do
 			local Forces = {}
-			for _,part in pairs(workspace:GetDescendants()) do
-				if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
+			for _, part in pairs(workspace:GetDescendants()) do
+				if Players[v].Character:FindFirstChild("Head") and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
 					for i,c in pairs(part:GetChildren()) do
 						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
 							c:Destroy()
 						end
 					end
-					local ForceInstance = Instance.new("BodyPosition", part)
+					local ForceInstance = Instance.new("BodyPosition")
 					Prote.ProtectInstance(ForceInstance)
+					ForceInstance.Parent = part
 					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 					table.insert(Forces, ForceInstance)
 					if not table.find(frozenParts, part) then
@@ -5105,12 +5133,14 @@ newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes
 						end
 					end
 					SetSimulationRadius()
-					local bodypos = Instance.new("BodyPosition", v)
+					local bodypos = Instance.new("BodyPosition")
 					Prote.ProtectInstance(bodypos)
+					bodypos.Parent = v
 					bodypos.Position = v.Position
 					bodypos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-					local bodygyro = Instance.new("BodyGyro", v)
+					local bodygyro = Instance.new("BodyGyro")
 					Prote.ProtectInstance(bodygyro)
+					bodygyro.Parent = v
 					bodygyro.CFrame = v.CFrame
 					bodygyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
 					if not table.find(frozenParts, v) then
@@ -5202,11 +5232,11 @@ end)
 newCmd("teleporttool", {"tptool"}, "teleporttool / tptool", "Gives You a Teleport Tool", function(args, speaker)
 	if findbp() then
 		local Backpack = getbp()
-		Prote.ProtectInstance(Backpack)
-		local TpTool = Instance.new("Tool", Backpack)
+		local TpTool = Instance.new("Tool")
 		Prote.ProtectInstance(TpTool)
 		TpTool.Name = "Teleport Tool"
 		TpTool.RequiresHandle = false
+		TpTool.Parent = Backpack
 		TpTool.Activated:Connect(function()
 			local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
 			local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
@@ -5417,6 +5447,8 @@ newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set
 	if args[1] then
 		local IRL = tonumber(args[1])
 		settings():GetService("NetworkSettings").IncomingReplicationLag = IRL
+	else
+		notify("Replication Lag", "Missing Argument")
 	end
 end)
 
@@ -5453,12 +5485,12 @@ newCmd("clearhats", {}, "clearhats", "Clears Hats in the Workspace", function(ar
 		local Character = Player.Character
 		local Old = Character:FindFirstChild("HumanoidRootPart").CFrame
 		local Hats = {}
-		for _,x in next, workspace:GetChildren() do
+		for _, x in next, workspace:GetChildren() do
 			if x:IsA("Accessory") then
-				table.insert(Hats,x)
+				table.insert(Hats, x)
 			end
 		end
-		for _,getacc in next, Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories() do
+		for _, getacc in next, Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories() do
 			getacc:Destroy()
 		end
 		for i = 1,#Hats do
@@ -5484,11 +5516,13 @@ newCmd("hatspin", {}, "hatspin", "Spins your Character's Accessories", function(
 	execCmd("unhatspin")
 	wait(.5)
 	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
-		local keep = Instance.new("BodyPosition", v.Handle)
+		local keep = Instance.new("BodyPosition")
 		Prote.ProtectInstance(keep)
+		keep.Parent = v.Handle
 		keep.Name = randomString()
-		local spin = Instance.new("BodyAngularVelocity", v.Handle)
+		local spin = Instance.new("BodyAngularVelocity")
 		Prote.ProtectInstance(spin)
+		spin.Parent = v.Handle
 		spin.Name = randomString()
 		spin.Parent = v.Handle
 		v.Handle:FindFirstChildOfClass("Weld"):Destroy()
@@ -5513,7 +5547,7 @@ newCmd("unhatspin", {}, "unhatspin", "Disables Hatspin", function(args, speaker)
 	if spinhats and spinhats ~= nil then
 		spinhats:Disconnect()
 	end
-	for _,v in pairs(speaker.Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories()) do
+	for _, v in pairs(speaker.Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories()) do
 		v.Parent = workspace
 		for i,c in pairs(v.Handle) do
 			if c:IsA("BodyPosition") or c:IsA("BodyAngularVelocity") then
