@@ -74,6 +74,8 @@ local Settings_Path = "Dark Admin/Settings.json"
 local CommandsLoaded = false
 local CommandsAreaLoaded = false
 local PluginCache = nil
+local Loaded_Title = Import("osdate.lua")
+local clientsidebypass = false
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
@@ -100,7 +102,6 @@ local origsettings = {
 	},
 }
 randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
-local clientsidebypass = false
 
 --// Start of Command Variables \\--
 
@@ -5814,5 +5815,5 @@ spawn(function()
 	end
 end)
 notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
-notify("Dark Admin", "Prefix is " .. Settings.Prefix)
+notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
