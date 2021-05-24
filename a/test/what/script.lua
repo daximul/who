@@ -358,22 +358,22 @@ local SmoothDrag = function(frame)
 		return frame.MouseEnter
 	end)
 	if s then
-		frame.Active = true;
+		frame.Active = true
 		event:connect(function()
 			local input = frame.InputBegan:connect(function(key)
 				if key.UserInputType == Enum.UserInputType.MouseButton1 then
-					local objectPosition = Vector2.new(DAMouse.X - frame.AbsolutePosition.X, DAMouse.Y - frame.AbsolutePosition.Y);
+					local objectPosition = Vector2.new(DAMouse.X - frame.AbsolutePosition.X, DAMouse.Y - frame.AbsolutePosition.Y)
 					while heartbeat:wait() and inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
 						pcall(function()
-							frame:TweenPosition(UDim2.new(0, DAMouse.X - objectPosition.X, 0, DAMouse.Y - objectPosition.Y), 'Out', 'Linear', 0.1, true);
+							frame:TweenPosition(UDim2.new(0, DAMouse.X - objectPosition.X, 0, DAMouse.Y - objectPosition.Y), "Out", "Linear", 0.1, true)
 						end)
 					end
 				end
 			end)
-			local leave;
+			local leave
 			leave = frame.MouseLeave:connect(function()
-				input:disconnect();
-				leave:disconnect();
+				input:Disconnect()
+				leave:Disconnect()
 			end)
 		end)
 	end
@@ -395,7 +395,7 @@ ParentGui = function(Gui)
 	end
 end
 
-local SmoothScroll = function(content, SmoothingFactor)
+SmoothScroll = function(content, SmoothingFactor)
 	content.ScrollingEnabled = false
 	local input = content:Clone()
 	input:ClearAllChildren()
@@ -405,7 +405,7 @@ local SmoothScroll = function(content, SmoothingFactor)
 	input.Name = "_smoothinputframe"
 	input.ScrollingEnabled = true
 	input.Parent = content.Parent
-	local function syncProperty(prop)
+	local syncProperty = function(prop)
 		content:GetPropertyChangedSignal(prop):Connect(function()
 			if prop == "ZIndex" then
 				input[prop] = content[prop] + 1
@@ -452,8 +452,8 @@ CaptureCmdBar = function()
 	end)
 end
 
---// Net is patched. Fix this idiot Dax
--- snipdoa
+--// Net is patched. Fix this Dax
+-- Snip
 local SetSimulationRadius = function()
 	spawn(function()
 		Network_Loop = game:GetService("RunService").RenderStepped:Connect(function()
@@ -709,7 +709,7 @@ local bignotify = function(Title, Message, Duration)
 	end)
 end
 
-getText = function(object)
+local getText = function(object)
 	if object ~= nil then
 		if object:FindFirstChild("Desc") ~= nil then
 			return {object.Desc.Value, object:FindFirstChild("Title")}
@@ -793,7 +793,7 @@ end
 
 SetTableContents = function(tbl, bool)
 	if tbl == nil then return end
-	if bool == nil then return end
+	if bool == nil then bool = false end
 	if type(tbl) == "table" then
 		for key in pairs(tbl) do
 			tbl[key] = bool
@@ -802,8 +802,8 @@ SetTableContents = function(tbl, bool)
 end
 
 getRoot = function(char)
-	local rootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
-	return rootPart
+	local RootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+	return RootPart
 end
 
 SetLocalAnimate = function(ch, val)
@@ -849,8 +849,8 @@ toClipboard = function(String)
 		clipBoard(String)
 		notify("Clipboard", "Copied")
 	else
-		notify("Clipboard Error", "Can't use clipboard, printed instead")
 		print("[da]: " .. String)
+		notify("Clipboard Error", "Can't use clipboard, printed instead")
 	end
 end
 
