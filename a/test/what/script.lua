@@ -3575,6 +3575,27 @@ newCmd("f3x", {"fex"}, "f3x / fex", "Building Tools", function(args, speaker)
 	loadstring(game:GetObjects("rbxassetid://4698064966")[1].Source)()
 end)
 
+newCmd("console", {}, "console", "Open the Old Roblox Console", function(args, speaker)
+	notify("Loading", "Hold on a sec")
+	local _, str = pcall(function()
+		return game:HttpGetAsync("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/rbx_console.lua", true)
+	end)
+	local s, e = loadstring(str)
+	if typeof(s) ~= "function" then
+		return
+	end
+	local success, message = pcall(s)
+	if (not success) then
+		if printconsole then
+			printconsole(message)
+		elseif printoutput then
+			printoutput(message)
+		end
+	end
+	wait(1)
+	notify("Console", "Press F9 to Open the Console")
+end)
+
 newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
 	if (not is_sirhurt_closure) and syn then
 		notify("Loading", "Hold on a sec")
@@ -3630,7 +3651,7 @@ end)
 
 newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Load a Remote Spy (SimpleSpy)", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGetAsync(("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua")))();
+	Import("simple_spy.lua")
 end)
 
 newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, speaker)
