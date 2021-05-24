@@ -100,9 +100,7 @@ local origsettings = {
 	},
 }
 randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
-local clientsidebypass = {
-	to = false,
-}
+local clientsidebypass = false
 
 --// Start of Command Variables \\--
 
@@ -3007,7 +3005,7 @@ newCmd("unloopjumppower", {"unloopjp"}, "unloopjumppower / unloopjp", "Disable L
 end)
 
 newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args, speaker)
-	if clientsidebypass.to == false then
+	if clientsidebypass == false then
 		local users = getPlayer(args[1], speaker)
 		for i,v in pairs(users) do
 			if Players[v].Character ~= nil then
@@ -5729,7 +5727,7 @@ newCmd("clientsidebypass", {"clbypass"}, "clientsidebypass / clbypass", "Bypass 
 		Prote.ProtectInstance(getRoot(Players.LocalPlayer.Character))
 		Prote.ProtectInstance(gethum())
 	end)
-	SetTableContents(clientsidebypass, true)
+	clientsidebypass = true
 	Players.LocalPlayer.Character:BreakJoints()
 	notify("Client Bypass", "Enabled")
 end)
@@ -5738,7 +5736,7 @@ newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", 
 	ClientByp:Disconnect()
 	wait()
 	ClientByp = nil
-	SetTableContents(clientsidebypass, false)
+	clientsidebypass = false
 	Players.LocalPlayer.Character:BreakJoints()
 	notify("Client Bypass", "Disabled")
 end)
