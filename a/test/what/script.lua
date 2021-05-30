@@ -4032,13 +4032,11 @@ newCmd("thirdp", {}, "thirdp", "Third Person", function(args, speaker)
 end)
 
 newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function(args, speaker)
-	CoreGui.PurchasePromptApp.PurchasePromptUI.Visible = false
-	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
+	CoreGui.PurchasePromptApp.Visible = false
 end)
 
 newCmd("showprompts", {}, "showprompts", "Continue Receiving Purchase Prompts", function(args, speaker)
-	CoreGui.PurchasePromptApp.PurchasePromptUI.Visible = true
-	CoreGui.PurchasePromptApp.PremiumPromptUI.Visible = false
+	CoreGui.PurchasePromptApp.Visible = true
 end)
 
 newCmd("deletehats", {"nohats"}, "deletehats / nohats", "Delete your Hats", function(args, speaker)
@@ -4863,8 +4861,9 @@ end)
 
 newCmd("light", {}, "light [radius] [brightness] (Client)", "Gives your Player Dynamic Light", function(args, speaker)
 	if speaker and speaker.Character and getRoot(speaker.Character) then
-		local light = Instance.new("PointLight", getRoot(speaker.Character))
+		local light = Instance.new("PointLight")
 		Prote.SpoofInstance(light)
+		light.Parent = getRoot(speaker.Character)
 		light.Name = pointLightName
 		light.Range = 30
 		if args[1] then
@@ -4963,12 +4962,12 @@ newCmd("boostfps", {}, "boostfps", "Lowers Game Quality to Boost FPS", function(
 	Prote.SpoofProperty(Terrain, "WaterWaveSpeed")
 	Prote.SpoofProperty(Terrain, "WaterReflectance")
 	Prote.SpoofProperty(Terrain, "WaterTransparency")
+	Prote.SpoofProperty(Lighting, "GlobalShadows")
+	Prote.SpoofProperty(Lighting, "FogEnd")
 	Terrain.WaterWaveSize = 0
 	Terrain.WaterWaveSpeed = 0
 	Terrain.WaterReflectance = 0
 	Terrain.WaterTransparency = 0
-	Prote.SpoofProperty(Lighting, "GlobalShadows")
-	Prote.SpoofProperty(Lighting, "FogEnd")
 	Lighting.GlobalShadows = false
 	Lighting.FogEnd = 9e9
 	settings().Rendering.QualityLevel = 1
@@ -5260,18 +5259,18 @@ end)
 newCmd("teleporttool", {"tptool"}, "teleporttool / tptool", "Gives You a Teleport Tool", function(args, speaker)
 	if findbp() then
 		local Backpack = getbp()
+		Prote.ProtectInstance(Backpack)
 		local TpTool = Instance.new("Tool")
-		Prote.ProtectInstance(TpTool)
 		TpTool.Name = "Teleport Tool"
 		TpTool.RequiresHandle = false
 		TpTool.Parent = Backpack
 		TpTool.Activated:Connect(function()
 			local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
-			local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
-			if not Char or not HRP then
+			local Root = Char and Char:FindFirstChild("HumanoidRootPart")
+			if not Char or not Root then
 				return notify("Error", "Failed to Find HumanoidRootPart")
 			end
-			HRP.CFrame = CFrame.new(DAMouse.Hit.X, DAMouse.Hit.Y + 3, DAMouse.Hit.Z, select(4, HRP.CFrame:components()))
+			Root.CFrame = CFrame.new(DAMouse.Hit.X, DAMouse.Hit.Y + 3, DAMouse.Hit.Z, select(4, Root.CFrame:components()))
 		end)
 	else
 		notify("Command Error", "Missing Backpack")
@@ -5502,7 +5501,7 @@ newCmd("fps", {"frames"}, "fps / frames", "Notify yourself your Framerate", func
 	local v = game:GetService("RunService").Stepped:Connect(function()
 		fps = fpsget()
 	end)
-	wait(.2)
+	wait(0.2)
 	v:Disconnect()
 	notify("FPS", "Current FPS is " .. fps)
 end)
