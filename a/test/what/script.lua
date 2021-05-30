@@ -4031,18 +4031,77 @@ newCmd("thirdp", {}, "thirdp", "Third Person", function(args, speaker)
 	speaker.CameraMode = "Classic"
 end)
 
-newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function(args, speaker)
-	CoreGui.PurchasePromptApp.Visible = false
-end)
-
 newCmd("showprompts", {}, "showprompts", "Continue Receiving Purchase Prompts", function(args, speaker)
 	CoreGui.PurchasePromptApp.Visible = true
+end)
+
+newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function(args, speaker)
+	CoreGui.PurchasePromptApp.Visible = false
 end)
 
 newCmd("deletehats", {"nohats"}, "deletehats / nohats", "Delete your Hats", function(args, speaker)
 	if Players.LocalPlayer and Players.LocalPlayer.Character and findhum() then
 		gethum():RemoveAccessories()
 	end
+end)
+
+newCmd("grabtools", {}, "grabtools", "Copies Tools from ReplicatedStorage and Lighting", function(args, speaker)
+	local copy = function(instance)
+		for i,c in pairs(instance:GetChildren())do
+			if c:IsA("Tool") or c:IsA("HopperBin") then
+				c:Clone().Parent = speaker:FindFirstChildOfClass("Backpack")
+			end
+			copy(c)
+		end
+	end
+	copy(game:GetService("Lighting"))
+	local copy = function(instance)
+		for i,c in pairs(instance:GetChildren())do
+			if c:IsA("Tool") or c:IsA("HopperBin") then
+				c:Clone().Parent = speaker:FindFirstChildOfClass("Backpack")
+			end
+			copy(c)
+		end
+	end
+	copy(game:GetService("ReplicatedStorage"))
+	notify("Tools", "Copied Tools from ReplicatedStorage and Lighting")
+end)
+
+newCmd("removetools", {}, "removetools", "Removes Tools from Character and Backpack", function(args, speaker)
+	for i,v in pairs(speaker:FindFirstChildOfClass("Backpack"):GetDescendants()) do
+		if v:IsA("Tool") or v:IsA("HopperBin") then
+			v:Destroy()
+		end
+	end
+	for i,v in pairs(speaker.Character:GetDescendants()) do
+		if v:IsA("Tool") or v:IsA("HopperBin") then
+			v:Destroy()
+		end
+	end
+	notify("Tools", "Removed All Tools from Character and Backpack")
+end)
+
+newCmd("copytools", {}, "copytools [plr] (Client)", "Copies a Player's Tools", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		spawn(function()
+			for i,v in pairs(Players[v]:FindFirstChildOfClass("Backpack"):GetChildren()) do
+				if v:IsA("Tool") or v:IsA("HopperBin") then
+					v:Clone().Parent = speaker:FindFirstChildOfClass("Backpack")
+				end
+			end
+		end)
+		notify("Tools", "Copied Tools from " .. Players[v].Name)
+	end
+end)
+
+newCmd("equiptools", {}, "equiptools", "Equips every Tool in your Inventory", function(args, speaker)
+	for i,v in pairs(speaker:FindFirstChildOfClass("Backpack"):GetChildren()) do
+		if v:IsA("Tool") or v:IsA("HopperBin") then
+			v.Parent = speaker.Character
+		end
+	end
+	notify("Tools", "Equipped All Tools")
 end)
 
 newCmd("droptools", {}, "droptools", "Drop your Tools", function(args, speaker)
