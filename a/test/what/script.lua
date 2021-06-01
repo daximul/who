@@ -4368,7 +4368,7 @@ newCmd("dupetools", {}, "dupetools [number]", "Duplicate Tools in your Inventory
 	end
 end)
 
-newCmd("commandcount", {}, "commandcount", "Notify the number of commands", function(args, speaker)
+newCmd("commandcount", {}, "commandcount", "Notify the Amount of Commands", function(args, speaker)
 	notify("Command Count", #cmds)
 end)
 
