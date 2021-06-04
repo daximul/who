@@ -63,7 +63,7 @@ local Settings = {
 	ChatLogs = false,
 	JoinLogs = false,
 	KeepDA = false,
-	AutoNet = true,
+	AutoNet = false,
 	cmdautorj = false,
 }
 
@@ -1673,7 +1673,7 @@ local LoadSettings = function()
 					if json.ChatLogs ~= nil then Settings.ChatLogs = json.ChatLogs else Settings.ChatLogs = false end
 					if json.JoinLogs ~= nil then Settings.JoinLogs = json.JoinLogs else Settings.JoinLogs = false end
 					if json.KeepDA ~= nil then Settings.KeepDA = json.KeepDA else Settings.KeepDA = false end
-					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = true end
+					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = false end
 					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
 				end)
 				if not success then
@@ -1704,7 +1704,7 @@ local LoadSettings = function()
 				Settings.ChatLogs = false
 				Settings.JoinLogs = false
 				Settings.KeepDA = false
-				Settings.AutoNet = true
+				Settings.AutoNet = false
 				Settings.cmdautorj = false
 				
 				notify("", "There was a problem writing a save file to your PC")
@@ -1720,7 +1720,7 @@ local LoadSettings = function()
 		Settings.ChatLogs = false
 		Settings.JoinLogs = false
 		Settings.KeepDA = false
-		Settings.AutoNet = true
+		Settings.AutoNet = false
 		Settings.cmdautorj = false
 	end
 end
