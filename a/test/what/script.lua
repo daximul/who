@@ -1,4 +1,4 @@
-if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end
+pcall(function() if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end end)
 
 _UnD = _UnD or false
 if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
