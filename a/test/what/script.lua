@@ -1,13 +1,14 @@
-pcall(function() if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end end)
-
 _UnD = _UnD or false
 if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
+
+local StarterTick = StarterTick or tick() or os.clock()
+
 if game:IsLoaded() and _UnD and syn then
 	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
 end
 
-local StarterTick = StarterTick or tick() or os.clock()
+if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end
 
 local Import = function(Asset)
 	if (type(Asset) == "number") then
@@ -5877,6 +5878,39 @@ newCmd("joinplayer", {"jplr"}, "joinplayer / jplr [user / id] [place id]", "Join
 	JoinServer(args[1], args[2])
 end)
 
+newCmd("changeteam", {"team"}, "changeteam / team [name]", "Change your Team (Game must have a Touchable SpawnLocation for Team)", function(args, speaker)
+	local TeamString = tostring(args[1])
+	local Team = game:GetService("Teams"):FindFirstChild(TeamString)
+	if not Team then return notify("Team Error", "Team " .. '"' .. TeamString .. '"' .. " does not Exist") end
+	local TouchedPart = {}
+	local firetouch = firetouchinterest or function(part1, part2, toggle)
+		if part1 and part2 then
+			if toggle == 0 then
+				TouchedPart[1] = part1.CFrame
+				part1.CFrame = part2.CFrame
+			else
+				part1.CFrame = TouchedPart[1]
+				TouchedPart[1] = nil
+			end
+		end
+	end
+    for i,v in next, workspace:GetDescendants() do
+    	if (v:IsA("SpawnLocation")) and (v.BrickColor == Team.TeamColor) then
+    		local RootPart = getRoot(Players.LocalPlayer.Character)
+    		if RootPart then
+    			firetouch(v, RootPart, 0)
+    			firetouch(v, RootPart, 1)
+    			break
+    		end
+    	end
+    end
+    wait(0.1)
+    if Players.LocalPlayer.Team == Team then
+    	notify("Team Changed", "Changed Team to " .. tostring(Team.Name))
+    else
+    	notify("Team Error", "Couldn't Change Team to " .. tostring(Team.Name))
+    end
+end)
 
 
 end)
