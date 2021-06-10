@@ -8,7 +8,11 @@ if game:IsLoaded() and _UnD and syn then
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
 end
 
-if (getgenv()["da_env"] and getgenv()["da_env"]["loaded"]) then return getgenv()["da_env"]["running_error"]() end
+if getgenv()["da_env"] ~= nil then
+	if getgenv()["da_env"]["loaded"] == true then
+		return getgenv()["da_env"]["running_error"]()
+	end
+end
 
 local Import = function(Asset)
 	if (type(Asset) == "number") then
