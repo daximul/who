@@ -78,6 +78,7 @@ local DEBUG = false
 local Settings_Path = "Dark Admin/Settings.json"
 local CommandsLoaded = false
 local CommandsAreaLoaded = false
+local BrowserLoaded = false
 local PluginCache = nil
 local Loaded_Title = Import("osdate.lua")
 local clientsidebypass = false
@@ -184,9 +185,7 @@ local RestartEffects = function()
 	end)
 end
 
-Players.LocalPlayer.CharacterAdded:Connect(function()
-	RestartEffects()
-end)
+Players.LocalPlayer.CharacterAdded:Connect(function() RestartEffects() end)
 
 CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChildWhichIsA("Frame").DescendantAdded:Connect(function(Overlay)
 	if cmdautorj == true then
@@ -2375,44 +2374,14 @@ local teleport = function(speaker, target, target2, fast)
 	end
 end
 
-local BrowserBtn = function(name, plugname, plugdesc, source)
-	local PlugAreaTemplate = Assets.PlugAreaTemplate:Clone()
-	local PlugName = PlugAreaTemplate.PlugName
-	local PlugDesc = PlugAreaTemplate.PlugDesc
-	local PlugAdd = PlugAreaTemplate.PlugAdd
-	local PlugRemove = PlugAreaTemplate.PlugRemove
-	local BrowserLabel = Assets.BrowserLabel:Clone()
-	local OldFileName = string.lower(name)
-	local NewFileName = string.gsub(OldFileName, " ", "")
-	local ExtensionFile = ("Dark Admin/Plugins/" .. NewFileName .. ".da")
-	PlugAreaTemplate.Parent = PluginBrowser.Container
-	BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
-	BrowserLabel.Visible = true
-	PlugName.Text = ("Plugin Name: " .. name)
-	PlugDesc.Text = ("Plugin Description:\n" .. plugdesc)
-	BrowserLabel.Label.Text = name
-	BrowserLabel.MouseButton1Down:Connect(function()
-		for idk,okay in pairs(PluginBrowser.Container:GetChildren()) do
-			okay.Visible = false
-			PluginBrowser.Area.Visible = false
-			PlugAreaTemplate.Visible = true
-		end
-	end)
-	PlugAdd.MouseButton1Down:Connect(function()
-		if not isfile(ExtensionFile) then
-			writefile(ExtensionFile, source)
-			wait(0.2)
-			addPlugin(NewFileName)
-			updatesaves()
-		else
-			addPlugin(NewFileName)
-			updatesaves()
-		end
-	end)
-	PlugRemove.MouseButton1Down:Connect(function()
-		deletePlugin(NewFileName)
-		updatesaves()
-	end)
+local BrowserList = {}
+local BrowserBtn = function(plugin_name, plugin_name, plugin_description, plugin_source)
+	BrowserList[#BrowserList + 1] = {
+		name = plugin_name,
+		plugname = plugin_name,
+		plugdesc = plugin_description,
+		source = plugin_source,
+	}
 end
 
 Cmdbar:GetPropertyChangedSignal("Text"):Connect(function()
@@ -2494,7 +2463,7 @@ end
 
 --// Setup Admin & Ui & Plugin Browser
 spawn(function()
-	ParentGui(GUI)
+	pcall(function() ParentGui(GUI) end)
 	spawn(function()
 		Startup()
 		SmoothDrag(CommandsGui)
@@ -2771,7 +2740,7 @@ spawn(function()
 	end)
 	spawn(function()
 		if syn and syn.queue_on_teleport and Settings.KeepDA then
-			syn.queue_on_teleport('loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua")))();')
+			syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 		end
 	end)
 	spawn(function()
@@ -2824,6 +2793,52 @@ newCmd("ui", {}, "ui", "Open the Dark Admin UI", function(args, speaker)
 end)
 
 newCmd("browser", {}, "browser", "Open the Plugin Browser", function(args, speaker)
+	if not BrowserLoaded then
+		BrowserLoaded = true
+		for _, v in next, BrowserList do
+			local name = v["name"]
+			local plugname = v["plugdesc"]
+			local plugdesc = v["plugdesc"]
+			local source = v["source"]
+			local PlugAreaTemplate = Assets.PlugAreaTemplate:Clone()
+			local PlugName = PlugAreaTemplate.PlugName
+			local PlugDesc = PlugAreaTemplate.PlugDesc
+			local PlugAdd = PlugAreaTemplate.PlugAdd
+			local PlugRemove = PlugAreaTemplate.PlugRemove
+			local BrowserLabel = Assets.BrowserLabel:Clone()
+			local OldFileName = string.lower(name)
+			local NewFileName = string.gsub(OldFileName, " ", "")
+			local ExtensionFile = ("Dark Admin/Plugins/" .. NewFileName .. ".da")
+			PlugAreaTemplate.Parent = PluginBrowser.Container
+			BrowserLabel.Parent = PluginBrowser.Area.ScrollingFrame
+			BrowserLabel.Visible = true
+			PlugName.Text = ("Plugin Name: " .. name)
+			PlugDesc.Text = ("Plugin Description:\n" .. plugdesc)
+			BrowserLabel.Label.Text = name
+			BrowserLabel.MouseButton1Down:Connect(function()
+				for idk,okay in pairs(PluginBrowser.Container:GetChildren()) do
+					okay.Visible = false
+					PluginBrowser.Area.Visible = false
+					PlugAreaTemplate.Visible = true
+				end
+			end)
+			PlugAdd.MouseButton1Down:Connect(function()
+				if not isfile(ExtensionFile) then
+					writefile(ExtensionFile, source)
+					wait(0.2)
+					addPlugin(NewFileName)
+					updatesaves()
+				else
+					addPlugin(NewFileName)
+					updatesaves()
+				end
+			end)
+			PlugRemove.MouseButton1Down:Connect(function()
+				deletePlugin(NewFileName)
+				updatesaves()
+			end)
+		end
+	end
 	PlugBrowseStatus(true)
 end)
 
@@ -5931,6 +5946,7 @@ spawn(function()
 		FindPlugins(Settings.PluginsTable)
 	end
 end)
+wait(0.1)
 notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
 notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
