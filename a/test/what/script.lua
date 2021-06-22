@@ -1,9 +1,10 @@
-_UnD = _UnD or false
-if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
+local game = game
+local _UnD = _UnD or false
+if not _UnD and not game.IsLoaded(game) then game.Loaded.Wait(game.Loaded) end
 
-local StarterTick = StarterTick or tick() or os.clock()
+local StarterTick = StarterTick or tick()
 
-if game:IsLoaded() and _UnD and syn then
+if game.IsLoaded(game) and _UnD and syn then
 	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
 end
@@ -5947,6 +5948,6 @@ spawn(function()
 	end
 end)
 wait(0.1)
-notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
+notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() - StarterTick))
 notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
