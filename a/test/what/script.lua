@@ -1,10 +1,9 @@
-local game = game
-local _UnD = _UnD or false
-if not _UnD and not game.IsLoaded(game) then game.Loaded.Wait(game.Loaded) end
+_UnD = _UnD or false
+if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
 
-local StarterTick = StarterTick or tick()
+local StarterTick = StarterTick or tick() or os.clock()
 
-if game.IsLoaded(game) and _UnD and syn then
+if game:IsLoaded() and _UnD and syn then
 	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
 end
@@ -5932,6 +5931,18 @@ newCmd("changeteam", {"team"}, "changeteam / team [name]", "Change your Team (Ga
     end
 end)
 
+newCmd("hidename", {"hidebill"}, "hidename / hidebill", "Hide Billboard Nametag", function(args, speaker)
+	local character = Players.LocalPlayer.Character
+	local bill = character:FindFirstChildWhichIsA("BillboardGui", true)
+	if not bill then return notify("Hide Name", "No Player Tag Found") end
+	for i,v in next, game:GetDescendants(character) do
+		if v:IsA("BillboardGui") then
+			v:Destroy()
+		end
+	end
+	notify("Hide Name", "Player Tag Hidden")
+end)
+
 
 end)
 
@@ -5948,6 +5959,6 @@ spawn(function()
 	end
 end)
 wait(0.1)
-notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() - StarterTick))
+notify("Loaded", ("Loaded in %.3f Seconds"):format((tick() or os.clock()) - StarterTick))
 notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
 --// Dark Admin;
