@@ -8,11 +8,6 @@ end
 
 local StarterTick = StarterTick or tick() or os.clock()
 
-if game:IsLoaded() and syn then
-	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
-	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
-end
-
 local Import = function(Asset)
 	if (type(Asset) == "number") then
 		return game:GetObjects("rbxassetid://" .. Asset)[1]
