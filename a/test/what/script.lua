@@ -1,17 +1,16 @@
-_UnD = _UnD or false
-if not _UnD and not game:IsLoaded() then game["Loaded"]:Wait() end
+if (not game:IsLoaded()) then game.Loaded:Wait() end
+
+if getgenv().da_env ~= nil then
+	if getgenv().da_env.loaded == true then
+		return getgenv().da_env.running_error()
+	end
+end
 
 local StarterTick = StarterTick or tick() or os.clock()
 
-if game:IsLoaded() and _UnD and syn then
+if game:IsLoaded() and syn then
 	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 	return game:GetService("TeleportService").TeleportToPlaceInstance(game:GetService("TeleportService"), game.PlaceId, game.JobId)
-end
-
-if getgenv()["da_env"] ~= nil then
-	if getgenv()["da_env"]["loaded"] == true then
-		return getgenv()["da_env"]["running_error"]()
-	end
 end
 
 local Import = function(Asset)
