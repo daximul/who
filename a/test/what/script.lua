@@ -6040,16 +6040,17 @@ newCmd("void", {}, "void [plr]", "Void a Player", function(args, speaker)
 	end
 end)
 
-newCmd("car", {}, "car", "Become a literal car", function(args, speaker)
+newCmd("car", {}, "car [speed]", "Become a literal car (Speed argument is optional, Default is 70)", function(args, speaker)
 	if not speaker then return notify("Car", "Missing LocalPlayer") end
 	if not speaker.Character then return notify("Car", "Missing Character") end
 	if not speaker.Character:FindFirstChildWhichIsA("Humanoid") then return notify("Car", "Missing Humanoid") end
 	if not speaker.Character:FindFirstChild("Animate") then return notify("Car", "Missing LocalAnimate") end
 	local Human = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	local carSpeed = tonumber(args[1]) or 70
 	if Human.RigType == Enum.HumanoidRigType.R6 then
 		Prote.SpoofProperty(Human, "WalkSpeed")
 		Prote.SpoofProperty(Human, "JumpPower")
-		Human.WalkSpeed = 70
+		Human.WalkSpeed = carSpeed
 		Human.JumpPower = 0.0001
 		Players.LocalPlayer.Character.Animate.walk.WalkAnim.AnimationId = "rbxassetid://129342287"
 		Players.LocalPlayer.Character.Animate.run.RunAnim.AnimationId = "rbxassetid://129342287"
@@ -6068,7 +6069,7 @@ newCmd("car", {}, "car", "Become a literal car", function(args, speaker)
 	if Human.RigType == Enum.HumanoidRigType.R15 then
 		Prote.SpoofProperty(Human, "WalkSpeed")
 		Prote.SpoofProperty(Human, "JumpPower")
-		Human.WalkSpeed = 70
+		Human.WalkSpeed = carSpeed
 		Human.JumpPower = 0.0001
 		Players.LocalPlayer.Character.Animate.walk.WalkAnim.AnimationId = "rbxassetid://3360694441"
 		Players.LocalPlayer.Character.Animate.run.RunAnim.AnimationId = "rbxassetid://3360694441"
