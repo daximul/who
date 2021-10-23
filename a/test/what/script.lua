@@ -131,7 +131,10 @@ local CmdNoclipping = nil
 local Noclipping = nil
 local Clip = true
 local viewing = nil
-local fcRunning = false
+local isAutoClicking = false
+local AutoclickerInput = nil
+local AutomaticKeyPressing = false
+local AutoKeyPressInput = nil
 local ESPenabled = false
 local swimming = false
 local cmdflinging = false
@@ -145,6 +148,7 @@ local invisRunning = false
 local spinhats = nil
 local BubbleChatFix = nil
 local CflyCon = nil
+local KeyCodeMap = {["0"]=0x30,["1"]=0x31,["2"]=0x32,["3"]=0x33,["4"]=0x34,["5"]=0x35,["6"]=0x36,["7"]=0x37,["8"]=0x38,["9"]=0x39,["a"]=0x41,["b"]=0x42,["c"]=0x43,["d"]=0x44,["e"]=0x45,["f"]=0x46,["g"]=0x47,["h"]=0x48,["i"]=0x49,["j"]=0x4A,["k"]=0x4B,["l"]=0x4C,["m"]=0x4D,["n"]=0x4E,["o"]=0x4F,["p"]=0x50,["q"]=0x51,["r"]=0x52,["s"]=0x53,["t"]=0x54,["u"]=0x55,["v"]=0x56,["w"]=0x57,["x"]=0x58,["y"]=0x59,["z"]=0x5A,["enter"]=0x0D,["shift"]=0x10,["ctrl"]=0x11,["alt"]=0x12,["pause"]=0x13,["capslock"]=0x14,["spacebar"]=0x20,["pageup"]=0x21,["pagedown"]=0x22,["end"]=0x23,["home"]=0x24,["left"]=0x25,["up"]=0x26,["right"]=0x27,["down"]=0x28,["insert"]=0x2D,["delete"]=0x2E,["f1"]=0x70,["f2"]=0x71,["f3"]=0x72,["f4"]=0x73,["f5"]=0x74,["f6"]=0x75,["f7"]=0x76,["f8"]=0x77,["f9"]=0x78,["f10"]=0x79,["f11"]=0x7A,["f12"]=0x7B}
 local Keys = {}
 local DA_Binds = {}
 local ChatlogAPI = {}
@@ -4102,7 +4106,6 @@ newCmd("equiptools", {}, "equiptools", "Equips every Tool in your Inventory", fu
 			v.Parent = speaker.Character
 		end
 	end
-	notify("Tools", "Equipped All Tools")
 end)
 
 newCmd("droptools", {}, "droptools", "Drop your Tools", function(args, speaker)
@@ -4174,36 +4177,28 @@ newCmd("setcreatorid", {}, "setcreatorid", "Set your User ID to the Creator's Us
 	end
 end)
 
-newCmd("printpos", {}, "printpos", "Print Current Position", function(args, speaker)
+newCmd("printposition", {"printpos"}, "printposition / printpos", "Print Current Position", function(args, speaker)
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
-	if not curpos then
-		return notify("Position", "Missing Character")
-	end
-	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
+	if not curpos then return notify("Position", "Missing Character") end
+	curpos = (math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z))
 	print("Current Position: " .. curpos)
 end)
 
-newCmd("notifypos", {}, "notifypos", "Notify Current Position", function(args, speaker)
+newCmd("notifyposition", {"notifypos"}, "notifyposition / notifypos", "Notify Current Position", function(args, speaker)
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
-	if not curpos then
-		return notify("Position", "Missing Character")
-	end
-	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
+	if not curpos then return notify("Position", "Missing Character") end
+	curpos = (math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z))
 	notify("Current Position", curpos)
 end)
 
-newCmd("copypos", {}, "copypos", "Copy Current Position to Clipboard", function(args, speaker)
+newCmd("copyposition", {"copypos"}, "copyposition / copypos", "Copy Current Position to Clipboard", function(args, speaker)
 	local curpos = speaker.Character and (getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart"))
 	curpos = curpos and curpos.Position
-	if not curpos then
-		return notify("Position", "Missing Character")
-	end
-	curpos = math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z)
-	if toClipboard then
-		toClipboard(curpos)
-	end
+	if not curpos then return notify("Position", "Missing Character") end
+	curpos = (math.round(curpos.X) .. ", " .. math.round(curpos.Y) .. ", " .. math.round(curpos.Z))
+	if toClipboard then toClipboard(curpos) end
 end)
 
 newCmd("swim", {}, "swim", "Become fish", function(args, speaker)
@@ -6089,6 +6084,89 @@ newCmd("car", {}, "car", "Become a literal car", function(args, speaker)
 		end
 		Human.HipHeight = "0.56"
 	end
+end)
+
+newCmd("autoclick", {}, "autoclick [click delay] [release delay]", "Automatically clicks your mouse with a set delay", function(args, speaker)
+	if mouse1press and mouse1release then
+		execCmd("unautoclick")
+		wait()
+		local clickDelay = 0.1
+		local releaseDelay = 0.1
+		if args[1] and isNumber(args[1]) then clickDelay = args[1] end
+		if args[2] and isNumber(args[2]) then releaseDelay = args[2] end
+		isAutoClicking = true
+		AutoclickerInput = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+			if not gameProcessedEvent then
+				if (input.KeyCode == Enum.KeyCode.Backspace and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Equals)) or (input.KeyCode == Enum.KeyCode.Equals and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Backspace)) then
+					isAutoClicking = false
+					AutoclickerInput:Disconnect()
+				end
+			end
+		end)
+		notify("Auto Clicker", "Press [backspace] and [=] at the same time to stop")
+		repeat wait(clickDelay)
+			mouse1press()
+			wait(releaseDelay)
+			mouse1release()
+		until isAutoClicking == false
+	else
+		notify("Incompatible Exploit", "Missing mouse1press and mouse1release")
+	end
+end)
+
+newCmd("unautoclick", {}, "unautoclick", "Turns off autoclick", function(args, speaker)
+	isAutoClicking = false
+	if AutoclickerInput ~= nil then
+		AutoclickerInput:Disconnect()
+		AutoclickerInput = nil
+	end
+end)
+
+newCmd("mousesensitivity", {"mousesens"}, "mousesensitivity / mousesens [0 - 10]", "Sets your Mouse Sensitivity to [num] (affects first person and right click drag) (Default is 1)", function(args, speaker)
+	game:GetService("UserInputService").MouseDeltaSensitivity = tonumber(args[1]) or 1
+end)
+
+newCmd("autokeypress", {}, "autokeypress [key] [down delay] [up delay]", "Automatically presses a key with a set delay", function(args, speaker)
+	if keypress and keyrelease and args[1] then
+		local code = KeyCodeMap[tostring(args[1]):lower()]
+		if not code then return notify("Auto Key Press", "Invalid Key") end
+		execCmd("unautokeypress")
+		wait()
+		local clickDelay = 0.1
+		local releaseDelay = 0.1
+		if args[2] and isNumber(args[2]) then clickDelay = args[2] end
+		if args[3] and isNumber(args[3]) then releaseDelay = args[3] end
+		AutomaticKeyPressing = true
+		AutoKeyPressInput = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+			if not gameProcessedEvent then
+				if (input.KeyCode == Enum.KeyCode.Backspace and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Equals)) or (input.KeyCode == Enum.KeyCode.Equals and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Backspace)) then
+					AutomaticKeyPressing = false
+					AutoKeyPressInput:Disconnect()
+				end
+			end
+		end)
+		notify("Auto Key Press", "Press [backspace] and [=] at the same time to stop")
+		repeat wait(clickDelay)
+			keypress(code)
+			wait(releaseDelay)
+			keyrelease(code)
+		until AutomaticKeyPressing == false
+		if AutoKeyPressInput then AutoKeyPressInput:Disconnect() keyrelease(code) end
+	else
+		notify("Incompatible Exploit", "Missing keypress and keyrelease")
+	end
+end)
+
+newCmd("unautokeypress", {}, "unautokeypress", "Stops autokeypress", function(args, speaker)
+	AutomaticKeyPressing = false
+	if AutoKeyPressInput then
+		AutoKeyPressInput:Disconnect()
+		AutoKeyPressInput = nil
+	end
+end)
+
+newCmd("clearcharappearance", {"clearchar", "clrchar"}, "clearcharappearance / clearchar / clrchar", "Removes all Accessories, Shirts, Pants, CharacterMesh, and BodyColors", function(args, speaker)
+	speaker:ClearCharacterAppearance()
 end)
 
 
