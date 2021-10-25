@@ -74,7 +74,7 @@ local Settings = {
 
 local cmds = {}
 local customAlias = {}
-local DEBUG = false
+local AdminDebug = false
 local Settings_Path = "Dark Admin/Settings.json"
 
 local CommandsLoaded = false
@@ -743,6 +743,56 @@ TweenAllTransToObject = function(Object, Time, BeforeObject)
     return Tween
 end
 
+local removeCutOff = function(Object)
+    local Container = Instance.new("Frame")
+    local Hitbox = Instance.new("ImageButton")
+    Container.Name = "Container"
+    Container.Parent = Object.Parent
+    Container.BackgroundTransparency = 1.000
+    Container.BorderSizePixel = 0
+    Container.Position = Object.Position
+    Container.ClipsDescendants = true
+    Container.Size = UDim2.fromOffset(Object.AbsoluteSize.X, Object.AbsoluteSize.Y)
+    Container.ZIndex = Object
+    Object.AutomaticSize = Enum.AutomaticSize.X
+    Object.Size = UDim2.fromScale(1, 1)
+    Object.Position = UDim2.fromScale(0, 0)
+    Object.Parent = Container
+    Object.TextTruncate = Enum.TextTruncate.None
+    Object.ZIndex = Object.ZIndex + 2
+    Hitbox.Name = "Hitbox"
+    Hitbox.Parent = Container.Parent
+    Hitbox.BackgroundTransparency = 1.000
+    Hitbox.Size = Container.Size
+    Hitbox.Position = Container.Position
+    Hitbox.ZIndex = Object.ZIndex + 2
+    local MouseOut = true
+    Hitbox.MouseEnter:Connect(function()
+        if Object.AbsoluteSize.X > Container.AbsoluteSize.X then
+            MouseOut = false
+            repeat
+                local Tween1 = TweenObj(Object, "Quad", "Out", 0.5, {
+                    Position = UDim2.fromOffset(Container.AbsoluteSize.X - Object.AbsoluteSize.X, 0)
+                })
+                wait(Tween1.Completed)
+                wait(2)
+                local Tween2 = TweenObj(Object, "Quad", "Out", 0.5, {
+                    Position = UDim2.fromOffset(0, 0)
+                })
+                wait(Tween2.Completed)
+                wait(2)
+            until MouseOut
+        end
+    end)
+    Hitbox.MouseLeave:Connect(function()
+        MouseOut = true
+        TweenObj(Object, "Quad", "Out", 0.25, {
+            Position = UDim2.fromOffset(0, 0)
+        })
+    end)
+    return Object
+end
+
 CmdBarStatus = function(bool)
 	if bool == true then
 		TweenObj(Main, "Quint", "Out", 0.5, {
@@ -1066,7 +1116,7 @@ execCmd = function(cmdStr, speaker, store)
 				if infTimes then
 					while lastBreakTime < cmdStartTime do
 						local success,err = pcall(cmd.FUNC, args, speaker)
-						if not success and DEBUG then
+						if not success and AdminDebug then
 							warn("Command Error:", cmdName, err)
 						end
 						wait(cmdDelay)
@@ -1077,7 +1127,7 @@ execCmd = function(cmdStr, speaker, store)
 						local success, err = pcall(function()
 							cmd.FUNC(args, speaker)
 						end)
-						if not success and DEBUG then
+						if not success and AdminDebug then
 							warn("Command Error:", cmdName, err)
 						end
 						if cmdDelay ~= 0 then wait(cmdDelay) end
@@ -2517,6 +2567,7 @@ local AddButton = function(Title, Func)
 	NewBtn.Title.Text = tostring(Title)
 	NewBtn.Parent = DaUi.Pages.Menu.Results
 	NewBtn.Visible = true
+	removeCutOff(NewBtn.Title)
 end
 
 local AddSetting = function(Title, Enabled, Callback)
@@ -2526,6 +2577,7 @@ local AddSetting = function(Title, Enabled, Callback)
 	Toggle.Title.Text = tostring(Title)
 	Toggle.Parent = DaUi.Pages.Menu.Results
 	Toggle.Visible = true
+	removeCutOff(Toggle.Title)
 end
 
 spawn(function()
