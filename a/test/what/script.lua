@@ -22,7 +22,38 @@ Import("asset_creator.lua")
 
 Prote = Import("prote.lua")
 
-local GUI = Import("interface.lua")
+
+
+
+local _GetPlayers = game:GetService("Players")
+local _GetMarket = game:GetService("MarketplaceService")
+-- local Interface = game:GetObjects("rbxassetid://7655239104")[1]
+local Interface = game:GetObjects("rbxassetid://7841745482")[1]
+Interface.CommandBar.Position = UDim2.new(0.5, -100, 1, 5)
+Interface.CMDS.Position = UDim2.new(0.694, -75, 10, -105)
+Interface.PluginBrowser.Position = UDim2.new(0.42, -75, 2, -105)
+Interface.MainDragFrame.Position = UDim2.new(0.5, -200, 1.8, -125)
+spawn(function()
+	Interface.MainDragFrame.Main.Pages.Menu.Profile.Image = ("https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(_GetPlayers.LocalPlayer.UserId) .. "&width=420&height=420&format=png")
+	Interface.MainDragFrame.Main.Pages.Server.Game.Id.Text = tostring(game.PlaceId)
+	Interface.MainDragFrame.Main.Pages.Server.Game.By.Text = ("By " .. '<font color="rgb(140, 144, 150)"><b>' .. tostring(_GetPlayers:GetNameFromUserIdAsync(game.CreatorId)) .. "</b></font>")
+	Interface.MainDragFrame.Main.Pages.Server.Game.Title.Text = tostring(_GetMarket:GetProductInfo(game.PlaceId).Name)
+	Interface.MainDragFrame.Main.Pages.Server.Game.Description.DescriptionFrame.Description.Text = tostring(_GetMarket:GetProductInfo(game.PlaceId).Description)
+	Interface.MainDragFrame.Main.Pages.Server.Game.Thumbnail.Image = ("https://www.roblox.com/asset-thumbnail/image?assetId=" .. tostring(game.PlaceId) .. "&width=768&height=432&format=png")
+	local _GetRandomMessage = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/randompost/main/random_phrase.lua")))();
+	if _GetRandomMessage:len() >= 70 then Interface.MainDragFrame.Main.Pages.Menu.Message.Title.TextScaled = true end
+	Interface.MainDragFrame.Main.Pages.Menu.Message.Title.Text = _GetRandomMessage
+	while wait(1) do
+		Interface.MainDragFrame.Main.Pages.Server.Players.PlayersFrame.Players.Text = ('<font color="rgb(140, 144, 150)">' .. tostring(#_GetPlayers:GetPlayers()) .. '</font>/<font color="rgb(140, 144, 150)">' .. tostring(_GetPlayers.MaxPlayers) .. '</font>')
+		Interface.MainDragFrame.Main.Pages.Server.ClientAge.ClientAgeFrame.ClientAge.Text = ('<font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60 / 60)) .. '</font> hr, <font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60)) .. '</font> m')
+	end
+end)
+
+
+
+
+local GUI = Interface
+-- local GUI = Import("interface.lua")
 local Main = GUI.CommandBar
 local Cmdbar = Main.Input
 Prote.ProtectInstance(Cmdbar, true)
@@ -79,9 +110,11 @@ local Settings_Path = "Dark Admin/Settings.json"
 
 local CommandsLoaded = false
 local BrowserLoaded = false
+local ScriptTabLoaded = false
 local IsDaUi = false
 local PluginCache = nil
 local Loaded_Title = Import("osdate.lua")
+local ScriptsHolder = Import("script_table.lua")
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
@@ -2580,6 +2613,30 @@ local AddSetting = function(Title, Enabled, Callback)
 	removeCutOff(Toggle.Title)
 end
 
+local ClearScriptArea = function()
+	spawn(function()
+		ScriptTabLoaded = false
+		for i,v in pairs(DaUi.Pages.Scripts.Results:GetChildren()) do
+			if not v:IsA("UIListLayout") then
+				v:Destroy()
+			end
+		end
+	end)
+end
+
+local CreateScript = function(scriptname, devs, gameid, scrfunction)
+	local log = Assets.ScriptLog:Clone()
+	log.Name = (string.lower(tostring(scriptname)) .. " " .. string.lower(tostring(devs)) .. " " .. string.lower(tostring(gameid)))
+	log.ScriptName.Text = tostring(scriptname)
+	log.Creator.Text = tostring(devs)
+	log.Compatibility.Text = tostring(gameid)
+	log.Execute.MouseButton1Down:Connect(function()
+		pcall(scrfunction)
+	end)
+	log.Parent = DaUi.Pages.Scripts.Results
+	log.Visible = true
+end
+
 spawn(function()
 	pcall(function() ParentGui(GUI) end)
 	spawn(function()
@@ -2603,11 +2660,24 @@ spawn(function()
 		end)
 	end)
 	spawn(function()
-		PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		DaUi.Pages.Scripts.SearchBar.SearchFrame.Search:GetPropertyChangedSignal("Text"):Connect(function()
+			local Text = string.lower(tostring(DaUi.Pages.Scripts.SearchBar.SearchFrame.Search.Text))
+			for _, v in next, DaUi.Pages.Scripts.Results:GetChildren() do
+				if v:IsA("Frame") then
+					local ScriptString = tostring(v.Name)
+					v.Visible = string.find(string.lower(ScriptString), Text, 1, true)
+				end
+			end
+		end)
 	end)
 	spawn(function()
+		PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		DaUi.Pages.Scripts.Results.CanvasSize = UDim2.new(0, 0, 0, DaUi.Pages.Scripts.Results.UIListLayout.AbsoluteContentSize.Y)
 		PluginBrowser.Area.ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 			PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		DaUi.Pages.Scripts.Results.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			DaUi.Pages.Scripts.Results.CanvasSize = UDim2.new(0, 0, 0, DaUi.Pages.Scripts.Results.UIListLayout.AbsoluteContentSize.Y)
 		end)
 	end)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
@@ -2627,18 +2697,23 @@ spawn(function()
 		DaUiStatus(false)
 	end)
 	DaUi.Menu.Settings.MouseButton1Down:Connect(function()
+		ClearScriptArea()
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.Menu)
 	end)
 	DaUi.Menu.Server.MouseButton1Down:Connect(function()
+		ClearScriptArea()
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.Server)
 	end)
 	DaUi.Menu.ChatLogs.MouseButton1Down:Connect(function()
+		ClearScriptArea()
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.ChatLogs)
 	end)
 	DaUi.Menu.JoinLogs.MouseButton1Down:Connect(function()
+		ClearScriptArea()
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.JoinLogs)
 	end)
 	DaUi.Menu.Commands.MouseButton1Down:Connect(function()
+		ClearScriptArea()
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.Commands)
 		if not CommandsLoaded then
 			CommandsLoaded = true
@@ -2648,6 +2723,15 @@ spawn(function()
 				else
 					addcmdtext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"], true)
 				end
+			end
+		end
+	end)
+	DaUi.Menu.Scripts.MouseButton1Down:Connect(function()
+		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.Scripts)
+		if not ScriptTabLoaded then
+			ScriptTabLoaded = true
+			for _, v in next, ScriptsHolder do
+				CreateScript(v["Name"], v["Dev"], v["ID"], v["Func"])
 			end
 		end
 	end)
