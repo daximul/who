@@ -20,4 +20,39 @@ spawn(function()
 		Interface.MainDragFrame.Main.Pages.Server.ClientAge.ClientAgeFrame.ClientAge.Text = ('<font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60 / 60)) .. '</font> hr, <font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60)) .. '</font> m')
 	end
 end)
+spawn(function()
+	local tweenService = game:GetService("TweenService")
+	local InterfaceTweeningDebounce = false
+	Interface.MainDragFrame.Main.Pages.Settings.PageName.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Interface.MainDragFrame.Main.Pages.Settings.Image.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	local tweenColor = function(instance, rgb, t1me)
+		local tweenGoals = {TextColor3 = rgb}
+		local tweenInfo = TweenInfo.new(t1me, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+		local tween = tweenService:Create(instance, tweenInfo, tweenGoals)
+		tween:Play()
+	end
+	local tweenImageColor = function(instance, rgb, t1me)
+		local tweenGoals = {ImageColor3 = rgb}
+		local tweenInfo = TweenInfo.new(t1me, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+		local tween = tweenService:Create(instance, tweenInfo, tweenGoals)
+		tween:Play()
+	end
+	for i,v in pairs(Interface.MainDragFrame.Main.Menu:GetChildren()) do
+		if v:IsA("TextButton") then
+			v.MouseButton1Down:Connect(function()
+				if InterfaceTweeningDebounce == true then return end
+				InterfaceTweeningDebounce = true
+				tweenColor(v.PageName, Color3.fromRGB(255, 255, 255), 0.2)
+				tweenImageColor(v.Image, Color3.fromRGB(255, 255, 255), 0.2)
+				for i2,v2 in pairs(Interface.MainDragFrame.Main.Menu:GetChildren()) do
+					if (v2:IsA("TextButton")) and (v2 ~= v) then
+						tweenColor(v2.PageName, Color3.fromRGB(208, 205, 201), 0.2)
+						tweenImageColor(v2.Image, Color3.fromRGB(208, 205, 201), 0.2)
+					end
+				end
+				InterfaceTweeningDebounce = false
+			end)
+		end
+	end
+end)
 return Interface
