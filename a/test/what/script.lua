@@ -2600,6 +2600,11 @@ local CreateScript = function(scriptname, devs, gameid, scrfunction)
 	local log = Assets.ScriptLog:Clone()
 	log.Name = (string.lower(tostring(scriptname)) .. " " .. string.lower(tostring(devs)) .. " " .. string.lower(tostring(gameid)))
 	log.ScriptName.Text = tostring(scriptname)
+	if tostring(scriptname):len() >= 23 then
+		log.ScriptName.TextScaled = true
+		log.ScriptName.TextWrapped = true
+		log.ScriptName.RichText = true
+	end
 	log.Creator.Text = tostring(devs)
 	log.Compatibility.Text = tostring(gameid)
 	log.Execute.MouseButton1Down:Connect(function()
