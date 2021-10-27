@@ -2600,9 +2600,7 @@ local CreateScript = function(scriptname, devs, gameid, scrfunction)
 	local log = Assets.ScriptLog:Clone()
 	log.Name = (string.lower(tostring(scriptname)) .. " " .. string.lower(tostring(devs)) .. " " .. string.lower(tostring(gameid)))
 	log.ScriptName.Text = tostring(scriptname)
-	if tostring(scriptname):len() >= 23 then
-		log.ScriptName.TextScaled = true
-		log.ScriptName.TextWrapped = true
+	if tostring(scriptname):len() >= 15 then
 		log.ScriptName.RichText = true
 	end
 	log.Creator.Text = tostring(devs)
