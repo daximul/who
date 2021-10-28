@@ -23,8 +23,6 @@ end)
 spawn(function()
 	local tweenService = game:GetService("TweenService")
 	local InterfaceTweeningDebounce = false
-	Interface.MainDragFrame.Main.Pages.Settings.PageName.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Interface.MainDragFrame.Main.Pages.Settings.Image.ImageColor3 = Color3.fromRGB(255, 255, 255)
 	local tweenColor = function(instance, rgb, t1me)
 		local tweenGoals = {TextColor3 = rgb}
 		local tweenInfo = TweenInfo.new(t1me, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
