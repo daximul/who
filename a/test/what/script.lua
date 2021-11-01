@@ -90,6 +90,7 @@ local ScriptsHolder = loadstring(game:HttpGetAsync(("https://raw.githubuserconte
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
+local RenderStepTable = {}
 local origsettings = {
 	Lighting = {
 		abt = game:GetService("Lighting").Ambient,
@@ -249,12 +250,6 @@ game:GetService("UserInputService").InputEnded:Connect(function(Input, GameProcc
 	end
 end)
 
-local returnGray = function(str)
-	str = tostring(str)
-	local output = '<font color="rgb(140, 144, 150)"><b>'.. str .. '</b></font>'
-	return output
-end
-
 local Time = function()
 	local HOUR = math.floor((tick() % 86400) / 3600)
 	local MINUTE = math.floor((tick() % 3600) / 60)
@@ -266,6 +261,23 @@ local Time = function()
 	SECOND = SECOND < 10 and "0" .. SECOND or SECOND
 	return HOUR .. ":" .. MINUTE .. ":" .. SECOND .. " " .. AP
 end
+
+local BindToRenderStep = function(name, func)
+        name = tostring(name)
+	if RenderStepTable[name] == nil then
+		RenderStepTable[name] = game:GetService("RunService").RenderStepped:Connect(func)
+	end
+end
+
+local UnbindFromRenderStep = function(name)
+        name = tostring(name)
+	if RenderStepTable[name] then
+		RenderStepTable[name]:Disconnect()
+		RenderStepTable[name] = nil
+	end
+end
+
+local runcode = function(func) func() end
 
 ChatlogAPI.loggedTable = {}
 ChatlogAPI.folderPath = ("Dark Admin/Logs/")
