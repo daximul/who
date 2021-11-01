@@ -420,22 +420,22 @@ local function StopFreecam()
 end
 
 local Plugin = {
-	PluginName = "Free Cam",
-	PluginDescription = "f r e e c a m",
-	Commands = {
-		["freecam"] = {
-			["ListName"] = "freecam / fc",
-			["Description"] = "Control Your Camera",
-			["Aliases"] = {"fc"},
-			["Function"] = function(args,speaker)
+	["PluginName"] = "Smooth Freecam",
+	["PluginDescription"] = "",
+	["Commands"] = {
+		["smoothfreecam"] = {
+			["ListName"] = "smoothfreecam / freecam2 / sfc / fc2",
+			["Description"] = "Control your camera in a smooth way",
+			["Aliases"] = {"freecam2", "sfc", "fc2"},
+			["Function"] = function(args, speaker)
 				StartFreecam()
 			end
 		},
-		["unfreecam"] = {
-			["ListName"] = "unfreecam / unfc",
-			["Description"] = "Stop Controlling Your Camera",
-			["Aliases"] = {"unfc"},
-			["Function"] = function(args,speaker)
+		["unsmoothfreecam"] = {
+			["ListName"] = "unsmoothfreecam / unfreecam2 / unsfc / unfc2",
+			["Description"] = "Stop controlling your camera",
+			["Aliases"] = {"unfreecam2", "unsfc", "unfc2"},
+			["Function"] = function(args, speaker)
 				StopFreecam()
 			end
 		},
