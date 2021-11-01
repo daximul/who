@@ -1,6 +1,5 @@
-local Text = ("")
-local Date = os.date("*t")
-local Month = Date["month"]
+local CurrentDate = os.date("*t")
+local Month = CurrentDate["month"]
 
 local Months = {
 	["January"] = 1,
@@ -17,24 +16,12 @@ local Months = {
 	["December"] = 12
 }
 
-if Month == Months["January"] then
-	Text = ("🎉 Dark Admin 🎉")
-elseif Month == Months["April"] then
-	Text = ("🥚 Dark Admin 🥚")
-elseif Month == Months["October"] then
-	Text = ("🎃 Dark Admin 🎃")
-elseif Month == Months["December"] then
-	Text = ("🎄 Dark Admin 🎄")
-elseif Month == Months["November"] then
-	Text = ("🦃 Dark Admin 🦃")
-elseif Month == Months["March"] then
-	Text = ("🍀 Dark Admin 🍀")
-elseif Month == Months["February"] then
-	Text = ("❤️ Dark Admin ❤️")
-else
-	Text = ("Dark Admin")
-end
+if Month == Months["January"] then return "🎉 Dark Admin 🎉" end
+if Month == Months["February"] then return "❤️ Dark Admin ❤️" end
+if Month == Months["March"] then return "🍀 Dark Admin 🍀" end
+if Month == Months["April"] then return "🥚 Dark Admin 🥚" end
+if Month == Months["October"] then return "🎃 Dark Admin 🎃" end
+if Month == Months["November"] then return "🦃 Dark Admin 🦃" end
+if Month == Months["December"] then return "🎄 Dark Admin 🎄" end
 
-if (Text == "") then Text = ("Dark Admin") end
-
-return Text
+return "Dark Admin"
