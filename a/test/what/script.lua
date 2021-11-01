@@ -263,21 +263,21 @@ local Time = function()
 end
 
 local BindToRenderStep = function(name, func)
-        name = tostring(name)
+	name = tostring(name)
 	if RenderStepTable[name] == nil then
 		RenderStepTable[name] = game:GetService("RunService").RenderStepped:Connect(func)
 	end
 end
 
 local UnbindFromRenderStep = function(name)
-        name = tostring(name)
+	name = tostring(name)
 	if RenderStepTable[name] then
 		RenderStepTable[name]:Disconnect()
 		RenderStepTable[name] = nil
 	end
 end
 
-local runcode = function(func) func() end
+local RunCode = function(func) func() end
 
 ChatlogAPI.loggedTable = {}
 ChatlogAPI.folderPath = ("Dark Admin/Logs/")
