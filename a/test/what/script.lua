@@ -157,6 +157,7 @@ local CflyCon = nil
 local KeyCodeMap = {["0"]=0x30,["1"]=0x31,["2"]=0x32,["3"]=0x33,["4"]=0x34,["5"]=0x35,["6"]=0x36,["7"]=0x37,["8"]=0x38,["9"]=0x39,["a"]=0x41,["b"]=0x42,["c"]=0x43,["d"]=0x44,["e"]=0x45,["f"]=0x46,["g"]=0x47,["h"]=0x48,["i"]=0x49,["j"]=0x4A,["k"]=0x4B,["l"]=0x4C,["m"]=0x4D,["n"]=0x4E,["o"]=0x4F,["p"]=0x50,["q"]=0x51,["r"]=0x52,["s"]=0x53,["t"]=0x54,["u"]=0x55,["v"]=0x56,["w"]=0x57,["x"]=0x58,["y"]=0x59,["z"]=0x5A,["enter"]=0x0D,["shift"]=0x10,["ctrl"]=0x11,["alt"]=0x12,["pause"]=0x13,["capslock"]=0x14,["spacebar"]=0x20,["pageup"]=0x21,["pagedown"]=0x22,["end"]=0x23,["home"]=0x24,["left"]=0x25,["up"]=0x26,["right"]=0x27,["down"]=0x28,["insert"]=0x2D,["delete"]=0x2E,["f1"]=0x70,["f2"]=0x71,["f3"]=0x72,["f4"]=0x73,["f5"]=0x74,["f6"]=0x75,["f7"]=0x76,["f8"]=0x77,["f9"]=0x78,["f10"]=0x79,["f11"]=0x7A,["f12"]=0x7B}
 local Keys = {}
 local DA_Binds = {}
+local FreecamAPI = (pam and pam.api.freecam) or Import("freecam.lua")
 local ChatlogAPI = {}
 local JoinlogAPI = {}
 local HopTbl = {}
@@ -1041,6 +1042,7 @@ GetInTable = function(Table, Name)
 end
 
 local fixcam = function(speaker)
+	FreecamAPI.Stop()
 	workspace.CurrentCamera:remove()
 	wait(0.1)
 	repeat wait() until speaker.Character ~= nil
@@ -4025,6 +4027,7 @@ newCmd("gotocamera", {"gotocam"}, "gotocamera / gotocam", "Go to the Workspace C
 end)
 
 newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", function(args, speaker)
+	FreecamAPI.Stop()
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users) do
 		if viewDied then
@@ -4050,6 +4053,7 @@ newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", funct
 end)
 
 newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Player", function(args, speaker)
+	FreecamAPI.Stop()
 	if viewing ~= nil then
 		viewing = nil
 	end
@@ -5254,9 +5258,7 @@ end)
 newCmd("noclipcam", {"nccam"}, "noclipcam / nccam", "Allows your Camera to go Through Objects like Walls", function(args, speaker)
 	local sc = (debug and debug.setconstant) or setconstant
 	local gc = (debug and debug.getconstants) or getconstants
-	if not sc or not getgc or not gc then
-		return notify("Incompatible Exploit", "Missing setconstant or getconstants or getgc")
-	end
+	if not sc or not getgc or not gc then return notify("Incompatible Exploit", "Missing setconstant or getconstants or getgc") end
 	local pop = speaker.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper
 	for _, v in pairs(getgc()) do
 		if type(v) == "function" and getfenv(v).script == pop then
@@ -6293,6 +6295,34 @@ end)
 
 newCmd("clearcharappearance", {"clearchar", "clrchar"}, "clearcharappearance / clearchar / clrchar", "Removes all Accessories, Shirts, Pants, CharacterMesh, and BodyColors", function(args, speaker)
 	speaker:ClearCharacterAppearance()
+end)
+
+newCmd("freecam", {"fc"}, "freecam / fc", "Allows you to freely move camera around the game", function(args, speaker)
+	FreecamAPI.Start()
+end)
+
+newCmd("unfreecam", {"unfc"}, "unfreecam / unfc", "Disables Freecam", function(args, speaker)
+	FreecamAPI.Stop()
+end)
+
+newCmd("freecamposition", {"fcpos"}, "freecamposition / fcpos [X Y Z]", "Moves / opens freecam in a certain position", function(args, speaker)
+	if #args < 3 then return notify("Freecam", "Missing Argument") end
+	local freecamPos = CFrame.new(tonumber(args[1]), tonumber(args[2]), tonumber(args[3]))
+	FreecamAPI.Start()
+end)
+
+newCmd("freecamgoto", {"fcgoto", "fctp"}, "freecamgoto / fcgoto / fctp [plr]", "Moves / opens freecam to a player", function(args, speaker)
+	local users = getPlayer(args[1], speaker)
+	for i,v in pairs(users) do
+		FreecamAPI.Start(getRoot(Players[v].Character).CFrame)
+	end
+end)
+
+newCmd("freecamspeed", {"fcspeed"}, "freecamspeed / fcspeed [num]", "Adjusts Freecam Speed (Default is 1)", function(args, speaker)
+	local FCSpeed = args[1] or 1
+	if isNumber(FCSpeed) then
+		FreecamAPI.UpdateSpeed(FCSpeed)
+	end
 end)
 
 
