@@ -2818,6 +2818,7 @@ BrowserBtn("Empty Server Finder", "Empty Server Finder", "Find the emptiest serv
 BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
 BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
 BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
+BrowserBtn("Head Pet", "Head Pet", "Follow a player as a literal floating head!\n\n;headfollow / headpet [plr]\n > Make your head follow a player\n;unheadfollow / unheadpet\n > Stop making your head follow a player", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/headpet.lua'))();")
 --// End of Setup \\--
 
 
