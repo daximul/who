@@ -16,12 +16,12 @@ local Months = {
 	["December"] = 12
 }
 
-if Month == Months["January"] then return "🎉 Dark Admin 🎉" end
-if Month == Months["February"] then return "❤️ Dark Admin ❤️" end
-if Month == Months["March"] then return "🍀 Dark Admin 🍀" end
+-- if Month == Months["January"] then return "🎉 Dark Admin 🎉" end
+-- if Month == Months["February"] then return "❤️ Dark Admin ❤️" end
+-- if Month == Months["March"] then return "🍀 Dark Admin 🍀" end
 if Month == Months["April"] then return "🥚 Dark Admin 🥚" end
 if Month == Months["October"] then return "🎃 Dark Admin 🎃" end
-if Month == Months["November"] then return "🦃 Dark Admin 🦃" end
+-- if Month == Months["November"] then return "🦃 Dark Admin 🦃" end
 if Month == Months["December"] then return "🎄 Dark Admin 🎄" end
 
 return "Dark Admin"
