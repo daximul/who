@@ -128,6 +128,8 @@ local spawnpoint = false
 local spDelay = 0.1
 local WallTpTouch = nil
 local walkto = false
+local ESP = nil
+local Locate = nil
 local HumanModCons = {}
 local StareLoop = nil
 local FLYING = false
@@ -525,13 +527,16 @@ Players.PlayerAdded:Connect(function(player)
 	JoinlogAPI.LogJoin(player)
 	ChatlogAPI.LogUser(player)
 	if ESPenabled then
-		repeat wait(1) until player.Character and getRoot(player.Character)
+		repeat wait() until player.Character and getRoot(player.Character)
 		ESP(player)
+		player.CharacterAdded:Connect(function()
+			repeat wait() until player.Character and getRoot(player.Character)
+			ESP(player)
+		end)
 	end
 end)
 
 Players.PlayerRemoving:Connect(function(player)
-	JoinlogAPI.LogLeave(player)
 	if ESPenabled then
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == player.Name .. "_ESP" then
@@ -539,12 +544,13 @@ Players.PlayerRemoving:Connect(function(player)
 			end
 		end
 	end
+	JoinlogAPI.LogLeave(player)
 	if viewing ~= nil and player == viewing then
 		if findhum() then
 			execCmd("unspectate nonotify")
 			notify("Spectate", "Disabled (Player Left)")
 		else
-			notify("Un-Spectate", "Missing Humanoid")
+			notify("Spectate", "Missing Humanoid")
 		end
 	end
 end)
@@ -2215,7 +2221,7 @@ iRound = function(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
-local ESP = function(plr)
+ESP = function(plr)
 	spawn(function()
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == plr.Name .. "_ESP" then
@@ -2227,7 +2233,7 @@ local ESP = function(plr)
 			local ESPholder = Instance.new("Folder", CoreGui)
 			Prote.ProtectInstance(ESPholder)
 			ESPholder.Name = plr.Name .. "_ESP"
-			repeat wait(1) until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
+			repeat wait() until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 			for b,n in pairs (plr.Character:GetChildren()) do
 				if (n:IsA("BasePart")) then
 					local a = Instance.new("BoxHandleAdornment")
@@ -2246,8 +2252,9 @@ local ESP = function(plr)
 				local BillboardGui = Instance.new("BillboardGui")
 				Prote.ProtectInstance(BillboardGui)
 				local TextLabel = Instance.new("TextLabel")
+				Prote.ProtectInstance(TextLabel)
 				BillboardGui.Adornee = plr.Character.Head
-				BillboardGui.Name = plr.Name
+				BillboardGui.Name = tostring(plr.Name)
 				BillboardGui.Parent = ESPholder
 				BillboardGui.Size = UDim2.new(0, 100, 0, 150)
 				BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
@@ -2261,7 +2268,7 @@ local ESP = function(plr)
 				TextLabel.TextColor3 = Color3.new(1, 1, 1)
 				TextLabel.TextStrokeTransparency = 0
 				TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
-				TextLabel.Text = "Name: " .. plr.Name
+				TextLabel.Text = "Name: " .. tostring(plr.Name)
 				TextLabel.ZIndex = 10
 				local espLoopFunc
 				local teamChange
@@ -2271,7 +2278,7 @@ local ESP = function(plr)
 						espLoopFunc:Disconnect()
 						teamChange:Disconnect()
 						ESPholder:Destroy()
-						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
+						repeat wait() until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 						ESP(plr)
 						addedFunc:Disconnect()
 					else
@@ -2284,18 +2291,18 @@ local ESP = function(plr)
 						espLoopFunc:Disconnect()
 						addedFunc:Disconnect()
 						ESPholder:Destroy()
-						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
+						repeat wait() until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 						ESP(plr)
 						teamChange:Disconnect()
 					else
 						teamChange:Disconnect()
 					end
 				end)
-				local function espLoop()
+				local espLoop = function()
 					if CoreGui:FindFirstChild(plr.Name .. "_ESP") then
 						if plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid") and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 							local pos = math.floor((getRoot(Players.LocalPlayer.Character).Position - getRoot(plr.Character).Position).magnitude)
-							TextLabel.Text = "Name: " .. plr.Name .. " | Health: " .. iRound(plr.Character:FindFirstChildOfClass("Humanoid").Health, 1) .. " | Studs: " .. pos
+							TextLabel.Text = ("Name: " .. tostring(plr.Name) .. " | Health: " .. tostring(iRound(plr.Character:FindFirstChildWhichIsA("Humanoid").Health, 1)) .. " | Studs: " .. tostring(pos))
 						end
 					else
 						teamChange:Disconnect()
@@ -2309,7 +2316,7 @@ local ESP = function(plr)
 	end)
 end
 
-local Locate = function(plr)
+Locate = function(plr)
 	spawn(function()
 		for i,v in pairs(CoreGui:GetChildren()) do
 			if v.Name == plr.Name .. "_LC" then
@@ -2321,7 +2328,7 @@ local Locate = function(plr)
 			local ESPholder = Instance.new("Folder", CoreGui)
 			Prote.ProtectInstance(ESPholder)
 			ESPholder.Name = plr.Name .. "_LC"
-			repeat wait(1) until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
+			repeat wait() until plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 			for b,n in pairs (plr.Character:GetChildren()) do
 				if (n:IsA("BasePart")) then
 					local a = Instance.new("BoxHandleAdornment")
@@ -2340,8 +2347,9 @@ local Locate = function(plr)
 				local BillboardGui = Instance.new("BillboardGui")
 				Prote.ProtectInstance(BillboardGui)
 				local TextLabel = Instance.new("TextLabel")
+				Prote.ProtectInstance(TextLabel)
 				BillboardGui.Adornee = plr.Character.Head
-				BillboardGui.Name = plr.Name
+				BillboardGui.Name = tostring(plr.Name)
 				BillboardGui.Parent = ESPholder
 				BillboardGui.Size = UDim2.new(0, 100, 0, 150)
 				BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
@@ -2355,7 +2363,7 @@ local Locate = function(plr)
 				TextLabel.TextColor3 = Color3.new(1, 1, 1)
 				TextLabel.TextStrokeTransparency = 0
 				TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
-				TextLabel.Text = "Name: " .. plr.Name
+				TextLabel.Text = "Name: " .. tostring(plr.Name)
 				TextLabel.ZIndex = 10
 				local lcLoopFunc
 				local addedFunc
@@ -2365,7 +2373,7 @@ local Locate = function(plr)
 						lcLoopFunc:Disconnect()
 						teamChange:Disconnect()
 						ESPholder:Destroy()
-						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
+						repeat wait() until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 						Locate(plr)
 						addedFunc:Disconnect()
 					else
@@ -2378,7 +2386,7 @@ local Locate = function(plr)
 						lcLoopFunc:Disconnect()
 						addedFunc:Disconnect()
 						ESPholder:Destroy()
-						repeat wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChild("Humanoid")
+						repeat wait() until getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid")
 						Locate(plr)
 						teamChange:Disconnect()
 					else
@@ -2389,7 +2397,7 @@ local Locate = function(plr)
 					if CoreGui:FindFirstChild(plr.Name .. "_LC") then
 						if plr.Character and getRoot(plr.Character) and plr.Character:FindFirstChildWhichIsA("Humanoid") and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 							local pos = math.floor((getRoot(Players.LocalPlayer.Character).Position - getRoot(plr.Character).Position).magnitude)
-							TextLabel.Text = "Name: " .. plr.Name .. " | Health: " .. round(plr.Character:FindFirstChildOfClass("Humanoid").Health, 1) .. " | Studs: " .. pos
+							TextLabel.Text = ("Name: " .. tostring(plr.Name) .. " | Health: " .. tostring(iRound(plr.Character:FindFirstChildWhichIsA("Humanoid").Health, 1)) .. " | Studs: " .. tostring(pos))
 						end
 					else
 						teamChange:Disconnect()
@@ -3627,7 +3635,7 @@ newCmd("pluginlist", {}, "pluginlist", "List all your plugins that are enabled",
 	if not table.isempty(Settings.PluginsTable) then
 		notify("Plugin List: " .. #Settings.PluginsTable, string.join(", ", Settings.PluginsTable))
     else
-        	notify("Plugin Error", "Zero Plugins Enabled")
+        notify("Plugin Error", "Zero Plugins Enabled")
 	end
 end)
 
@@ -3642,19 +3650,16 @@ newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Pr
 	local getnamecall = getnamecallmethod or get_namecall_method
 	local mt = getrawmt(game)
 	local old = mt.__namecall
-	local protect = newcclosure or protect_function
+	local closure = newcclosure or protect_function
 	local hookfunc = hookfunction or detour_function
-
-	if not protect then
+	if not closure then
 		notify("Incompatible Exploit", "Missing newcclosure or protect_function")
-		protect = function(f)
+		closure = function(f)
 			return f
 		end
 	end
-
 	setReadOnly(mt, false)
-	
-	mt.__namecall = protect(function(self, ...)
+	mt.__namecall = closure(function(self, ...)
 		local method = getnamecall()
 		if method == "Kick" then
 			wait(9e9)
@@ -3662,9 +3667,7 @@ newCmd("clientantikick", {"antikick"}, "clientantikick / antikick (Client)", "Pr
 		end
 		return old(self, ...)
 	end)
-	
-	hookfunc(Players.LocalPlayer.Kick, protect(function() wait(9e9) end))
-
+	hookfunc(Players.LocalPlayer.Kick, closure(function() wait(9e9) end))
 	notify("Client Anti-Kick", "Enabled, only affects locally.")
 end)
 
@@ -3792,7 +3795,7 @@ newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, spe
 end)
 
 newCmd("jobid", {}, "jobid", "Copy the Server's JobId, this can be put in console on Google to join someone's exact server", function(args, speaker)
-	local jobId = ('Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. game.JobId ..'")')
+	local jobId = ('Roblox.GameLauncher.joinGameInstance(' .. tostring(game.PlaceId) .. ', "' .. tostring(game.JobId) ..'")')
 	toClipboard(jobId)
 end)
 
@@ -3932,7 +3935,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	    end
 	end
 	
-	Respawn = function()
+	InvisRespawn = function()
 	    IsRunning = false
 	    if IsInvis == true then
 	        pcall(function()
@@ -3957,7 +3960,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	
 	local invisDied
 	invisDied = InvisibleCharacter:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-	    Respawn()
+	    InvisRespawn()
 		invisDied:Disconnect()
 	end)
 	
@@ -3993,7 +3996,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	    SetLocalAnimate(Player.Character, true)
 	    SetLocalAnimate(Player.Character, false)
 		invisDied = Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-		    Respawn()
+		    InvisRespawn()
 			invisDied:Disconnect()
 		end)
 		invisRunning = false
@@ -4025,7 +4028,7 @@ newCmd("gotocamera", {"gotocam"}, "gotocamera / gotocam", "Go to the Workspace C
 	getRoot(speaker.Character).CFrame = workspace.Camera.CFrame
 end)
 
-newCmd("spectate", {"spec"}, "spectate / spec [plr]", "Spectate a Player", function(args, speaker)
+newCmd("spectate", {"spec", "view"}, "spectate / spec / view [plr]", "Spectate a Player", function(args, speaker)
 	FreecamAPI.Stop()
 	local users = getPlayer(args[1], speaker)
 	for i,v in pairs(users) do
@@ -4067,7 +4070,7 @@ newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Pl
 		end
 	else
 		if tostring(args[1]) ~= "nonotify" then
-			notify("Un-Spectate", "Missing Humanoid")
+			notify("Spectate", "Missing Humanoid")
 		end
 	end
 end)
@@ -4096,7 +4099,12 @@ newCmd("esp", {}, "esp", "Use ESP on Players", function(args, speaker)
 	ESPenabled = true
 	for i,v in pairs(Players:GetChildren()) do
 		if v.ClassName == "Player" and v.Name ~= speaker.Name then
+			repeat wait() until v.Character and getRoot(v.Character)
 			ESP(v)
+			player.CharacterAdded:Connect(function()
+				repeat wait() until v.Character and getRoot(v.Character)
+				ESP(v)
+			end)
 		end
 	end
 end)
