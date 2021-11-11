@@ -9,7 +9,21 @@ if tostring(game.PlaceId) ~= "734159876" then return Plugin end
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local randomName = function() return math.random(100000, 999999999) end
+local ESPLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/ToonESP/main/lib3.lua"))();
+
+for indz,Shark in pairs(workspace.Sharks:GetChildren()) do
+	while not Shark:FindFirstChild("Body") do wait() end
+	while not Shark.Body:FindFirstChild("P") do wait() end
+	ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
+end
+
+workspace.Sharks.ChildAdded:Connect(function(Shark)
+	while not Shark:FindFirstChild("Body") do wait() end
+	while not Shark.Body:FindFirstChild("P") do wait() end
+	ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
+end)
+
+local createRandomString = function() return math.random(100000, 999999999) end
 
 local Connections = {}
 local lib = {
@@ -50,7 +64,7 @@ Plugin.Commands["deleteallboats"] = {
 		end
 		for _, v2 in pairs(Engines) do   
     		local EgnRet = v2.Engine.EngineEvent
-			lib.connect(randomName(), function()
+			lib.connect(createRandomString(), function()
 				EgnRet:FireServer(-0, Vector3.new(math.huge, math.huge, 0))
 			end)
 		end
@@ -71,7 +85,7 @@ Plugin.Commands["spinallboats"] = {
 		end
 		for _, v2 in pairs(Engines) do   
     		local EgnRet = v2.Engine.EngineEvent
-    		lib.connect(randomName(), function()
+    		lib.connect(createRandomString(), function()
         		EgnRet:FireServer(-0, Vector3.new(999999, 999999, 0))
     		end)
 		end
@@ -84,8 +98,8 @@ Plugin.Commands["flareguncrash"] = {
 	["Aliases"] = {"flaregunrain"},
 	["Function"] = function(args, speaker)
 		DisconnectAll()
-		lib.connect(randomName(), function() while wait() do workspace.Events.GamePasses.EquipFlareGun:FireServer() end end)
-		lib.connect(randomName(), function(object)
+		lib.connect(createRandomString(), function() while wait() do workspace.Events.GamePasses.EquipFlareGun:FireServer() end end)
+		lib.connect(createRandomString(), function(object)
 			if object:IsA("Tool") then
         			wait()
         			object.Parent = Players.LocalPlayer.Character
@@ -111,6 +125,33 @@ Plugin.Commands["giveflaregun"] = {
 		else
 			workspace.Events.GamePasses.EquipFlareGun:FireServer()
 		end
+	end
+}
+
+Plugin.Commands["givescubagear"] = {
+	["ListName"] = ("givescubagear / scubadear"),
+	["Description"] = ("Sharkbite - Give yourself scuba gear"),
+	["Aliases"] = {"scubadear"},
+	["Function"] = function(args, speaker)
+		workspace.Events.GamePasses.EquipScubaGear:FireServer()
+	end
+}
+
+Plugin.Commands["sharkesp"] = {
+	["ListName"] = ("sharkesp"),
+	["Description"] = ("Sharkbite - Enable Shark ESP"),
+	["Aliases"] = {},
+	["Function"] = function(args, speaker)
+		ESPLib.ToggleESP(true)
+	end
+}
+
+Plugin.Commands["unsharkesp"] = {
+	["ListName"] = ("unsharkesp"),
+	["Description"] = ("Sharkbite - Disable Shark ESP"),
+	["Aliases"] = {},
+	["Function"] = function(args, speaker)
+		ESPLib.ToggleESP(false)
 	end
 }
 
