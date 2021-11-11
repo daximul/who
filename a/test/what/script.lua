@@ -4054,7 +4054,7 @@ newCmd("spectate", {"spec", "view"}, "spectate / spec / view [plr]", "Spectate a
 	end
 end)
 
-newCmd("unspectate", {"unspec"}, "unspectate / unspec [plr]", "Stop viewing a Player", function(args, speaker)
+newCmd("unspectate", {"unspec", "unview"}, "unspectate / unspec / unview [plr]", "Stop viewing a Player", function(args, speaker)
 	FreecamAPI.Stop()
 	if viewing ~= nil then
 		viewing = nil
