@@ -9,6 +9,8 @@ if tostring(game.PlaceId) ~= "734159876" then return Plugin end
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local randomName = function() return math.random(100000, 999999999) end
+
 local Connections = {}
 local lib = {
 	["connect"] = function(name, func, path)
@@ -27,10 +29,10 @@ local lib = {
 }
 
 local DisconnectAll = function()
-	lib.disconnect("Delete")
-	lib.disconnect("Spin")
-	lib.disconnect("Give Flare")
-	lib.disconnect("Flare")
+	for key in pairs(Connections) do
+		Connections[key]:Disconnect()
+		Connections[key] = nil
+	end
 	wait(0.1)
 end
 
@@ -48,7 +50,7 @@ Plugin.Commands["deleteallboats"] = {
 		end
 		for _, v2 in pairs(Engines) do   
     		local EgnRet = v2.Engine.EngineEvent
-			lib.connect("Delete", function()
+			lib.connect(randomName(), function()
 				EgnRet:FireServer(-0, Vector3.new(math.huge, math.huge, 0))
 			end)
 		end
@@ -69,7 +71,7 @@ Plugin.Commands["spinallboats"] = {
 		end
 		for _, v2 in pairs(Engines) do   
     		local EgnRet = v2.Engine.EngineEvent
-    		lib.connect("Spin", function()
+    		lib.connect(randomName(), function()
         		EgnRet:FireServer(-0, Vector3.new(999999, 999999, 0))
     		end)
 		end
@@ -82,8 +84,8 @@ Plugin.Commands["flareguncrash"] = {
 	["Aliases"] = {"flaregunrain"},
 	["Function"] = function(args, speaker)
 		DisconnectAll()
-		lib.connect("Give Flare", function() while wait() do workspace.Events.GamePasses.EquipFlareGun:FireServer() end end)
-		lib.connect("Flare", function(object)
+		lib.connect(randomName(), function() while wait() do workspace.Events.GamePasses.EquipFlareGun:FireServer() end end)
+		lib.connect(randomName(), function(object)
 			if object:IsA("Tool") then
         			wait()
         			object.Parent = Players.LocalPlayer.Character
