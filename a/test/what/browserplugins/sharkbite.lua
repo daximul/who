@@ -10,18 +10,24 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local ESPLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/ToonESP/main/lib3.lua"))();
+local sharklist = {}
 
 spawn(function()
 	while not workspace:FindFirstChild("Sharks") do wait() end
 	for indz,Shark in pairs(workspace.Sharks:GetChildren()) do
 		while not Shark:FindFirstChild("Body") do wait() end
 		while not Shark.Body:FindFirstChild("P") do wait() end
-		ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
+		sharklist[tostring(Shark.Name)] = ESPLib.PartESP2(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
 	end
 	workspace.Sharks.ChildAdded:Connect(function(obj)
 		while not obj:FindFirstChild("Body") do wait() end
 		while not obj.Body:FindFirstChild("P") do wait() end
-		ESPLib.PartESP(obj.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(obj.Name))
+		sharklist[tostring(obj.Name)] = ESPLib.PartESP2(obj.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(obj.Name))
+	end)
+	workspace.Sharks.ChildRemoved:Connect(function(obj)
+		if sharklist[tostring(obj.Name)] ~= nil then
+			sharklist[tostring(obj.Name)].RemoveESP()
+		end
 	end)
 end)
 
