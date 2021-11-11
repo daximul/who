@@ -186,11 +186,13 @@ Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(fu
 	end
 end)
 
-local Queue_Admin = function()
-	if (syn and syn.queue_on_teleport) and (Settings.KeepDA == false) then
-		syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
-	end
-end
+Players.LocalPlayer.OnTeleport:Connect(function(State)
+    if State == Enum.TeleportState.Started then
+    	if Settings.KeepDA == true then
+        	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
+    	end
+    end
+end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
 	NOFLY()
@@ -224,12 +226,10 @@ CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChildWhichIsA("Frame").Descen
 			Overlay:GetPropertyChangedSignal("Text"):Wait()
 			if Overlay.Text == "Disconnected" then
 				if #Players:GetPlayers() <= 1 then
-					Queue_Admin()
 					Players.LocalPlayer:Kick("\nRejoining...")
 					wait()
 					TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
 				else
-					Queue_Admin()
 					TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 				end
 			end
@@ -2781,7 +2781,6 @@ AddButton("Save Join Logs", function()
 end)
 AddSetting("Keep Admin", Settings.KeepDA, function(Callback)
 	Settings.KeepDA = Callback
-	Queue_Admin()
 	updatesaves()
 end)
 AddSetting("Chat Logs", Settings.ChatLogs, function(Callback)
@@ -2918,12 +2917,10 @@ end)
 
 newCmd("rejoin", {"rj"}, "rejoin / rj", "Rejoin the server", function(args, speaker)
 	if #Players:GetPlayers() <= 1 then
-		Queue_Admin()
 		Players.LocalPlayer:Kick("\nRejoining...")
 		wait()
 		TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
 	else
-		Queue_Admin()
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
 	end
 end)
