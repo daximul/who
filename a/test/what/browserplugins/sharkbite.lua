@@ -11,16 +11,18 @@ local RunService = game:GetService("RunService")
 
 local ESPLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/ToonESP/main/lib3.lua"))();
 
-for indz,Shark in pairs(workspace.Sharks:GetChildren()) do
-	while not Shark:FindFirstChild("Body") do wait() end
-	while not Shark.Body:FindFirstChild("P") do wait() end
-	ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
-end
-
-workspace.Sharks.ChildAdded:Connect(function(Shark)
-	while not Shark:FindFirstChild("Body") do wait() end
-	while not Shark.Body:FindFirstChild("P") do wait() end
-	ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
+spawn(function()
+	while not workspace:FindFirstChild("Sharks") do wait() end
+	for indz,Shark in pairs(workspace.Sharks:GetChildren()) do
+		while not Shark:FindFirstChild("Body") do wait() end
+		while not Shark.Body:FindFirstChild("P") do wait() end
+		ESPLib.PartESP(Shark.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(Shark.Name))
+	end
+	workspace.Sharks.ChildAdded:Connect(function(obj)
+		while not obj:FindFirstChild("Body") do wait() end
+		while not obj.Body:FindFirstChild("P") do wait() end
+		ESPLib.PartESP(obj.Body.P, {192, 57, 43}, {192, 57, 43}, tostring(obj.Name))
+	end)
 end)
 
 local createRandomString = function() return math.random(100000, 999999999) end
@@ -129,9 +131,9 @@ Plugin.Commands["giveflaregun"] = {
 }
 
 Plugin.Commands["givescubagear"] = {
-	["ListName"] = ("givescubagear / scubadear"),
+	["ListName"] = ("givescubagear / scubagear"),
 	["Description"] = ("Sharkbite - Give yourself scuba gear"),
-	["Aliases"] = {"scubadear"},
+	["Aliases"] = {"scubagear"},
 	["Function"] = function(args, speaker)
 		workspace.Events.GamePasses.EquipScubaGear:FireServer()
 	end
