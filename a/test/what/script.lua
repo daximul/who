@@ -2819,6 +2819,7 @@ BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Mo
 BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
 BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
 BrowserBtn("Head Pet", "Head Pet", "Follow a player as a literal floating head!\n\n;headfollow / headpet [plr]\n > Make your head follow a player\n;unheadfollow / unheadpet\n > Stop making your head follow a player", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/headpet.lua'))();")
+BrowserBtn("Sharkbite", "Sharkbite", "Destroy the lives of Sharkbite Players with this simple plugin", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/sharkbite.lua'))();")
 --// End of Setup \\--
 
 
@@ -6323,6 +6324,25 @@ newCmd("freecamspeed", {"fcspeed"}, "freecamspeed / fcspeed [num]", "Adjusts Fre
 	local FCSpeed = args[1] or 1
 	if isNumber(FCSpeed) then
 		FreecamAPI.UpdateSpeed(FCSpeed)
+	end
+end)
+
+newCmd("sitwalk", {}, "sitwalk", "Makes your character sit while still being able to walk", function(args, speaker)
+	if not speaker then return end
+	if not speaker.Character then return end
+	if not speaker.Character:FindFirstChildWhichIsA("Humanoid") then return notify("", "Missing Humanoid") end
+	if not speaker.Character:FindFirstChild("Animate") then return notify("", "Missing Animate") end
+	local LocalAnimate = speaker.Character:FindFirstChild("Animate")
+	local SitAnimationId = LocalAnimate.sit:FindFirstChildWhichIsA("Animation").AnimationId
+	LocalAnimate.idle:FindFirstChildWhichIsA("Animation").AnimationId = SitAnimationId
+	LocalAnimate.walk:FindFirstChildWhichIsA("Animation").AnimationId = SitAnimationId
+	LocalAnimate.run:FindFirstChildWhichIsA("Animation").AnimationId = SitAnimationId
+	LocalAnimate.jump:FindFirstChildWhichIsA("Animation").AnimationId = SitAnimationId
+	local Human = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	if r15(speaker) then
+		Human.HipHeight = 0.5
+	else
+		Human.HipHeight = -1.5
 	end
 end)
 
