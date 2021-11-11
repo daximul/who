@@ -155,6 +155,23 @@ Plugin.Commands["unsharkesp"] = {
 	end
 }
 
+Plugin.Commands["removebarriers"] = {
+	["ListName"] = ("removebarriers / removebarrier"),
+	["Description"] = ("Sharkbite - Remove Map Barriers"),
+	["Aliases"] = {"removebarrier"},
+	["Function"] = function(args, speaker)
+		if workspace:FindFirstChild("IslandBarrier") then
+			workspace["IslandBarrier"]:Destroy()
+		end
+		if workspace:FindFirstChild("StuffSimonHasntFoldered") then
+			workspace["StuffSimonHasntFoldered"]:Destroy()
+		end
+		if workspace:FindFirstChild("3rdBarrier") then
+			workspace["3rdBarrier"]:Destroy()
+		end
+	end
+}
+
 Plugin.Commands["sharkbitedisconnect"] = {
 	["ListName"] = ("sharkbitedisconnect / sharkbitedis / sharkbited"),
 	["Description"] = ("Sharkbite - Disconnect all loops"),
