@@ -90,24 +90,24 @@ local ScriptsHolder = loadstring(game:HttpGetAsync(("https://raw.githubuserconte
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
-local RenderStepTable = {}
+AdminConnections = {}
 local origsettings = {
-	Lighting = {
-		abt = game:GetService("Lighting").Ambient,
-		oabt = game:GetService("Lighting").OutdoorAmbient,
-		brt = game:GetService("Lighting").Brightness,
-		time = game:GetService("Lighting").ClockTime,
-		fe = game:GetService("Lighting").FogEnd,
-		fs = game:GetService("Lighting").FogStart,
-		gs = game:GetService("Lighting").GlobalShadows,
+	["Lighting"] = {
+		["abt"] = game:GetService("Lighting").Ambient,
+		["oabt"] = game:GetService("Lighting").OutdoorAmbient,
+		["brt"] = game:GetService("Lighting").Brightness,
+		["time"] = game:GetService("Lighting").ClockTime,
+		["fe"] = game:GetService("Lighting").FogEnd,
+		["fs"] = game:GetService("Lighting").FogStart,
+		["gs"] = game:GetService("Lighting").GlobalShadows,
 	},
-	Player = {
-		Id = Players.LocalPlayer.UserId,
-		Ws = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed,
-		Jp = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").JumpPower,
+	["Player"] = {
+		["Id"] = Players.LocalPlayer.UserId,
+		["Ws"] = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed,
+		["Jp"] = Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").JumpPower,
 	},
-	Camera = {
-		Fov = workspace.CurrentCamera.FieldOfView,
+	["Camera"] = {
+		["Fov"] = workspace.CurrentCamera.FieldOfView,
 	},
 }
 randomString = function() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, math.random(25, 30)) end
@@ -136,13 +136,15 @@ local FLYING = false
 local GYROFLYING = false
 local Floating = false
 local CmdNoclipping = nil
+local CmdClip = true
 local Noclipping = nil
-local Clip = true
 local viewing = nil
 local isAutoClicking = false
 local AutoclickerInput = nil
 local AutomaticKeyPressing = false
 local AutoKeyPressInput = nil
+local frozenParts = {}
+local FreezingUnanchored = nil
 local ESPenabled = false
 local swimming = false
 local cmdflinging = false
@@ -156,7 +158,7 @@ local invisRunning = false
 local spinhats = nil
 local BubbleChatFix = nil
 local CflyCon = nil
-local KeyCodeMap = {["0"]=0x30,["1"]=0x31,["2"]=0x32,["3"]=0x33,["4"]=0x34,["5"]=0x35,["6"]=0x36,["7"]=0x37,["8"]=0x38,["9"]=0x39,["a"]=0x41,["b"]=0x42,["c"]=0x43,["d"]=0x44,["e"]=0x45,["f"]=0x46,["g"]=0x47,["h"]=0x48,["i"]=0x49,["j"]=0x4A,["k"]=0x4B,["l"]=0x4C,["m"]=0x4D,["n"]=0x4E,["o"]=0x4F,["p"]=0x50,["q"]=0x51,["r"]=0x52,["s"]=0x53,["t"]=0x54,["u"]=0x55,["v"]=0x56,["w"]=0x57,["x"]=0x58,["y"]=0x59,["z"]=0x5A,["enter"]=0x0D,["shift"]=0x10,["ctrl"]=0x11,["alt"]=0x12,["pause"]=0x13,["capslock"]=0x14,["spacebar"]=0x20,["pageup"]=0x21,["pagedown"]=0x22,["end"]=0x23,["home"]=0x24,["left"]=0x25,["up"]=0x26,["right"]=0x27,["down"]=0x28,["insert"]=0x2D,["delete"]=0x2E,["f1"]=0x70,["f2"]=0x71,["f3"]=0x72,["f4"]=0x73,["f5"]=0x74,["f6"]=0x75,["f7"]=0x76,["f8"]=0x77,["f9"]=0x78,["f10"]=0x79,["f11"]=0x7A,["f12"]=0x7B}
+local KeyCodeMap = {["0"]=0x30,["1"]=0x31,["2"]=0x32,["3"]=0x33,["4"]=0x34,["5"]=0x35,["6"]=0x36,["7"]=0x37,["8"]=0x38,["9"]=0x39,["a"]=0x41,["b"]=0x42,["c"]=0x43,["d"]=0x44,["e"]=0x45,["f"]=0x46,["g"]=0x47,["h"]=0x48,["i"]=0x49,["j"]=0x4A,["k"]=0x4B,["l"]=0x4C,["m"]=0x4D,["n"]=0x4E,["o"]=0x4F,["p"]=0x50,["q"]=0x51,["r"]=0x52,["s"]=0x53,["t"]=0x54,["u"]=0x55,["v"]=0x56,["w"]=0x57,["x"]=0x58,["y"]=0x59,["z"]=0x5A,["enter"]=0x0D,["shift"]=0x10,["ctrl"]=0x11,["alt"]=0x12,["pause"]=0x13,["capslock"]=0x14,["caps"]=0x14,["spacebar"]=0x20,["space"]=0x20,["pageup"]=0x21,["pagedown"]=0x22,["end"]=0x23,["home"]=0x24,["left"]=0x25,["up"]=0x26,["right"]=0x27,["down"]=0x28,["insert"]=0x2D,["delete"]=0x2E,["f1"]=0x70,["f2"]=0x71,["f3"]=0x72,["f4"]=0x73,["f5"]=0x74,["f6"]=0x75,["f7"]=0x76,["f8"]=0x77,["f9"]=0x78,["f10"]=0x79,["f11"]=0x7A,["f12"]=0x7B}
 local Keys = {}
 local DA_Binds = {}
 local FreecamAPI = Import("freecam.lua")
@@ -201,7 +203,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	FLYING = false
 	GYROFLYING = false
 	Floating = false
-	Clip = true
+	CmdClip = true
 	invisRunning = false
 	
 	repeat wait() until getRoot(Players.LocalPlayer.Character)
@@ -265,22 +267,24 @@ local Time = function()
 	return HOUR .. ":" .. MINUTE .. ":" .. SECOND .. " " .. AP
 end
 
-local BindToRenderStep = function(name, func)
-	name = tostring(name)
-	if RenderStepTable[name] == nil then
-		RenderStepTable[name] = game:GetService("RunService").RenderStepped:Connect(func)
+BindToConnection = function(name, func, path)
+	if AdminConnections[tostring(name)] == nil then
+		if path ~= nil then
+			AdminConnections[tostring(name)] = path:Connect(func)
+		else
+			AdminConnections[tostring(name)] = game:GetService("RunService").RenderStepped:Connect(func)
+		end
 	end
 end
 
-local UnbindFromRenderStep = function(name)
-	name = tostring(name)
-	if RenderStepTable[name] then
-		RenderStepTable[name]:Disconnect()
-		RenderStepTable[name] = nil
+UnbindFromConnection = function(name)
+	if AdminConnections[tostring(name)] ~= nil then
+		AdminConnections[tostring(name)]:Disconnect()
+		AdminConnections[tostring(name)] = nil
 	end
 end
 
-local RunCode = function(func) func() end
+local RunCode = function(funcToRun) funcToRun() end
 
 ChatlogAPI.loggedTable = {}
 ChatlogAPI.folderPath = ("Dark Admin/Logs/")
@@ -3151,10 +3155,10 @@ newCmd("pulseto", {"pto"}, "pulseto / pto [plr] [seconds]", "Teleports you to a 
 end)
 
 newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
-	Clip = false
+	CmdClip = false
 	wait(0.1)
 	local NoclipLoop = function()
-		if Clip == false and speaker.Character ~= nil then
+		if CmdClip == false and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
 				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
 					Prote.SpoofProperty(child, "CanCollide")
@@ -3169,20 +3173,21 @@ newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 end)
 
 newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args, speaker)
-	if Noclipping then
+	if Noclipping ~= nil then
 		Noclipping:Disconnect()
+		Noclipping = nil
 	end
-	Clip = true
+	CmdClip = true
 	if args[1] and args[1] == "nonotify" then return end
 	notify("Noclip", "Noclip Disabled")
 end)
 
 newCmd("togglenoclip", {}, "togglenoclip", "Toggle Noclip", function(args, speaker)
-	if Clip == true then
+	if CmdClip == true then
 		execCmd("clip nonotify")
 		wait()
 		execCmd("noclip")
-	elseif Clip == false then
+	elseif CmdClip == false then
 		execCmd("clip")
 	end
 end)
@@ -4101,7 +4106,7 @@ newCmd("esp", {}, "esp", "Use ESP on Players", function(args, speaker)
 		if v.ClassName == "Player" and v.Name ~= speaker.Name then
 			repeat wait() until v.Character and getRoot(v.Character)
 			ESP(v)
-			v.CharacterAdded:Connect(function()
+			player.CharacterAdded:Connect(function()
 				repeat wait() until v.Character and getRoot(v.Character)
 				ESP(v)
 			end)
@@ -4520,33 +4525,6 @@ end)
 
 newCmd("commandcount", {}, "commandcount", "Notify the Amount of Commands", function(args, speaker)
 	notify("Command Count", #cmds)
-end)
-
-newCmd("noclip", {}, "noclip", "Go Through Objects", function(args, speaker)
-	CmdClip = false
-	wait(0.1)
-	local NoclipLoop = function()
-		if CmdClip == false and speaker.Character ~= nil then
-			for _, child in pairs(speaker.Character:GetDescendants()) do
-				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
-					Prote.SpoofProperty(child, "CanCollide")
-					child.CanCollide = false
-				end
-			end
-		end
-	end
-	CmdNoclipping = game:GetService("RunService").Stepped:Connect(NoclipLoop)
-	if args[1] and args[1] == "nonotify" then return end
-	notify("Noclip", "Noclip Enabled")
-end)
-
-newCmd("clip", {}, "clip", "Disables Noclip", function(args, speaker)
-	if CmdNoclipping then
-		CmdNoclipping:Disconnect()
-	end
-	CmdClip = true
-	if args[1] and args[1] == "nonotify" then return end
-	notify("Noclip", "Noclip Disabled")
 end)
 
 newCmd("lag", {}, "lag", "Make yourself look like you are lagging", function(args, speaker)
@@ -5324,30 +5302,8 @@ end)
 
 newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes Unanchored Parts", function(args, speaker)
 	if sethidden then
-		local badnames = {
-			"Head",
-			"UpperTorso",
-			"LowerTorso",
-			"RightUpperArm",
-			"LeftUpperArm",
-			"RightLowerArm",
-			"LeftLowerArm",
-			"RightHand",
-			"LeftHand",
-			"RightUpperLeg",
-			"LeftUpperLeg",
-			"RightLowerLeg",
-			"LeftLowerLeg",
-			"RightFoot",
-			"LeftFoot",
-			"Torso",
-			"Right Arm",
-			"Left Arm",
-			"Right Leg",
-			"Left Leg",
-			"HumanoidRootPart"
-		}
-		local FREEZENOOB = function(v)
+		local badnames = {"Head", "UpperTorso", "LowerTorso", "RightUpperArm", "LeftUpperArm", "RightLowerArm", "LeftLowerArm", "RightHand", "LeftHand", "RightUpperLeg", "LeftUpperLeg", "RightLowerLeg", "LeftLowerLeg", "RightFoot", "LeftFoot", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg", "HumanoidRootPart"}
+		local FreezeObject = function(v)
 			if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
 				local BADD = false
 				for i = 1,#badnames do
@@ -5381,10 +5337,8 @@ newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes
 				end
 			end
 		end
-		for i,v in pairs(workspace:GetDescendants()) do
-			FREEZENOOB(v)
-		end
-		freezingua = workspace.DescendantAdded:Connect(FREEZENOOB)
+		for i,v in pairs(workspace:GetDescendants()) do FreezeObject(v) end
+		FreezingUnanchored = workspace.DescendantAdded:Connect(FreezeObject)
 	else
 		notify("Incompatible Exploit", "Missing sethiddenproperty")
 	end
@@ -5392,8 +5346,9 @@ end)
 
 newCmd("thawunanchored", {"thawua", "unfreezeua"}, "thawunanchored / thawua / unfreezeua", "Thaws Unanchored Parts", function(args, speaker)
 	if sethidden then
-		if freezingua then
-			freezingua:Disconnect()
+		if FreezingUnanchored ~= nil then
+			FreezingUnanchored:Disconnect()
+			FreezingUnanchored = nil
 		end
 		SetSimulationRadius()
 		for i,v in pairs(frozenParts) do
@@ -5522,8 +5477,9 @@ newCmd("walltp", {}, "walltp", "Teleports You Above/Over Any Wall You Run Into",
 end)
 
 newCmd("unwalltp", {}, "unwalltp", "Disables Walltp", function(args, speaker)
-	if WallTpTouch then
+	if WallTpTouch ~= nil then
 		WallTpTouch:Disconnect()
+		WallTpTouch = nil
 	end
 end)
 
