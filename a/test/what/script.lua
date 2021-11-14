@@ -4106,7 +4106,7 @@ newCmd("esp", {}, "esp", "Use ESP on Players", function(args, speaker)
 		if v.ClassName == "Player" and v.Name ~= speaker.Name then
 			repeat wait() until v.Character and getRoot(v.Character)
 			ESP(v)
-			player.CharacterAdded:Connect(function()
+			v.CharacterAdded:Connect(function()
 				repeat wait() until v.Character and getRoot(v.Character)
 				ESP(v)
 			end)
