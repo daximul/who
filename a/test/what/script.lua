@@ -2590,10 +2590,9 @@ local AddInputBox = function(Title, Callback)
 end
 
 local AddButton = function(Title, Func)
-	Func = Func or function() end
 	local NewBtn = Assets.ButtonBox:Clone()
 	NewBtn.Hitbox.MouseButton1Down:Connect(function()
-		pcall(Func)
+		Func()
 	end)
 	NewBtn.Title.Text = tostring(Title)
 	NewBtn.Parent = DaUi.Pages.Menu.Results
@@ -2632,7 +2631,7 @@ local CreateScript = function(scriptname, devs, gameid, scrfunction)
 	log.Creator.Text = tostring(devs)
 	log.Compatibility.Text = tostring(gameid)
 	log.Execute.MouseButton1Down:Connect(function()
-		pcall(scrfunction)
+		scrfunction()
 	end)
 	log.Parent = DaUi.Pages.Scripts.Results
 	log.Visible = true
