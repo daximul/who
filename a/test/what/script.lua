@@ -61,18 +61,18 @@ local string = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/
 local table = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Toon-arch/libpp/main/libraries/table.lua")))();
 
 local Settings = {
-	Prefix = ";",
-	PluginsTable = {},
-	daflyspeed = 1,
-	vehicleflyspeed = 1,
-	cframeflyspeed = 1,
-	gyroflyspeed = 3,
-	ChatLogs = false,
-	JoinLogs = false,
-	KeepDA = false,
-	AutoNet = false,
-	cmdautorj = false,
-	disablenotifications = false,
+	["Prefix"] = ";",
+	["PluginsTable"] = {},
+	["daflyspeed"] = 1,
+	["vehicleflyspeed"] = 1,
+	["cframeflyspeed"] = 1,
+	["gyroflyspeed"] = 3,
+	["ChatLogs"] = false,
+	["JoinLogs"] = false,
+	["KeepDA"] = false,
+	["AutoNet"] = false,
+	["cmdautorj"] = false,
+	["disablenotifications"] = false,
 }
 
 local cmds = {}
@@ -138,6 +138,9 @@ local Floating = false
 local CmdNoclipping = nil
 local CmdClip = true
 local Noclipping = nil
+local invisRunning = false
+local CrosshairY = nil
+local CrosshairX = nil
 local viewing = nil
 local isAutoClicking = false
 local AutoclickerInput = nil
@@ -154,7 +157,6 @@ local pointLightName = randomString()
 local selectionBoxName = randomString()
 local clientsidebypass = false
 local QEfly = true
-local invisRunning = false
 local spinhats = nil
 local BubbleChatFix = nil
 local CflyCon = nil
@@ -3887,145 +3889,20 @@ newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
 end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
-	if invisRunning then return end
-	invisRunning = true
-	local Player = game:GetService("Players").LocalPlayer
-	repeat wait(.1) until Player.Character
-	local Character = Player.Character
-	Character.Archivable = true
-	local IsInvis = false
-	local IsRunning = true
-	local InvisibleCharacter = Character:Clone()
-	InvisibleCharacter.Parent = game:GetService("Lighting")
-	local Void = workspace.FallenPartsDestroyHeight
-	InvisibleCharacter.Name = ""
-	local CF
-	
-	local invisFix = game:GetService("RunService").Stepped:Connect(function()
-	    pcall(function()
-	        local IsInteger
-	        if tostring(Void):find("-") then
-	            IsInteger = true
-	        else
-	            IsInteger = false
-	        end
-	        local Pos = Player.Character.HumanoidRootPart.Position
-	        local Pos_String = tostring(Pos)
-	        local Pos_Seperate = Pos_String:split(", ")
-	        local X = tonumber(Pos_Seperate[1])
-	        local Y = tonumber(Pos_Seperate[2])
-	        local Z = tonumber(Pos_Seperate[3])
-	        if IsInteger == true then
-	            if Y <= Void then
-	                Respawn()
-	            end
-	        elseif IsInteger == false then
-	            if Y >= Void then
-	                Respawn()
-	            end
-	        end
-	    end)
-	end)
-	
-	for i,v in pairs(InvisibleCharacter:GetDescendants())do
-	    if v:IsA("BasePart") then
-	        if v.Name == "HumanoidRootPart" then
-	        	Prote.SpoofProperty(v, "HumanoidRootPart")
-	            v.Transparency = 1
-	        else
-	        	Prote.SpoofProperty(v, "HumanoidRootPart")
-	            v.Transparency = 0.5
-	        end
-	    end
-	end
-	
-	InvisRespawn = function()
-	    IsRunning = false
-	    if IsInvis == true then
-	        pcall(function()
-	            Player.Character = Character
-	            wait()
-	            Character.Parent = workspace
-	            Character:FindFirstChildWhichIsA("Humanoid"):Destroy()
-	            IsInvis = false
-	            InvisibleCharacter.Parent = nil
-				invisRunning = false
-	        end)
-	    elseif IsInvis == false then
-	        pcall(function()
-	            Player.Character = Character
-	            wait()
-	            Character.Parent = workspace
-	            Character:FindFirstChildWhichIsA("Humanoid"):Destroy()
-	            TurnVisible()
-	        end)
-	    end
-	end
-	
-	local invisDied
-	invisDied = InvisibleCharacter:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-	    InvisRespawn()
-		invisDied:Disconnect()
-	end)
-	
-	if IsInvis == true then return end
-	IsInvis = true
-	CF = workspace.CurrentCamera.CFrame
-	local CF_1 = Player.Character.HumanoidRootPart.CFrame
-	Character:MoveTo(Vector3.new(0, math.pi * 1000000, 0))
-	workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
-	wait(.2)
-	workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-	InvisibleCharacter = InvisibleCharacter
-	Character.Parent = game:GetService("Lighting")
-	InvisibleCharacter.Parent = workspace
-	InvisibleCharacter.HumanoidRootPart.CFrame = CF_1
-	Player.Character = InvisibleCharacter
-	fixcam(Player)
-	SetLocalAnimate(Player.Character, true)
-	SetLocalAnimate(Player.Character, false)
-	
-	TurnVisible = function()
-	    if IsInvis == false then return end
-		invisFix:Disconnect()
-		invisDied:Disconnect()
-	    CF = workspace.CurrentCamera.CFrame
-	    Character = Character
-	    local CF_1 = Player.Character.HumanoidRootPart.CFrame
-	    Character.HumanoidRootPart.CFrame = CF_1
-	    InvisibleCharacter:Destroy()
-	    Player.Character = Character
-	    Character.Parent = workspace
-	    IsInvis = false
-	    SetLocalAnimate(Player.Character, true)
-	    SetLocalAnimate(Player.Character, false)
-		invisDied = Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
-		    InvisRespawn()
-			invisDied:Disconnect()
-		end)
-		invisRunning = false
-	end
+	if invisRunning == true then return end
+	local OldPos = getRoot(Players.LocalPlayer.Character).CFrame
+	getRoot(Players.LocalPlayer.Character).CFrame = CFrame.new(9e9, 9e9, 9e9)
+	local Clone = getRoot(Players.LocalPlayer.Character):Clone()
+	wait(0.2)
+	getRoot(Players.LocalPlayer.Character):Destroy()
+	Clone.CFrame = OldPos
+	Clone.Parent = Players.LocalPlayer.Character
 	notify("Invisibility", "You are invisible to players!")
 end)
 
 newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no godmode but some tools work", function(args, speaker)
 	Import("tinv.lua")
 	notify("T Invis", "You are now Invisible")
-end)
-
-newCmd("invisible2", {"invis2"}, "invisible2 / invis2", "Second Version of Invisibility", function(args, speaker)
-	local OldPos = getRoot(Players.LocalPlayer.Character).CFrame
-	getRoot(Players.LocalPlayer.Character).CFrame = CFrame.new(9e9, 9e9, 9e9)
-	local Clone = getRoot(Players.LocalPlayer.Character):Clone()
-	wait(.2)
-	getRoot(Players.LocalPlayer.Character):Destroy()
-	Clone.CFrame = OldPos
-	Clone.Parent = Players.LocalPlayer.Character
-	notify("Invisibility 2", "You are now Invisible")
-end)
-
-newCmd("visible", {"vis"}, "visible / vis", "Become Visible", function(args, speaker)
-	TurnVisible()
 end)
 
 newCmd("gotocamera", {"gotocam"}, "gotocamera / gotocam", "Go to the Workspace Camera", function(args, speaker)
@@ -5572,7 +5449,7 @@ newCmd("walkto", {"follow"}, "walkto / follow [plr]", "Follow a Player", functio
 		if Players[v].Character ~= nil then
 			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
 				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
-				wait(.1)
+				wait(0.1)
 			end
 			walkto = true
 			repeat wait()
@@ -5593,7 +5470,7 @@ newCmd("pathfindwalkto", {"pathfindfollow"}, "pathfindwalkto / pathfindfollow [p
 		if Players[v].Character ~= nil then
 			if speaker.Character:FindFirstChildOfClass("Humanoid") and speaker.Character:FindFirstChildOfClass("Humanoid").SeatPart then
 				speaker.Character:FindFirstChildOfClass("Humanoid").Sit = false
-				wait(.1)
+				wait(0.1)
 			end
 			walkto = true
 			repeat wait()
@@ -5626,8 +5503,9 @@ end)
 newCmd("stare", {}, "stare [plr]", "Stare at a Player", function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
-		if StareLoop then
+		if StareLoop ~= nil then
 			StareLoop:Disconnect()
+			StareLoop = nil
 		end
 		if not Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and Players[v].Character:FindFirstChild("HumanoidRootPart") then return end
 		local StareFunc = function()
@@ -5646,18 +5524,14 @@ newCmd("stare", {}, "stare [plr]", "Stare at a Player", function(args, speaker)
 end)
 
 newCmd("unstare", {}, "unstare [plr]", "Disables Stare", function(args, speaker)
-	if StareLoop then
+	if StareLoop ~= nil then
 		StareLoop:Disconnect()
+		StareLoop = nil
 	end
 end)
 
-newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set IncomingReplicationLag", function(args, speaker)
-	if args[1] then
-		local IRL = tonumber(args[1])
-		settings():GetService("NetworkSettings").IncomingReplicationLag = IRL
-	else
-		notify("Replication Lag", "Missing Argument")
-	end
+newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set IncomingReplicationLag (Default is 0)", function(args, speaker)
+	settings():GetService("NetworkSettings").IncomingReplicationLag = tonumber(args[1]) or 0
 end)
 
 newCmd("nameprotect", {}, "nameprotect", "Protect your Name Locally by Setting it to \"User\"", function(args, speaker)
@@ -5667,7 +5541,7 @@ end)
 
 newCmd("ping", {}, "ping", "Notify yourself your Ping", function(args, speaker)
 	local Current_Ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString():split(" ")[1] .. "ms"
-	notify("Ping", Current_Ping)
+	notify("Ping", tostring(Current_Ping))
 end)
 
 newCmd("fps", {"frames"}, "fps / frames", "Notify yourself your Framerate", function(args, speaker)
@@ -5679,12 +5553,10 @@ newCmd("fps", {"frames"}, "fps / frames", "Notify yourself your Framerate", func
 		return ("%.3f"):format(x)
 	end
 	local fps = nil
-	local v = game:GetService("RunService").Stepped:Connect(function()
-		fps = fpsget()
-	end)
+	local v = game:GetService("RunService").Stepped:Connect(function() fps = fpsget() end)
 	wait(0.2)
 	v:Disconnect()
-	notify("FPS", "Current FPS is " .. fps)
+	notify("FPS", "Current FPS is " .. tostring(fps))
 end)
 
 newCmd("clearhats", {}, "clearhats", "Clears Hats in the Workspace", function(args, speaker)
@@ -5720,9 +5592,16 @@ newCmd("clearhats", {}, "clearhats", "Clears Hats in the Workspace", function(ar
 	end
 end)
 
+newCmd("removehats", {"nohats"}, "removehats / nohats", "Remove your hats", function(args, speaker)
+	if not speaker:FindFirstChildWhichIsA("Humanoid") then return notify("Remove Hats", "Missing Humanoid") end
+	for i, v in next, speaker:FindFirstChildWhichIsA("Humanoid"):GetAccessories() do
+        v:Destroy()
+    end
+end)
+
 newCmd("hatspin", {}, "hatspin", "Spins your Character's Accessories", function(args, speaker)
 	execCmd("unhatspin")
-	wait(.5)
+	wait(0.5)
 	for _,v in pairs(speaker.Character:FindFirstChildOfClass("Humanoid"):GetAccessories()) do
 		local keep = Instance.new("BodyPosition")
 		Prote.ProtectInstance(keep)
@@ -5752,8 +5631,9 @@ newCmd("hatspin", {}, "hatspin", "Spins your Character's Accessories", function(
 end)
 
 newCmd("unhatspin", {}, "unhatspin", "Disables Hatspin", function(args, speaker)
-	if spinhats and spinhats ~= nil then
+	if spinhats ~= nil then
 		spinhats:Disconnect()
+		spinhats = nil
 	end
 	for _, v in pairs(speaker.Character:FindFirstChildWhichIsA("Humanoid"):GetAccessories()) do
 		v.Parent = workspace
@@ -6304,6 +6184,35 @@ newCmd("sitwalk", {}, "sitwalk", "Makes your character sit while still being abl
 	else
 		Human.HipHeight = -1.5
 	end
+end)
+
+newCmd("crosshair", {}, "crosshair", "Creates a crosshair in the center of your screen", function(args, speaker)
+	local Viewport = workspace.CurrentCamera.ViewportSize
+	local CrosshairY = Drawing.new("Line")
+	local CrosshairX = Drawing.new("Line")
+	CrosshairY.Thickness = 1
+	CrosshairX.Thickness = 1
+	CrosshairY.Transparency = 1
+	CrosshairX.Transparency = 1
+	CrosshairY.Visible = true
+	CrosshairX.Visible = true
+	CrosshairY.To = Vector2.new(Viewport.CrosshairX / 2, Viewport.CrosshairY / 2 - 10)
+	CrosshairX.To = Vector2.new(Viewport.CrosshairX / 2 - 10, Viewport.CrosshairY / 2)
+	CrosshairY.From = Vector2.new(Viewport.CrosshairX / 2, Viewport.CrosshairY / 2 + 10)
+	CrosshairX.From = Vector2.new(Viewport.CrosshairX / 2 + 10, Viewport.CrosshairY / 2)
+end)
+
+newCmd("uncrosshair", {"nocrosshair"}, "uncrosshair / nocrosshair", "Remove the created crosshair", function(args, speaker)
+	if CrosshairY == nil then return end
+	if CrosshairX == nil then return end
+	CrosshairY.Visible = false
+	CrosshairX.Visible = false
+	wait()
+	CrosshairY:remove()
+	CrosshairX:remove()
+	wait()
+	CrosshairY = nil
+	CrosshairX = nil
 end)
 
 
