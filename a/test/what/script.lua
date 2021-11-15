@@ -139,8 +139,6 @@ local CmdNoclipping = nil
 local CmdClip = true
 local Noclipping = nil
 local invisRunning = false
-local CrosshairY = nil
-local CrosshairX = nil
 local viewing = nil
 local isAutoClicking = false
 local AutoclickerInput = nil
@@ -6184,35 +6182,6 @@ newCmd("sitwalk", {}, "sitwalk", "Makes your character sit while still being abl
 	else
 		Human.HipHeight = -1.5
 	end
-end)
-
-newCmd("crosshair", {}, "crosshair", "Creates a crosshair in the center of your screen", function(args, speaker)
-	local Viewport = workspace.CurrentCamera.ViewportSize
-	local CrosshairY = Drawing.new("Line")
-	local CrosshairX = Drawing.new("Line")
-	CrosshairY.Thickness = 1
-	CrosshairX.Thickness = 1
-	CrosshairY.Transparency = 1
-	CrosshairX.Transparency = 1
-	CrosshairY.Visible = true
-	CrosshairX.Visible = true
-	CrosshairY.To = Vector2.new(Viewport.CrosshairX / 2, Viewport.CrosshairY / 2 - 10)
-	CrosshairX.To = Vector2.new(Viewport.CrosshairX / 2 - 10, Viewport.CrosshairY / 2)
-	CrosshairY.From = Vector2.new(Viewport.CrosshairX / 2, Viewport.CrosshairY / 2 + 10)
-	CrosshairX.From = Vector2.new(Viewport.CrosshairX / 2 + 10, Viewport.CrosshairY / 2)
-end)
-
-newCmd("uncrosshair", {"nocrosshair"}, "uncrosshair / nocrosshair", "Remove the created crosshair", function(args, speaker)
-	if CrosshairY == nil then return end
-	if CrosshairX == nil then return end
-	CrosshairY.Visible = false
-	CrosshairX.Visible = false
-	wait()
-	CrosshairY:remove()
-	CrosshairX:remove()
-	wait()
-	CrosshairY = nil
-	CrosshairX = nil
 end)
 
 
