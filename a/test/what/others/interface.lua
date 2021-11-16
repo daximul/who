@@ -12,7 +12,7 @@ spawn(function()
 	Interface.MainDragFrame.Main.Pages.Server.Game.Title.Text = tostring(_GetMarket:GetProductInfo(game.PlaceId).Name)
 	Interface.MainDragFrame.Main.Pages.Server.Game.Description.DescriptionFrame.Description.Text = tostring(_GetMarket:GetProductInfo(game.PlaceId).Description)
 	Interface.MainDragFrame.Main.Pages.Server.Game.Thumbnail.Image = ("https://www.roblox.com/asset-thumbnail/image?assetId=" .. tostring(game.PlaceId) .. "&width=768&height=432&format=png")
-	local _GetRandomMessage = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/randompost/main/random_phrase.lua")))();
+	local _GetRandomMessage = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/u9yh45/main/m/p.lua")))();
 	if _GetRandomMessage:len() >= 70 then Interface.MainDragFrame.Main.Pages.Menu.Message.Title.TextScaled = true end
 	Interface.MainDragFrame.Main.Pages.Menu.Message.Title.Text = _GetRandomMessage
 	while wait(1) do
