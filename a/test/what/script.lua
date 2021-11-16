@@ -2625,14 +2625,10 @@ local CreateScript = function(scriptname, devs, gameid, scrfunction)
 	local log = Assets.ScriptLog:Clone()
 	log.Name = (string.lower(tostring(scriptname)) .. " " .. string.lower(tostring(devs)) .. " " .. string.lower(tostring(gameid)))
 	log.ScriptName.Text = tostring(scriptname)
-	if tostring(scriptname):len() >= 15 then
-		log.ScriptName.RichText = true
-	end
+	if tostring(scriptname):len() >= 15 then log.ScriptName.RichText = true end
 	log.Creator.Text = tostring(devs)
 	log.Compatibility.Text = tostring(gameid)
-	log.Execute.MouseButton1Down:Connect(function()
-		scrfunction()
-	end)
+	log.Execute.MouseButton1Down:Connect(function() spawn(function() scrfunction() end) end)
 	log.Parent = DaUi.Pages.Scripts.Results
 	log.Visible = true
 end
