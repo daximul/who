@@ -871,7 +871,7 @@ DaUiStatus = function(bool)
 end
 
 notify = function(Title, Message, Duration)
-	if Settings.disablenotifications  then return end
+	if Settings.disablenotifications then return end
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
 		local Desc = tostring(Message)
@@ -915,7 +915,7 @@ notify = function(Title, Message, Duration)
 end
 
 local bignotify = function(Title, Message, Duration)
-	if Settings.disablenotifications  then return end
+	if Settings.disablenotifications then return end
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
 		local Desc = tostring(Message)
