@@ -192,7 +192,7 @@ end)
 
 Players.LocalPlayer.OnTeleport:Connect(function(State)
     if State == Enum.TeleportState.Started then
-    	if Settings.KeepDA == true then
+    	if Settings.KeepDA then
         	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
     	end
     end
@@ -225,7 +225,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 CoreGui:FindFirstChild("RobloxPromptGui"):FindFirstChildWhichIsA("Frame").DescendantAdded:Connect(function(Overlay)
-	if cmdautorj == true then
+	if cmdautorj then
 		if Overlay.Name == "ErrorTitle" then
 			Overlay:GetPropertyChangedSignal("Text"):Wait()
 			if Overlay.Text == "Disconnected" then
@@ -268,7 +268,7 @@ local Time = function()
 end
 
 BindToConnection = function(name, func, path)
-	if AdminConnections[tostring(name)] == nil then
+	if not AdminConnections[tostring(name)] then
 		if path ~= nil then
 			AdminConnections[tostring(name)] = path:Connect(func)
 		else
@@ -386,7 +386,7 @@ end
 
 ChatlogAPI.LogUser = function(plr)
 	plr.Chatted:Connect(function(msg)
-		if Settings.ChatLogs == false then return end
+		if not Settings.ChatLogs then return end
 
 		local t = os.date("*t")
 		local dateDat = (t["hour"] .. ":" .. t["min"] .. ":" .. t["sec"])
@@ -510,7 +510,7 @@ JoinlogAPI.fixateUser = function(plr, status)
 end
 
 JoinlogAPI.LogJoin = function(plr)
-	if Settings.JoinLogs == false then return end
+	if not Settings.JoinLogs then return end
 
 	local t = os.date("*t")
 	local dateDat = (t["hour"] .. ":" .. t["min"] .. ":" .. t["sec"])
@@ -519,7 +519,7 @@ JoinlogAPI.LogJoin = function(plr)
 end
 
 JoinlogAPI.LogLeave = function(plr)
-	if Settings.JoinLogs == false then return end
+	if not Settings.JoinLogs then return end
 
 	local t = os.date("*t")
 	local dateDat = (t["hour"] .. ":" .. t["min"] .. ":" .. t["sec"])
@@ -641,7 +641,7 @@ SmoothScroll = function(content, SmoothingFactor)
 		content.CanvasPosition = d
 	end)
 	content.AncestryChanged:Connect(function()
-		if content.Parent == nil then
+		if not content.Parent then
 			input:Destroy()
 			smoothConnection:Disconnect()
 		end
@@ -822,7 +822,7 @@ local removeCutOff = function(Object)
 end
 
 CmdBarStatus = function(bool)
-	if bool == true then
+	if bool then
 		TweenObj(Main, "Quint", "Out", 0.5, {
 			Position = UDim2.new(0.5, -100, 1, -60)
 		})
@@ -834,7 +834,7 @@ CmdBarStatus = function(bool)
 end
 
 CmdListStatus = function(bool)
-	if bool == true then
+	if bool then
 		TweenObj(CommandsGui, "Quint", "Out", 0.3, {
 			Position = UDim2.new(0.694, -75, 0.656, -105)
 		})
@@ -846,7 +846,7 @@ CmdListStatus = function(bool)
 end
 
 PlugBrowseStatus = function(bool)
-	if bool == true then
+	if bool then
 		TweenObj(PluginBrowser, "Quint", "Out", 0.3, {
 			Position = UDim2.new(0.42, -75, 0.512, -105)
 		})
@@ -859,7 +859,7 @@ end
 
 DaUiStatus = function(bool)
 	IsDaUi = bool
-	if bool == true then
+	if bool then
 		TweenObj(UiDragF, "Quint", "Out", .3, {
 			Position = UDim2.new(0.5, -200, 0.5, -125)
 		})
@@ -871,7 +871,7 @@ DaUiStatus = function(bool)
 end
 
 notify = function(Title, Message, Duration)
-	if Settings.disablenotifications == true then return end
+	if Settings.disablenotifications  then return end
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
 		local Desc = tostring(Message)
@@ -915,7 +915,7 @@ notify = function(Title, Message, Duration)
 end
 
 local bignotify = function(Title, Message, Duration)
-	if Settings.disablenotifications == true then return end
+	if Settings.disablenotifications  then return end
 	spawn(function()
 		local Notification = NotificationTemplate:Clone()
 		local Desc = tostring(Message)
@@ -963,7 +963,7 @@ isNumber = function(str)
 end
 
 FindInTable = function(tbl,val)
-	if tbl == nil then return false end
+	if not tbl then return false end
 	for _, v in pairs(tbl) do
 		if v == val then return true end
 	end 
@@ -971,7 +971,7 @@ FindInTable = function(tbl,val)
 end
 
 ClearTable = function(tbl)
-	if tbl == nil then return end
+	if not tbl then return end
 	if type(tbl) == "table" then
 		for key in pairs(tbl) do
 			tbl[key] = nil
@@ -980,8 +980,8 @@ ClearTable = function(tbl)
 end
 
 SetTableContents = function(tbl, bool)
-	if tbl == nil then return end
-	if bool == nil then bool = false end
+	if not tbl then return end
+	if not bool then bool = false end
 	if type(tbl) == "table" then
 		for key in pairs(tbl) do
 			tbl[key] = bool
@@ -995,7 +995,7 @@ getRoot = function(char)
 end
 
 SetLocalAnimate = function(ch, val)
-	if val == nil then val = false end
+	if not val then val = false end
 	if ch ~= nil then
 		local AnimateScript = ch["Animate"]
 		AnimateScript = AnimateScript:IsA("LocalScript") and AnimateScript or nil
@@ -1075,7 +1075,7 @@ end
 
 splitString = function(str, delim)
 	local broken = {}
-	if delim == nil then delim = "," end
+	if not delim then delim = "," end
 	for w in string.gmatch(str, "[^" .. delim .. "]+") do
 		table.insert(broken, w)
 	end
@@ -1397,7 +1397,7 @@ local SpecialPlayerCases = {
 	["age(%d+)"] = function(speaker, args)
 		local returns = {}
 		local age = tonumber(args[1])
-		if not age == nil then return end
+		if not age then return end
 		for _,plr in pairs(Players:GetPlayers()) do
 			if plr.AccountAge <= age then
 				table.insert(returns, plr)
@@ -1519,7 +1519,7 @@ getPlayersByName = function(Name)
 end
 
 getPlayer = function(list, speaker)
-	if list == nil then return {speaker.Name} end
+	if not list then return {speaker.Name} end
 	local nameList = splitString(list, ",")
 
 	local foundList = {}
@@ -1573,7 +1573,7 @@ MatchSearch = function(str1, str2)
 end
 
 StringFind = function(tbl, str)
-	if tbl == nil then return end
+	if not tbl then return end
 	if type(tbl) == "table" then
 		for _, v in ipairs(tbl) do
 			if MatchSearch(str, v) then
@@ -1771,7 +1771,7 @@ writefileCooldown = function(name,data)
 			wfile_cooldown = true
 			writefile(name, data)
 		else
-			repeat wait() until wfile_cooldown == false
+			repeat wait() until not wfile_cooldown
 			writefileCooldown(name, data)
 		end
 		wait(3)
@@ -1854,7 +1854,7 @@ end
 LoadSettings()
 
 updatesaves = function()
-	if nosaves == false and writefileExploit() then
+	if not nosaves and writefileExploit() then
 		local update = {
 			Prefix = Settings.Prefix;
 			PluginsTable = Settings.PluginsTable;
@@ -2000,7 +2000,7 @@ LoadPlugin = function(val, startup)
 				end
 			end
 		end
-	elseif plugin == nil then
+	elseif not plugin then
 		plugin = nil
 	end
 end
@@ -2014,7 +2014,7 @@ FindPlugins = function()
 end
 
 local xrayobjects = function(bool)
-	if bool == true then
+	if bool  then
 		for i, v in next, workspace:GetDescendants() do
 			if v:IsA("Part") and v.Transparency <= 0.3 then
 				Prote.SpoofProperty(v, "Transparency")
@@ -2716,7 +2716,7 @@ spawn(function()
 		if not CommandsLoaded then
 			CommandsLoaded = true
 			for _, v in next, cmds do
-				if v["PLUGIN"] == false then
+				if not v["PLUGIN"] then
 					addcmdtext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"])
 				else
 					addcmdtext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"], true)
@@ -2832,7 +2832,7 @@ BrowserBtn("Sharkbite", "Sharkbite", "Destroy the lives of Sharkbite Players wit
 --// Commands
 
 newCmd("commands", {"cmds"}, "commands / cmds", "View the Command List", function(args, speaker)
-	if IsDaUi == false then
+	if not IsDaUi then
 		DaUiStatus(true)
 		DaUi.Pages.UIPageLayout:JumpTo(DaUi.Pages.Commands)
 	else
@@ -2841,7 +2841,7 @@ newCmd("commands", {"cmds"}, "commands / cmds", "View the Command List", functio
 	if not CommandsLoaded then
 		CommandsLoaded = true
 		for _, v in next, cmds do
-			if v["PLUGIN"] == false then
+			if not v["PLUGIN"] then
 				addcmdtext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"])
 			else
 				addcmdtext(v["NAME"], v["TITLE"], v["ALIAS"], v["DESC"], true)
@@ -2987,7 +2987,7 @@ newCmd("netcheck", {}, "netcheck", "Notify Who is Using Network Ownership", func
 end)
 
 newCmd("walkspeed", {"ws"}, "walkspeed / ws [number]", "Change your WalkSpeed", function(args, speaker)
-	if args[1] == nil then return notify("WalkSpeed", "Argument Missing") end
+	if not args[1] then return notify("WalkSpeed", "Argument Missing") end
 	local wspeed = args[1]
 	if speaker and speaker.Character and findhum() then
 		if isNumber(wspeed) then
@@ -3030,7 +3030,7 @@ newCmd("unloopspeed", {"unloopws"}, "unloopspeed / unloopws", "Disable LoopSpeed
 end)
 
 newCmd("jumppower", {"jp"}, "jumppower / jp [number]", "Change your JumpPower", function(args, speaker)
-	if args[1] == nil then return notify("JumpPower", "Argument Missing") end
+	if not args[1] then return notify("JumpPower", "Argument Missing") end
 	local jppower = args[1]
 	if speaker and speaker.Character and findhum() then
 		if isNumber(jppower) then
@@ -3080,7 +3080,7 @@ newCmd("unloopjumppower", {"unloopjp"}, "unloopjumppower / unloopjp", "Disable L
 end)
 
 newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args, speaker)
-	if clientsidebypass == false then
+	if not clientsidebypass then
 		local users = getPlayer(args[1], speaker)
 		for i,v in pairs(users) do
 			if Players[v].Character ~= nil then
@@ -3111,7 +3111,7 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 end)
 
 newCmd("pulseto", {"pto"}, "pulseto / pto [plr] [seconds]", "Teleports you to a player for a specified ammount of time", function(args, speaker)
-	if clientsidebypass == false then
+	if not clientsidebypass then
 		local users = getPlayer(args[1], speaker)
 		for i,v in pairs(users) do
 			if Players[v].Character ~= nil then
@@ -3153,9 +3153,9 @@ newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 	CmdClip = false
 	wait(0.1)
 	local NoclipLoop = function()
-		if CmdClip == false and speaker.Character ~= nil then
+		if not CmdClip and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
-				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+				if child:IsA("BasePart") and child.CanCollide  and child.Name ~= floatName then
 					Prote.SpoofProperty(child, "CanCollide")
 					child.CanCollide = false
 				end
@@ -3178,11 +3178,11 @@ newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args
 end)
 
 newCmd("togglenoclip", {}, "togglenoclip", "Toggle Noclip", function(args, speaker)
-	if CmdClip == true then
+	if CmdClip  then
 		execCmd("clip nonotify")
 		wait()
 		execCmd("noclip")
-	elseif CmdClip == false then
+	elseif not CmdClip then
 		execCmd("clip")
 	end
 end)
@@ -3357,17 +3357,17 @@ newCmd("gyroflyspeed", {"gflyspeed"}, "gyroflyspeed / gflyspeed [num]", "Sets Gy
 end)
 
 newCmd("togglefly", {}, "togglefly", "Toggle Fly", function(args, speaker)
-	if FLYING == true then
+	if FLYING  then
 		NOFLY()
-	elseif FLYING == false then
+	elseif not FLYING then
 		sFLY()
 	end
 end)
 
 newCmd("togglegyrofly", {"togglegfly"}, "togglegyrofly / togglegfly", "Toggle Gyro Fly", function(args, speaker)
-	if GYROFLYING == true then
+	if GYROFLYING  then
 		execCmd("ungyrofly")
-	elseif GYROFLYING == false then
+	elseif not GYROFLYING then
 		execCmd("gyrofly")
 	end
 end)
@@ -3738,14 +3738,14 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 				local RealFenv = {script = Script}
 				local FenvMt = {}
 				FenvMt.__index = function(a,b)
-					if RealFenv[b] == nil then
+					if not RealFenv[b] then
 						return getfenv()[b]
 					else
 						return RealFenv[b]
 					end
 				end
 				FenvMt.__newindex = function(a, b, c)
-					if RealFenv[b] == nil then
+					if not RealFenv[b] then
 						getfenv()[b] = c
 					else
 						RealFenv[b] = c
@@ -3883,7 +3883,7 @@ newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
 end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
-	if invisRunning == true then return end
+	if invisRunning  then return end
 	local OldPos = getRoot(Players.LocalPlayer.Character).CFrame
 	getRoot(Players.LocalPlayer.Character).CFrame = CFrame.new(9e9, 9e9, 9e9)
 	local Clone = getRoot(Players.LocalPlayer.Character):Clone()
@@ -4406,7 +4406,7 @@ newCmd("lag", {}, "lag", "Make yourself look like you are lagging", function(arg
 		wait(0.1)
 		getRoot(speaker.Character).Anchored = true
 		wait(0.1)
-	until FakeLagging == false
+	until not FakeLagging
 end)
 
 newCmd("unlag", {}, "unlag", "Stop the fake lag", function(args, speaker)
@@ -4571,7 +4571,7 @@ newCmd("infinitejump", {"infjump"}, "infinitejump / infjump", "Be Able to Keep J
 	notify("Infinite Jump", "Enabled")
 	cmdinfjump = true
 	game:GetService("UserInputService").JumpRequest:Connect(function()
-		if cmdinfjump == true then
+		if cmdinfjump  then
 			if findhum() then
 				local Human = gethum()
 				Prote.SpoofInstance(Human)
@@ -5184,7 +5184,7 @@ newCmd("freezeunanchored", {"freezeua"}, "freezeunanchored / freezeua", "Freezes
 				if speaker.Character and v:IsDescendantOf(speaker.Character) then
 					BADD = true
 				end
-				if BADD == false then
+				if not BADD then
 					for i,c in pairs(v:GetChildren()) do
 						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
 							c:Destroy()
@@ -5338,7 +5338,7 @@ newCmd("walltp", {}, "walltp", "Teleports You Above/Over Any Wall You Run Into",
 			local HitP = getRoot(hit.Parent)
 			if HitP ~= nil then
 				Root.CFrame = hit.CFrame * CFrame.new(Root.CFrame.lookVector.X,HitP.Size.Z/2 + speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight,Root.CFrame.lookVector.Z)
-			elseif HitP == nil then
+			elseif not HitP then
 				Root.CFrame = hit.CFrame * CFrame.new(Root.CFrame.lookVector.X,hit.Size.Y/2 + speaker.Character:FindFirstChildOfClass("Humanoid").HipHeight,Root.CFrame.lookVector.Z)
 			end
 		end
@@ -5448,7 +5448,7 @@ newCmd("walkto", {"follow"}, "walkto / follow [plr]", "Follow a Player", functio
 			walkto = true
 			repeat wait()
 				speaker.Character:FindFirstChildOfClass("Humanoid"):MoveTo(getRoot(Players[v].Character).Position)
-			until Players[v].Character == nil or not getRoot(Players[v].Character) or walkto == false
+			until not Players[v].Character or not getRoot(Players[v].Character) or not walkto 
 		end
 	end
 end)
@@ -5485,7 +5485,7 @@ newCmd("pathfindwalkto", {"pathfindfollow"}, "pathfindwalkto / pathfindfollow [p
 				if not success then
 					speaker.Character:FindFirstChildOfClass("Humanoid"):MoveTo(getRoot(Players[v].Character).Position)
 				end
-			until Players[v].Character == nil or not getRoot(Players[v].Character) or walkto == false
+			until not Players[v].Character or not getRoot(Players[v].Character) or not walkto 
 		end
 	end
 end)
@@ -5742,7 +5742,7 @@ newCmd("fixbubblechat", {}, "fixbubblechat", "Fix the Bubblechat Being Cut Off",
 end)
 
 newCmd("unfixbubblechat", {}, "unfixbubblechat", "Disable Fixbubblechat", function(args, speaker)
-	if BubbleChatFix == nil then
+	if not BubbleChatFix then
 		return notify("Bubble Chat", "Wasn't Fixed")
 	end
 	BubbleChatFix:Disconnect()
@@ -5794,10 +5794,10 @@ newCmd("unclientsidebypass", {"unclbypass"}, "unclientsidebypass / unclbypass", 
 end)
 
 newCmd("joinplayer", {"jplr"}, "joinplayer / jplr [user / id] [place id]", "Join a Specific Player's Server", function(args, speaker)
-	if args[1] == nil then return notify("Join Player", "Missing Argument") end
+	if not args[1] then return notify("Join Player", "Missing Argument") end
 	local retries = 0
 	JoinServer = function(User, PlaceId)
-		if args[2] == nil then PlaceId = game.PlaceId end
+		if not args[2] then PlaceId = game.PlaceId end
 		if not pcall(function()
 				local FoundUser, UserId = pcall(function()
 					if tonumber(User) then
@@ -6072,7 +6072,7 @@ newCmd("autoclick", {}, "autoclick [click delay] [release delay]", "Automaticall
 			mouse1press()
 			wait(releaseDelay)
 			mouse1release()
-		until isAutoClicking == false
+		until not isAutoClicking
 	else
 		notify("Incompatible Exploit", "Missing mouse1press and mouse1release")
 	end
@@ -6114,7 +6114,7 @@ newCmd("autokeypress", {}, "autokeypress [key] [down delay] [up delay]", "Automa
 			keypress(code)
 			wait(releaseDelay)
 			keyrelease(code)
-		until AutomaticKeyPressing == false
+		until not AutomaticKeyPressing 
 		if AutoKeyPressInput then AutoKeyPressInput:Disconnect() keyrelease(code) end
 	else
 		notify("Incompatible Exploit", "Missing keypress and keyrelease")
