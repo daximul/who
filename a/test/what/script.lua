@@ -6180,6 +6180,32 @@ newCmd("sitwalk", {}, "sitwalk", "Makes your character sit while still being abl
 	end
 end)
 
+newCmd("savegame", {"saveplace"}, "savegame / saveplace", "Uses saveinstance or Dex to save the game", function(args, speaker)
+	if saveinstance then
+		notify("Downloading", "This will take a while")
+		if getsynasset then
+			saveinstance()
+		else
+			saveinstance(game)
+		end
+		notify("Game Saved", "Saved place to your workspace.")
+	else
+		notify("Incompatible Exploit", "Missing saveinstance, use Dex")
+		wait()
+		execCmd("explorer")
+	end
+end)
+
+newCmd("clearerror", {}, "clearerror", "Clears the annoying box and blur when a game kicks you", function(args, speaker)
+	game:GetService("GuiService"):ClearError()
+end)
+
+newCmd("volume", {"vol"}, "volume / vol [0 - 10]", "Adjusts your game volume on a scale of 0 to 10", function(args, speaker)
+	if args[1] and isNumber(args[1]) then
+		UserSettings():GetService("UserGameSettings").MasterVolume = tonumber(args[1]) / 10
+	end
+end)
+
 
 
 VirtualEnvironment()
