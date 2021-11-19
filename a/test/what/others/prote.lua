@@ -6,7 +6,7 @@ local spec = {
     ["getnamecall"] = getnamecallmethod or get_namecall_method,
     ["makereadonly"] = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end),
     ["newclose"] = newcclosure or protect_function or function(f) return f end,
-    ["capturedGames"] = {"6650331930"},
+    ["capturedGames"] = {["6650331930"]=true},
     ["CmdTextConnections"] = nil
 }
 
@@ -113,9 +113,9 @@ mt.__index = spec.newclose(function(Instance_, Index)
         if (table.find(AllowedIndexes, Index)) then
             return __Index(Instance_, Index)
         end
-        if (Instance_:IsA("Humanoid") and spec.capturedGames[tostring(game.PlaceId)] ~= nil) then
+        if (Instance_:IsA("Humanoid") and spec.capturedGames[tostring(game.PlaceId)] == true) then
             for i, v in next, spec.getcons(Instance_:GetPropertyChangedSignal("WalkSpeed")) do
-                v.Disable(v)
+                v:Disable()
             end
         end
         return __Index(SpoofedInstance, Index)
@@ -230,16 +230,16 @@ end
 Prote.Misc.SpoofCommandBar = function()
 	spec.CmdTextConnections = spec.getcons(game:GetService("UserInputService").TextBoxFocused)
 	for i, v in next, spec.CmdTextConnections do
-		v.Disable(v)
+		v:Disable()
 	end
 	for i, v in next, spec.getcons(game:GetService("UserInputService").TextBoxFocusReleased) do
-		v.Disable(v)
+		v:Disable()
 	end
 end
 
 Prote.Misc.UnSpoofCommandBar = function()
 	for i, v in next, spec.CmdTextConnections do
-		v.Enable(v)
+		v:Enable()
 	end
 end
 
