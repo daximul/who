@@ -73,6 +73,7 @@ local Settings = {
 	["AutoNet"] = false,
 	["cmdautorj"] = false,
 	["disablenotifications"] = false,
+	["undetectedcmdbar"] = false,
 }
 
 local cmds = {}
@@ -649,9 +650,11 @@ SmoothScroll = function(content, SmoothingFactor)
 end
 
 CaptureCmdBar = function()
+	Prote.Misc.SpoofCommandBar()
 	Cmdbar:CaptureFocus()
 	spawn(function() repeat Cmdbar.Text = "" until Cmdbar.Text == "" end)
 	spawn(function() CmdBarStatus(true) end)
+	Prote.Misc.UnSpoofCommandBar()
 end
 
 local SetSimulationRadius = function()
@@ -1800,6 +1803,7 @@ LoadSettings = function()
 					if json.AutoNet ~= nil then Settings.AutoNet = json.AutoNet else Settings.AutoNet = false end
 					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
 					if json.disablenotifications ~= nil then Settings.disablenotifications = json.disablenotifications else Settings.disablenotifications = false end
+					if json.undetectedcmdbar ~= nil then Settings.undetectedcmdbar = json.undetectedcmdbar else Settings.undetectedcmdbar = false end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1832,6 +1836,7 @@ LoadSettings = function()
 				Settings.AutoNet = false
 				Settings.cmdautorj = false
 				Settings.disablenotifications = false
+				Settings.undetectedcmdbar = false
 				
 				notify("", "There was a problem writing a save file to your PC")
 			end
@@ -1849,6 +1854,7 @@ LoadSettings = function()
 		Settings.AutoNet = false
 		Settings.cmdautorj = false
 		Settings.disablenotifications = false
+		Settings.undetectedcmdbar = false
 	end
 end
 LoadSettings()
@@ -1868,6 +1874,7 @@ updatesaves = function()
 			AutoNet = Settings.AutoNet;
 			cmdautorj = Settings.cmdautorj;
 			disablenotifications = Settings.disablenotifications;
+			undetectedcmdbar = Settings.undetectedcmdbar;
 		}
 		writefileCooldown(Settings_Path, game:GetService("HttpService"):JSONEncode(update))
 	end
@@ -2800,6 +2807,10 @@ AddSetting("Join Logs", Settings.JoinLogs, function(Callback)
 end)
 AddSetting("No Notifications", Settings.disablenotifications, function(Callback)
 	Settings.disablenotifications = Callback
+	updatesaves()
+end)
+AddSetting("Undetected CommandBar", Settings.undetectedcmdbar, function(Callback)
+	Settings.undetectedcmdbar = Callback
 	updatesaves()
 end)
 AddSetting("Auto Net", Settings.AutoNet, function(Callback)
