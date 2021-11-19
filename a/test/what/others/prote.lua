@@ -1,14 +1,13 @@
---//                                  Prote API                                       \\--
---// Protect Instances, Spoof Instances, and Spoof Properties with incredible accuracy \\--
-
-local Prote = {}
+local Prote = {["Misc"]={}}
 
 local spec = {
-    getrawmt = (debug and debug.getmetatable) or getrawmetatable;
-    getcons = getconnections or get_signal_cons;
-    getnamecall = getnamecallmethod or get_namecall_method;
-    makereadonly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end);
-    newclose = newcclosure or protect_function or function(f) return f end;
+    ["getrawmt"] = (debug and debug.getmetatable) or getrawmetatable,
+    ["getcons"] = getconnections or get_signal_cons,
+    ["getnamecall"] = getnamecallmethod or get_namecall_method,
+    ["makereadonly"] = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end),
+    ["newclose"] = newcclosure or protect_function or function(f) return f end,
+    ["capturedGames"] = {"6650331930"},
+    ["CmdTextConnections"] = nil
 }
 
 local tblmap = function(tbl, ret)
@@ -114,9 +113,9 @@ mt.__index = spec.newclose(function(Instance_, Index)
         if (table.find(AllowedIndexes, Index)) then
             return __Index(Instance_, Index)
         end
-        if (Instance_:IsA("Humanoid") and game.PlaceId == 6650331930) then
+        if (Instance_:IsA("Humanoid") and spec.capturedGames[tostring(game.PlaceId)] ~= nil) then
             for i, v in next, spec.getcons(Instance_:GetPropertyChangedSignal("WalkSpeed")) do
-                v:Disable()
+                v.Disable(v)
             end
         end
         return __Index(SpoofedInstance, Index)
@@ -185,13 +184,6 @@ end)
 
 spec.makereadonly(mt, true)
 
-for i, v in next, spec.getcons(game:GetService("UserInputService").TextBoxFocused) do
-    v:Disable()
-end
-for i, v in next, spec.getcons(game:GetService("UserInputService").TextBoxFocusReleased) do
-    v:Disable()
-end
-
 Prote.ProtectInstance = function(Instance_, disallow)
     if (not ProtectedInstances[Instance_]) then
         ProtectedInstances[#ProtectedInstances + 1] = Instance_
@@ -227,6 +219,28 @@ Prote.SpoofProperty = function(Instance_, Property, Value)
         Property = Property,
         Value = Value and Value or Instance_[Property]
     }}
+end
+
+Prote.UnSpoofInstance = function(Instance_)
+	if SpoofedInstances[Instance_] then
+		SpoofedInstances[Instance_] = nil
+	end
+end
+
+Prote.Misc.SpoofCommandBar = function()
+	spec.CmdTextConnections = spec.getcons(game:GetService("UserInputService").TextBoxFocused)
+	for i, v in next, spec.CmdTextConnections do
+		v.Disable(v)
+	end
+	for i, v in next, spec.getcons(game:GetService("UserInputService").TextBoxFocusReleased) do
+		v.Disable(v)
+	end
+end
+
+Prote.Misc.UnSpoofCommandBar = function()
+	for i, v in next, spec.CmdTextConnections do
+		v.Enable(v)
+	end
 end
 
 return Prote
