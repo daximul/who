@@ -2647,31 +2647,8 @@ spawn(function()
 		SmoothDrag(PluginBrowser)
 		UiDragF.Active = true
 		UiDragF.Draggable = true
-		local pb_scroll = PluginBrowser.Area.ScrollingFrame
-		SmoothScroll(pb_scroll, 0.14)
+		SmoothScroll(PluginBrowser.Area.ScrollingFrame, 0.14)
 		macroSystem()
-	end)
-	spawn(function()
-		DaUi.Pages.Commands.SearchBar.SearchFrame.Search:GetPropertyChangedSignal("Text"):Connect(function()
-			local Text = string.lower(DaUi.Pages.Commands.SearchBar.SearchFrame.Search.Text)
-			for _, v in next, DaUi.Pages.Commands.Results:GetChildren() do
-				if v:IsA("TextButton") then
-					local Command = v.Label.Text
-					v.Visible = string.find(string.lower(Command), Text, 1, true)
-				end
-			end
-		end)
-	end)
-	spawn(function()
-		DaUi.Pages.Scripts.SearchBar.SearchFrame.Search:GetPropertyChangedSignal("Text"):Connect(function()
-			local Text = string.lower(tostring(DaUi.Pages.Scripts.SearchBar.SearchFrame.Search.Text))
-			for _, v in next, DaUi.Pages.Scripts.Results:GetChildren() do
-				if v:IsA("Frame") then
-					local ScriptString = tostring(v.Name)
-					v.Visible = string.find(string.lower(ScriptString), Text, 1, true)
-				end
-			end
-		end)
 	end)
 	spawn(function()
 		PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
@@ -2681,6 +2658,24 @@ spawn(function()
 		end)
 		DaUi.Pages.Scripts.Results.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 			DaUi.Pages.Scripts.Results.CanvasSize = UDim2.new(0, 0, 0, DaUi.Pages.Scripts.Results.UIListLayout.AbsoluteContentSize.Y)
+		end)
+		DaUi.Pages.Commands.SearchBar.SearchFrame.Search:GetPropertyChangedSignal("Text"):Connect(function()
+			local Text = string.lower(DaUi.Pages.Commands.SearchBar.SearchFrame.Search.Text)
+			for _, v in next, DaUi.Pages.Commands.Results:GetChildren() do
+				if v:IsA("TextButton") then
+					local Command = v.Label.Text
+					v.Visible = string.find(string.lower(Command), Text, 1, true)
+				end
+			end
+		end)
+		DaUi.Pages.Scripts.SearchBar.SearchFrame.Search:GetPropertyChangedSignal("Text"):Connect(function()
+			local Text = string.lower(tostring(DaUi.Pages.Scripts.SearchBar.SearchFrame.Search.Text))
+			for _, v in next, DaUi.Pages.Scripts.Results:GetChildren() do
+				if v:IsA("Frame") then
+					local ScriptString = tostring(v.Name)
+					v.Visible = string.find(string.lower(ScriptString), Text, 1, true)
+				end
+			end
 		end)
 	end)
 	CommandsGui.Close.MouseButton1Down:Connect(function()
@@ -2755,18 +2750,11 @@ spawn(function()
 			end
 		end
 	end)
-	spawn(function()
-		for _, plr in pairs(Players:GetChildren()) do
-			if plr.ClassName == "Player" then
-				ChatlogAPI.LogUser(plr)
-			end
+	for _, plr in pairs(Players:GetChildren()) do
+		if plr.ClassName == "Player" then
+			ChatlogAPI.LogUser(plr)
 		end
-	end)
-	spawn(function()
-		if syn and syn.queue_on_teleport and Settings.KeepDA then
-			syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
-		end
-	end)
+	end
 end)
 SetPrefix = AddInputBox("Prefix", function(Callback)
 	if typeof(Callback) == "string" and #Callback <= 2 then
