@@ -192,11 +192,11 @@ Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(fu
 end)
 
 Players.LocalPlayer.OnTeleport:Connect(function(State)
-    if State == Enum.TeleportState.Started then
-    	if Settings.KeepDA then
-        	syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
-    	end
-    end
+	if State == Enum.TeleportState.Started then
+		if Settings.KeepDA then
+			syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
+		end
+	end
 end)
 
 Players.LocalPlayer.CharacterAdded:Connect(function()
@@ -206,18 +206,14 @@ Players.LocalPlayer.CharacterAdded:Connect(function()
 	Floating = false
 	CmdClip = true
 	invisRunning = false
-	
 	repeat wait() until getRoot(Players.LocalPlayer.Character)
-	
 	execCmd("clip nonotify")
-	
 	pcall(function()
 		if spawnpoint and spawnpos ~= nil then
 			wait(spDelay)
 			getRoot(Players.LocalPlayer.Character).CFrame = spawnpos
 		end
 	end)
-	
 	Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
 		if getRoot(Players.LocalPlayer.Character) then
 			LastDeathPos = getRoot(Players.LocalPlayer.Character).CFrame
@@ -992,8 +988,10 @@ SetTableContents = function(tbl, bool)
 	end
 end
 
-getRoot = function(char)
-	local RootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+getRoot = function(_char)
+	local _character = nil
+	if _char == nil then _character = Players.LocalPlayer.Character else _character = _char end
+	local RootPart = _character:FindFirstChild("HumanoidRootPart") or _character:FindFirstChild("Torso") or _character:FindFirstChild("UpperTorso")
 	return RootPart
 end
 
