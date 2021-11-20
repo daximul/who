@@ -138,7 +138,6 @@ local GYROFLYING = false
 local Floating = false
 local CmdNoclipping = nil
 local CmdClip = true
-local Noclipping = nil
 local invisRunning = false
 local viewing = nil
 local isAutoClicking = false
@@ -264,13 +263,10 @@ local Time = function()
 	return HOUR .. ":" .. MINUTE .. ":" .. SECOND .. " " .. AP
 end
 
-BindToConnection = function(name, func, path)
-	if not AdminConnections[tostring(name)] then
-		if path ~= nil then
-			AdminConnections[tostring(name)] = path:Connect(func)
-		else
-			AdminConnections[tostring(name)] = game:GetService("RunService").RenderStepped:Connect(func)
-		end
+BindToConnection = function(name, connection)
+	if AdminConnections[tostring(name)] == nil then
+		AdminConnections[tostring(name)] = connection
+		return AdminConnections[tostring(name)]
 	end
 end
 
@@ -2544,7 +2540,6 @@ end
 local newCmd = function(name, aliases, title, description, func) addcmd(name, aliases, title, description, func) end
 
 local VirtualEnvironment = function()
-	if not getgenv then return end
 	local Environment = {}
 	Environment.loaded = true
 	Environment.Interface = GUI
@@ -2554,7 +2549,7 @@ local VirtualEnvironment = function()
 	Environment.notify = notify
 	Environment.getcmds = function() return cmds end
 	Environment.running_error = function() notify(Loaded_Title, "Already Running!") end
-	Environment.matchsearch = MatchSearch
+	Environment.matchSearch = MatchSearch
 	Environment.execCmd = execCmd
 	Environment.events = {}
 	getgenv()["DA_ENV"] = Environment
@@ -3152,22 +3147,22 @@ newCmd("noclip", {}, "noclip", "Disable your Collison", function(args, speaker)
 	local NoclipLoop = function()
 		if not CmdClip and speaker.Character ~= nil then
 			for _, child in pairs(speaker.Character:GetDescendants()) do
-				if child:IsA("BasePart") and child.CanCollide  and child.Name ~= floatName then
+				if child:IsA("BasePart") and child.CanCollide and child.Name ~= floatName then
 					Prote.SpoofProperty(child, "CanCollide")
 					child.CanCollide = false
 				end
 			end
 		end
 	end
-	Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoop)
+	CmdNoclipping = game:GetService("RunService").Stepped:Connect(NoclipLoop)
 	if args[1] and args[1] == "nonotify" then return end
 	notify("Noclip", "Noclip Enabled")
 end)
 
 newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args, speaker)
-	if Noclipping ~= nil then
-		Noclipping:Disconnect()
-		Noclipping = nil
+	if CmdNoclipping ~= nil then
+		CmdNoclipping:Disconnect()
+		CmdNoclipping = nil
 	end
 	CmdClip = true
 	if args[1] and args[1] == "nonotify" then return end
@@ -3175,7 +3170,7 @@ newCmd("clip", {"unnoclip"}, "clip / unnoclip", "Stop Noclipping", function(args
 end)
 
 newCmd("togglenoclip", {}, "togglenoclip", "Toggle Noclip", function(args, speaker)
-	if CmdClip  then
+	if CmdClip then
 		execCmd("clip nonotify")
 		wait()
 		execCmd("noclip")
@@ -3463,10 +3458,10 @@ end)
 
 newCmd("clientbring", {"cbring"}, "clientbring / cbring [plr]", "Bring a User on your Client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users)do
+	for i,v in pairs(users) do
 		if Players[v].Character ~= nil then
-			if Players[v].Character:FindFirstChild("Humanoid") then
-				Players[v].Character:FindFirstChildOfClass('Humanoid').Sit = false
+			if Players[v].Character:FindFirstChildWhichIsA("Humanoid") then
+				Players[v].Character:FindFirstChildWhichIsA("Humanoid").Sit = false
 			end
 			wait()
 			getRoot(Players[v].Character).CFrame = getRoot(speaker.Character).CFrame + Vector3.new(3,1,0)
@@ -4116,7 +4111,27 @@ newCmd("equiptools", {}, "equiptools", "Equips every Tool in your Inventory", fu
 	end
 end)
 
-newCmd("droptools", {}, "droptools", "Drop your Tools", function(args, speaker)
+newCmd("activatetools", {}, "activatetools", "Equips and activates all of your tools", function(args, speaker)
+	if findhum(speaker.Character) then
+		gethum(speaker.Character):UnequipTools()
+	end
+	local VirtualInputManager = game:GetService("VirtualInputManager")
+	local SendMouseButtonEvent = VirtualInputManager.SendMouseButtonEvent
+	local GrabbedTools = {}
+	for i,v in pairs(speaker:FindFirstChildOfClass("Backpack"):GetChildren()) do
+		if v:IsA("Tool") or v:IsA("HopperBin") then
+			table.insert(GrabbedTools, v)
+			v.Parent = speaker.Character
+		end
+	end
+	wait()
+	for i, v in next, GrabbedTools do
+		v:Activate()
+	end
+	SendMouseButtonEvent(VirtualInputManager, 0, 0, 0, true, nil, #GrabbedTools)
+end)
+
+newCmd("droptools", {}, "droptools", "Drop all of your tools", function(args, speaker)
 	for i,v in pairs(Players.LocalPlayer.Backpack:GetChildren()) do
 		if v:IsA("Tool") then
 			Prote.SpoofProperty(v, "Parent")
@@ -4160,7 +4175,7 @@ newCmd("copyusername", {"copyname"}, "copyusername / copyname", "Copies a player
 	end
 end)
 
-newCmd("copyuserid", {"copyid"}, "copyuserid / copyid", "Copies a player's user ID to your clipboard", function(args, speaker)
+newCmd("copyuserid", {"copyid"}, "copyuserid / copyid", "Copies a player's User ID to your clipboard", function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
 		local id = tostring(Players[v].UserId)
@@ -4171,17 +4186,17 @@ end)
 
 newCmd("resetuserid", {}, "resetuserid", "Set your User ID back to normal", function(args, speaker)
 	speaker.UserId = origsettings.Player.Id
-	notify("Set ID", "Set UserId to original")
+	notify("", "Set UserId to Original")
 end)
 
 newCmd("setcreatorid", {}, "setcreatorid", "Set your User ID to the Creator's User ID", function(args, speaker)
 	if game.CreatorType == Enum.CreatorType.User then
 		speaker.UserId = game.CreatorId
-		notify("Set ID", "Set UserId to " .. game.CreatorId)
+		notify("", "Set UserId to " .. game.CreatorId)
 	elseif game.CreatorType == Enum.CreatorType.Group then
 		local OwnerID = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId).Owner.Id
 		speaker.UserId = OwnerID
-		notify("Set ID", "Set UserId to " .. OwnerID)
+		notify("", "Set UserId to " .. OwnerID)
 	end
 end)
 
@@ -6202,7 +6217,6 @@ newCmd("volume", {"vol"}, "volume / vol [0 - 10]", "Adjusts your game volume on 
 		UserSettings():GetService("UserGameSettings").MasterVolume = tonumber(args[1]) / 10
 	end
 end)
-
 
 
 VirtualEnvironment()
