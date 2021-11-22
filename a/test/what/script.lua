@@ -139,6 +139,9 @@ local Floating = false
 local CmdNoclipping = nil
 local CmdClip = true
 local invisRunning = false
+local InvisSeat = false
+local InvisWeld = false
+local beforeInvisTransparency = {}
 local viewing = nil
 local isAutoClicking = false
 local AutoclickerInput = nil
@@ -3875,15 +3878,59 @@ newCmd("fov", {}, "fov", "Change your Field of View", function(args, speaker)
 end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
-	if invisRunning  then return end
-	local OldPos = getRoot(Players.LocalPlayer.Character).CFrame
-	getRoot(Players.LocalPlayer.Character).CFrame = CFrame.new(9e9, 9e9, 9e9)
-	local Clone = getRoot(Players.LocalPlayer.Character):Clone()
+	if invisRunning then return end
+	local Root = getRoot()
+	local OldPos = Root.CFrame
+	InvisSeat = Instance.new("Seat")
+	InvisWeld = Instance.new("Weld")
+	Prote.ProtectInstance(InvisSeat)
+	Prote.ProtectInstance(InvisWeld)
+	Root.CFrame = CFrame.new(9e9, 9e9, 9e9)
 	wait(0.2)
-	getRoot(Players.LocalPlayer.Character):Destroy()
-	Clone.CFrame = OldPos
-	Clone.Parent = Players.LocalPlayer.Character
+	Root.Anchored = true
+	InvisSeat.Transparency = 1
+	InvisSeat.Parent = workspace
+	InvisSeat.CFrame = Root.CFrame
+	InvisSeat.Anchored = false
+	InvisWeld.Parent = InvisSeat
+	InvisWeld.Part0 = InvisSeat
+	InvisWeld.Part1 = Root
+	Root.Anchored = false
+	InvisSeat.CFrame = OldPos
+	for i, v in next, Root.Parent:GetChildren() do
+		if v:IsA("BasePart") or v:IsA("MeshPart") or v:IsA("Part") then
+			beforeInvisTransparency[v] = v.Transparency
+			v.Transparency = v.Transparency <= 0.3 and 0.4 or v.Transparency
+		elseif v:IsA("Accessory") then
+			local Handle = v:FindFirstChildWhichIsA("MeshPart") or v:FindFirstChildWhichIsA("Part")
+			if Handle then
+				beforeInvisTransparency[Handle] = Handle.Transparency
+				Handle.Transparency = Handle.Transparency <= 0.3 and 0.4 or Handle.Transparency    
+			end
+		end
+	end
+	invisRunning = true
 	notify("Invisibility", "You are invisible to players!")
+end)
+
+newCmd("visible", {"vis"}, "visible / vis", "Disable Invisibility", function(args, speaker)
+	if invisRunning == false then return end
+	invisRunning = false
+	if InvisSeat and InvisWeld then
+		InvisSeat:Destroy()
+		InvisWeld:Destroy()
+		spawn(function()
+			wait()
+			InvisSeat = false
+			InvisWeld = false
+		end)
+		for i, v in next, beforeInvisTransparency do
+			if type(v) == "number" then
+				i.Transparency = v
+			end
+		end
+		notify("Invisibility", "You are now visible!")
+	end
 end)
 
 newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no godmode but some tools work", function(args, speaker)
@@ -5008,16 +5055,19 @@ newCmd("god", {}, "god", "Makes your character difficult to kill in most games",
 	nHuman.Health = nHuman.MaxHealth
 end)
 
-newCmd("noroot", {}, "noroot", "Removes your characters HumanoidRootPart", function(args, speaker)
+newCmd("noroot", {}, "noroot", "Removes your Character's RootPart", function(args, speaker)
 	if speaker.Character ~= nil then
-		local char = Players.LocalPlayer.Character
-		char.Parent = nil
-		char.HumanoidRootPart:Destroy()
-		char.Parent = workspace
+		local root = getRoot()
+		if root then
+			local char = Players.LocalPlayer.Character
+			char.Parent = nil
+			root:Destroy()
+			char.Parent = workspace
+		end
 	end
 end)
 
-newCmd("boostfps", {}, "boostfps", "Lowers Game Quality to Boost FPS", function(args, speaker)
+newCmd("fpsboost", {"boostfps"}, "fpsboost / boostfps", "Lowers Game Quality to Boost FPS", function(args, speaker)
 	local Lighting = game:GetService("Lighting")
 	local Terrain = workspace:FindFirstChildOfClass("Terrain")
 	Prote.SpoofProperty(Terrain, "WaterWaveSize")
