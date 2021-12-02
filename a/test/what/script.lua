@@ -152,6 +152,7 @@ local FreezingUnanchored = nil
 local ESPenabled = false
 local swimming = false
 local cmdflinging = false
+local flingtbl = {}
 local floatName = randomString()
 local spinName = randomString()
 local pointLightName = randomString()
@@ -4495,71 +4496,88 @@ newCmd("unspin", {}, "unspin", "Disables Spin", function(args, speaker)
 	end
 end)
 
-newCmd("fling", {}, "fling", "Fling Anyone You Touch", function(args, speaker)
-	for _, child in pairs(speaker.Character:GetDescendants()) do
-		if child:IsA("BasePart") then
-			Prote.SpoofProperty(child, "CustomPhysicalProperties")
-			child.CustomPhysicalProperties = PhysicalProperties.new(2, 0.3, 0.5)
-		end
+newCmd("fling", {}, "fling", "Flings anyone you touch", function(args, speaker)
+	local rootpart = getRoot(speaker.Character)
+	if not rootpart then return end
+	flingtbl.OldPos = rootpart.CFrame
+	flingtbl.OldVelocity = rootpart.Velocity
+	local bv = Instance.new("BodyAngularVelocity")
+	Prote.ProtectInstance(bv)
+	flingtbl.bv = bv
+	bv.MaxTorque = Vector3.new(1, 1, 1) * math.huge
+	bv.P = math.huge
+	bv.AngularVelocity = Vector3.new(0, 9e5, 0)
+	bv.Parent = rootpart
+	local Char = speaker.Character:GetChildren()
+	for i, v in next, Char do
+	    if v:IsA("BasePart") then
+	        v.CanCollide = false
+	        v.Massless = true
+	        v.Velocity = Vector3.new(0, 0, 0)
+	    end
 	end
-	execCmd("noclip nonotify")
-	wait(0.1)
-	Prote.SpoofProperty(getRoot(speaker.Character), "Velocity")
-	Prote.SpoofProperty(getRoot(speaker.Character), "Anchored")
-	local bambam = Instance.new("BodyAngularVelocity")
-	Prote.ProtectInstance(bambam)
-	bambam.Parent = getRoot(speaker.Character)
-	bambam.Name = randomString()
-	bambam.AngularVelocity = Vector3.new(0, 311111, 0)
-	bambam.MaxTorque = Vector3.new(0, 311111, 0)
-	bambam.P = math.huge
-	local PauseFling = function()
-		if findhum() then
-			if gethum().FloorMaterial == Enum.Material.Air then
-				bambam.AngularVelocity = Vector3.new(0, 0, 0)
-			else
-				bambam.AngularVelocity = Vector3.new(0, 311111, 0)
-			end
-		end
-	end
-	if TouchingFloor then
-		TouchingFloor:Disconnect()
-	end
-	if TouchingFloorReset then
-		TouchingFloorReset:Disconnect()
-	end
-	TouchingFloor = gethum():GetPropertyChangedSignal("FloorMaterial"):Connect(PauseFling)
+	flingtbl.Noclipping2 = game:GetService("RunService").Stepped:Connect(function()
+	    for i, v in next, Char do
+	        if v:IsA("BasePart") then
+	            v.CanCollide = false
+	        end
+	    end
+	end)
 	cmdflinging = true
-	local flingDied = function()
-		execCmd("unfling")
-	end
-	TouchingFloorReset = gethum().Died:Connect(flingDied)
 end)
 
 newCmd("unfling", {}, "unfling", "Disables the Fling Command", function(args, speaker)
-	execCmd("clip nonotify")
-	if TouchingFloor then
-		TouchingFloor:Disconnect()
+	local rootpart = getRoot(speaker.Character)
+	if not rootpart then return end
+	local Char = speaker.Character:GetChildren()
+	if flingtbl.bv ~= nil then
+		flingtbl.bv:Destroy()
+		flingtbl.bv = nil
 	end
-	if TouchingFloorReset then
-		TouchingFloorReset:Disconnect()
+	if flingtbl.Noclipping2 ~= nil then
+		flingtbl.Noclipping2:Disconnect()
+		flingtbl.Noclipping2 = nil
 	end
+	for i, v in next, Char do
+		if v:IsA("BasePart") then
+			v.CanCollide = true
+			v.Massless = false
+		end
+	end
+	flingtbl.isRunning = game:GetService("RunService").Stepped:Connect(function()
+		if flingtbl.OldPos ~= nil then
+			rootpart.CFrame = flingtbl.OldPos
+		end
+		if flingtbl.OldVelocity ~= nil then
+			rootpart.Velocity = flingtbl.OldVelocity
+		end
+	end)
+	wait(2)
+	rootpart.Anchored = true
+	if flingtbl.isRunning ~= nil then
+		flingtbl.isRunning:Disconnect()
+		flingtbl.isRunning = nil
+	end
+	rootpart.Anchored = false
+	if flingtbl.OldVelocity ~= nil then
+		rootpart.Velocity = flingtbl.OldVelocity
+	end
+	if flingtbl.OldPos ~= nil then
+		rootpart.CFrame = flingtbl.OldPos
+	end
+	wait()
+	flingtbl.OldVelocity = nil
+	flingtbl.OldPos = nil
 	cmdflinging = false
-	wait(0.1)
-	local speakerChar = speaker.Character
-	if not speakerChar or not getRoot(speakerChar) then return end
-	for i,v in pairs(getRoot(speakerChar):GetChildren()) do
-		if v.ClassName == "BodyAngularVelocity" then
-			v:Destroy()
-		end
-	end
-	for _, child in pairs(speakerChar:GetDescendants()) do
-		if child.ClassName == "Part" or child.ClassName == "MeshPart" then
-			Prote.SpoofProperty(child, "CustomPhysicalProperties")
-			child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
-		end
-	end
 end)
+
+newCmd("togglefling", {}, "togglefling", "Toggle the Fling Command", function(args, speaker)
+	if cmdflinging then
+		execCmd("unfling")
+	else
+		execCmd("fling")
+	end
+end
 
 newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args, speaker)
 	local ch = speaker.Character
