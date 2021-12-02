@@ -4499,7 +4499,6 @@ end)
 newCmd("fling", {}, "fling", "Flings anyone you touch", function(args, speaker)
 	local rootpart = getRoot(speaker.Character)
 	if not rootpart then return end
-	flingtbl.OldPos = rootpart.CFrame
 	flingtbl.OldVelocity = rootpart.Velocity
 	local bv = Instance.new("BodyAngularVelocity")
 	Prote.ProtectInstance(bv)
@@ -4529,6 +4528,7 @@ end)
 newCmd("unfling", {}, "unfling", "Disables the Fling Command", function(args, speaker)
 	local rootpart = getRoot(speaker.Character)
 	if not rootpart then return end
+	flingtbl.OldPos = rootpart.CFrame
 	local Char = speaker.Character:GetChildren()
 	if flingtbl.bv ~= nil then
 		flingtbl.bv:Destroy()
