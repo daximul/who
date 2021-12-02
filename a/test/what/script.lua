@@ -4577,7 +4577,7 @@ newCmd("togglefling", {}, "togglefling", "Toggle the Fling Command", function(ar
 	else
 		execCmd("fling")
 	end
-end
+end)
 
 newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args, speaker)
 	local ch = speaker.Character
