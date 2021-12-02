@@ -4101,24 +4101,17 @@ newCmd("breakloops", {"break"}, "breakloops / break", "Stops every current comma
 end)
 
 newCmd("grabtools", {}, "grabtools", "Copies Tools from ReplicatedStorage and Lighting", function(args, speaker)
-	local copy = function(instance)
-		for i,c in pairs(instance:GetChildren())do
+	local copyinst = nil
+	copyinst = function(instance)
+		for i,c in pairs(instance:GetChildren()) do
 			if c:IsA("Tool") or c:IsA("HopperBin") then
 				c:Clone().Parent = speaker:FindFirstChildOfClass("Backpack")
 			end
-			copy(c)
+			copyinst(c)
 		end
 	end
-	copy(game:GetService("Lighting"))
-	local copy = function(instance)
-		for i,c in pairs(instance:GetChildren())do
-			if c:IsA("Tool") or c:IsA("HopperBin") then
-				c:Clone().Parent = speaker:FindFirstChildOfClass("Backpack")
-			end
-			copy(c)
-		end
-	end
-	copy(game:GetService("ReplicatedStorage"))
+	copyinst(game:GetService("Lighting"))
+	copyinst(game:GetService("ReplicatedStorage"))
 	notify("Tools", "Copied Tools from ReplicatedStorage and Lighting")
 end)
 
@@ -5537,7 +5530,7 @@ newCmd("pathfindwalkto", {"pathfindfollow"}, "pathfindwalkto / pathfindfollow [p
 					for waypointIndex, waypoint in pairs(waypoints) do
 						local waypointPosition = waypoint.Position
 						hum:MoveTo(waypointPosition)
-						repeat 
+						repeat
 							distance = (waypointPosition - hum.Parent.PrimaryPart.Position).magnitude
 							wait()
 						until
@@ -5590,7 +5583,7 @@ newCmd("replicationlag", {"backtrack"}, "replicationlag / backtrack [num]", "Set
 	settings():GetService("NetworkSettings").IncomingReplicationLag = tonumber(args[1]) or 0
 end)
 
-newCmd("nameprotect", {}, "nameprotect", "Protect your Name Locally by Setting it to \"User\"", function(args, speaker)
+newCmd("nameprotect", {}, "nameprotect", "Spoof your username locally by Setting it to \"User\"", function(args, speaker)
 	Import("nameprot.lua")
 	notify("", "Name Protected")
 end)
@@ -5767,8 +5760,6 @@ newCmd("enable", {}, "enable [inventory/playerlist/chat/all]", "Toggles Visibili
 		elseif opt == "all" then
 			game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 		end
-	else
-		notify("", "Missing Argument")
 	end
 end)
 
@@ -5784,8 +5775,6 @@ newCmd("disable", {}, "disable [inventory/playerlist/chat/all]", "Toggles Visibi
 		elseif opt == "all" then
 			game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 		end
-	else
-		notify("", "Missing Argument")
 	end
 end)
 
@@ -6219,7 +6208,7 @@ end)
 newCmd("freecamspeed", {"fcspeed"}, "freecamspeed / fcspeed [num]", "Adjusts Freecam Speed (Default is 1)", function(args, speaker)
 	local FCSpeed = args[1] or 1
 	if isNumber(FCSpeed) then
-		FreecamAPI.UpdateSpeed(FCSpeed)
+		FreecamAPI.UpdateSpeed(tonumber(FCSpeed))
 	end
 end)
 
