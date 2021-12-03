@@ -5952,6 +5952,58 @@ newCmd("changeteam", {"team"}, "changeteam / team [name]", "Change your Team (Ga
     end
 end)
 
+newCmd("noclickdetectorlimits", {"nocdlimits"}, "noclickdetectorlimits / nocdlimits", "Sets all click detectors MaxActivationDistance to math.huge", function(args, speaker)
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v:IsA("ClickDetector") then
+			v.MaxActivationDistance = math.huge
+		end
+	end
+end)
+
+newCmd("fireclickdetectors", {"firecd"}, "fireclickdetectors / firecd", "Uses all click detectors in a game", function(args, speaker)
+	if fireclickdetector then
+		for i,v in pairs(workspace:GetDescendants()) do
+			if v:IsA("ClickDetector") then
+				fireclickdetector(v)
+			end
+		end
+	else
+		notify("Incompatible Exploit", "Missing fireclickdetector")
+	end
+end)
+
+newCmd("firetouchinterests", {"touchinterests"}, "firetouchinterests / touchinterests", "Uses all touchinterests in a game", function(args, speaker)
+	local Root = getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart")
+	local Touch = function(x)
+		x = x.FindFirstAncestorWhichIsA(x, "Part")
+		if x then
+			if firetouchinterest then
+				return spawn(function()
+					firetouchinterest(x, Root, 1, wait() and firetouchinterest(x, Root, 0))
+				end)
+			end
+			x.CFrame = Root.CFrame
+		end
+	end
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v.IsA(v, "TouchTransmitter") then
+			Touch(v)
+		end
+	end
+end)
+
+newCmd("fireproximityprompts", {"firepp"}, "fireproximityprompts / firepp", "Uses all proximity prompts in a game", function(args, speaker)
+	if fireproximityprompt then
+		for i, v in pairs(workspace:GetDescendants()) do
+			if v:FindFirstChild("ProximityPrompt") then
+				fireproximityprompt(v.ProximityPrompt)
+			end
+		end
+	else
+		notify("Incompatible Exploit", "Missing fireproximityprompt")
+	end
+end)
+
 newCmd("hidename", {"hidebill"}, "hidename / hidebill", "Hide Billboard Nametag", function(args, speaker)
 	local character = Players.LocalPlayer.Character
 	local bill = character:FindFirstChildWhichIsA("BillboardGui", true)
