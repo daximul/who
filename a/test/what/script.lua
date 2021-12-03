@@ -3433,6 +3433,29 @@ newCmd("fastkill", {}, "fastkill [plr]", "Try to Kill a User Fast", function(arg
 	end
 end)
 
+newCmd("handlekill", {"hkill"}, "handlekill / hkill [plr] (Tool)", "Try to kills a User using Tool Damage", function(args, speaker)
+	if not firetouchinterest then return notify("Incompatible Exploit", "Missing firetouchinterest") end
+	local RS = game:GetService("RunService").RenderStepped
+	local Tool = speaker.Character:FindFirstChildWhichIsA("Tool")
+	local Handle = Tool and Tool:FindFirstChild("Handle")
+	if not Tool or not Handle then return notify("Handle Kill", "You need to hold a \"Tool\" that does damage on touch. For example the default \"Sword\" tool.") end
+	for _, v in ipairs(getPlayer(args[1], speaker)) do
+		v = Players[v]
+		spawn(function()
+			while Tool and speaker.Character and v.Character and Tool.Parent == speaker.Character do
+				local Human = v.Character:FindFirstChildWhichIsA("Humanoid")
+				if not Human or Human.Health <= 0 then
+					break
+				end
+				for _, v1 in ipairs(v.Character:GetChildren()) do
+					v1 = ((v1:IsA("BasePart") and firetouchinterest(Handle, v1, 1, (RS:Wait() and nil) or firetouchinterest(Handle, v1, 0)) and nil) or v1) or v1
+				end
+			end
+			notify("Handle Kill Stopped!", v.Name .. " died/left or you unequipped the tool!")
+		end)
+	end
+end)
+
 newCmd("clientkill", {"ckill"}, "clientkill / ckill [plr]", "Kill a User on your Client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
 	for i,Target in pairs(users) do
