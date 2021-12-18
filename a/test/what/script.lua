@@ -4107,11 +4107,11 @@ newCmd("thirdp", {}, "thirdp", "Third Person", function(args, speaker)
 end)
 
 newCmd("showprompts", {}, "showprompts", "Continue Receiving Purchase Prompts", function(args, speaker)
-	CoreGui.PurchasePromptApp.Visible = true
+	CoreGui.PurchasePrompt.Visible = true
 end)
 
 newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function(args, speaker)
-	CoreGui.PurchasePromptApp.Visible = false
+	CoreGui.PurchasePrompt.Visible = false
 end)
 
 newCmd("deletehats", {"nohats"}, "deletehats / nohats", "Delete your Hats", function(args, speaker)
