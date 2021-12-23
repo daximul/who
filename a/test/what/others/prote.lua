@@ -1,3 +1,6 @@
+local game = game
+local GetService = game.GetService
+
 local Prote = {["Misc"]={}}
 
 local spec = {
@@ -9,6 +12,11 @@ local spec = {
     ["capturedGames"] = {["6650331930"]=true},
     ["CmdTextConnections"] = nil
 }
+local UserInputService = GetService(game, "UserInputService")
+local IsA, GetPropertyChangedSignal, Clone =
+	game.IsA,
+	game.GetPropertyChangedSignal,
+	game.Clone
 
 local tblmap = function(tbl, ret)
     if tbl == nil then return end
@@ -75,7 +83,7 @@ mt.__namecall = spec.newclose(function(self, ...)
 
     local Protected = ProtectedInstances[self]
 
-    if (Protected) then
+    if Protected then
         if table.find(Methods, Method) then
             return Method == "IsA" and false or nil
         end
@@ -87,7 +95,7 @@ mt.__namecall = spec.newclose(function(self, ...)
         end)
     end
 
-    if (Method == "GetFocusedTextBox") then
+    if Method == "GetFocusedTextBox" then
         if (table.find(ProtectedInstances, __Namecall(self, ...))) then
             return nil
         end
@@ -109,19 +117,19 @@ mt.__index = spec.newclose(function(Instance_, Index)
     local SpoofedInstance = SpoofedInstances[Instance_]
     local SpoofedPropertiesForInstance = SpoofedProperties[Instance_]
 
-    if (SpoofedInstance) then
+    if SpoofedInstance then
         if (table.find(AllowedIndexes, Index)) then
             return __Index(Instance_, Index)
         end
-        if (Instance_:IsA("Humanoid") and spec.capturedGames[tostring(game.PlaceId)] == true) then
-            for i, v in next, spec.getcons(Instance_:GetPropertyChangedSignal("WalkSpeed")) do
-                v:Disable()
+        if (IsA(Instance_, "Humanoid") and spec.capturedGames[tostring(game.PlaceId)] == true) then
+            for i, v in next, spec.getcons(GetPropertyChangedSignal(Instance_, "WalkSpeed")) do
+                v.Disable(v)
             end
         end
         return __Index(SpoofedInstance, Index)
     end
 
-    if (SpoofedPropertiesForInstance) then
+    if SpoofedPropertiesForInstance then
         for i, SpoofedProperty in next, SpoofedPropertiesForInstance do
             if (Index == SpoofedProperty.Property) then
                 return SpoofedProperty.Value
@@ -129,8 +137,8 @@ mt.__index = spec.newclose(function(Instance_, Index)
         end
     end
 
-    if (ProtectedInstance) then
-        if (table.find(Methods, Index)) then
+    if ProtectedInstance then
+        if table.find(Methods, Index) then
             return function()
                 return Index == "IsA" and false or nil
             end
@@ -145,7 +153,7 @@ mt.__index = spec.newclose(function(Instance_, Index)
         end
     end
 
-    if (Index == "GetFocusedTextBox") then
+    if Index == "GetFocusedTextBox" then
         if (table.find(ProtectedInstances, __Index(Instance_, Index)(Instance_))) then
             return function()
                 return nil
@@ -195,19 +203,19 @@ end
 
 Prote.SpoofInstance = function(Instance_, Instance2)
     if (not SpoofedInstances[Instance_]) then
-        SpoofedInstances[Instance_] = Instance2 and Instance2 or Instance_:Clone()
+        SpoofedInstances[Instance_] = Instance2 and Instance2 or Clone(Instance_)
     end
 end
 
 Prote.SpoofProperty = function(Instance_, Property, Value)
-    for i, v in next, spec.getcons(Instance_:GetPropertyChangedSignal(Property)) do
-        v:Disable()
+    for i, v in next, spec.getcons(GetPropertyChangedSignal(Instance_, Property)) do
+        v.Disable(v)
     end
-    if (SpoofedProperties[Instance_]) then
+    if SpoofedProperties[Instance_] then
         local Properties = tblmap(SpoofedProperties[Instance_], function(i, v)
             return v.Property
         end)
-        if (not table.find(Properties, Property)) then
+        if not table.find(Properties, Property) then
             table.insert(SpoofedProperties[Instance_], {
                 Property = Property,
                 Value = Value and Value or Instance_[Property]
@@ -228,18 +236,18 @@ Prote.UnSpoofInstance = function(Instance_)
 end
 
 Prote.Misc.SpoofCommandBar = function()
-	spec.CmdTextConnections = spec.getcons(game:GetService("UserInputService").TextBoxFocused)
+	spec.CmdTextConnections = spec.getcons(UserInputService.TextBoxFocused)
 	for i, v in next, spec.CmdTextConnections do
-		v:Disable()
+		v.Disable(v)
 	end
-	for i, v in next, spec.getcons(game:GetService("UserInputService").TextBoxFocusReleased) do
-		v:Disable()
+	for i, v in next, spec.getcons(UserInputService.TextBoxFocusReleased) do
+		v.Disable(v)
 	end
 end
 
 Prote.Misc.UnSpoofCommandBar = function()
 	for i, v in next, spec.CmdTextConnections do
-		v:Enable()
+		v.Enable(v)
 	end
 end
 
