@@ -53,7 +53,7 @@ local Import = function(Asset)
 		return game:GetObjects("rbxassetid://" .. Asset)[1]
 	else
 		local Link = string.format("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/%s", Asset)
-		local Response = game:HttpGetAsync(Link)
+		local Response = game.HttpGetAsync(game, Link)
 		local Function = loadstring(Response)
 		local Success, Return = pcall(Function)
 		if Success then
@@ -136,7 +136,7 @@ local ScriptTabLoaded = false
 local IsDaUi = false
 local PluginCache = nil
 local Loaded_Title = Import("osdate.lua")
-local ScriptsHolder = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/daximul/u9yh45/main/m/s.lua")))();
+local ScriptsHolder = loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/daximul/u9yh45/main/m/s.lua"))();
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
@@ -223,7 +223,7 @@ HopTbl.GetPublicServers = function(a)
 	local b, c = {}, ""
 	while c do
 		local d = "https://games.roblox.com/v1/games/" .. a .. "/servers/Public?sortOrder=Asc&limit=100" .. ((#c <= 0 and "") or ("&cursor=" .. c))
-		local e = JSONDecode(HttpService, game:HttpGet(d))
+		local e = JSONDecode(HttpService, game.HttpGet(game, d))
 		for _, v in ipairs(e.data) do
 			b[#b + 1] = v
 		end
@@ -243,7 +243,7 @@ end)
 CConnect(Players.LocalPlayer.OnTeleport, function(State)
 	if State == Enum.TeleportState.Started then
 		if Settings.KeepDA then
-			syn.queue_on_teleport("loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
+			syn.queue_on_teleport("loadstring(game.HttpGetAsync(game, \"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
 		end
 	end
 end)
@@ -2847,26 +2847,26 @@ AddSetting("Auto Net", Settings.AutoNet, function(Callback)
 	Settings.AutoNet = Callback
 	updatesaves()
 end)
-BrowserBtn("Hub Loader", "Hub Loader", "Load Specific Hubs", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/hubloader.lua'))();")
-BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\n~ Controls ~\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
-BrowserBtn("Smooth Freecam", "Smooth Freecam", "Control your Camera in a Smooth way", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/smoothfreecam.lua'))();")
-BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
-BrowserBtn("Chat Spy", "Chat Spy", "Spy on Messages in Chat", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chatspy.lua'))();")
-BrowserBtn("System Chat", "System Chat", "Fake your Chat as System\n\n{System} Your mom has joined the game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/systemchat.lua'))();")
-BrowserBtn("Lag Server", "Lag Server", "Lag the Server. You will lag for 6 seconds before it works.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/lagserver.lua'))();")
-BrowserBtn("Chat Translator", "Chat Translator", "Translate Chat and Reply\n\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-1_codes\n\nYou have to look the 639-1 column to get a language", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chattranslator.lua'))();")
-BrowserBtn("Toon ESP", "Toon ESP", "Load my ESP Script", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/toonesp.lua'))();")
-BrowserBtn("Drag and Resize Chat", "Drag and Resize Chat", "Make the Default ROBLOX Chat Draggable and Resizable", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/dragresizechat.lua'))();")
-BrowserBtn("Fun Gravity", "Fun Gravity", "Have Fun with Unanchored Parts", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/fungravity.lua'))();")
-BrowserBtn("Cyclically Btools", "Cyclically's Custom Btools", "Better Btools with Undo & Identify", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/cycbtools.lua'))();")
-BrowserBtn("Wall Run", "Wall Run", "Walk/Run on Walls!\n\nGravity Controller Originally made by EgoMoose", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/wallrun.lua'))();")
-BrowserBtn("RTX", "RTX: Graphics Enhancer", "Enhance your Graphics\n\nLevels in the Command Name:\n1: Low, not that good\n2: Medium sort of good\n3: Epic", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/rtx.lua'))();")
-BrowserBtn("Empty Server Finder", "Empty Server Finder", "Find the emptiest server of the current game you are playing", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/emptyserverfinder.lua'))();")
-BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
-BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
-BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
-BrowserBtn("Head Pet", "Head Pet", "Follow a player as a literal floating head!\n\n;headfollow / headpet [plr]\n > Make your head follow a player\n;unheadfollow / unheadpet\n > Stop making your head follow a player", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/headpet.lua'))();")
-BrowserBtn("Sharkbite", "Sharkbite", "Destroy the lives of Sharkbite Players with this simple plugin", "return loadstring(game:HttpGet('https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/sharkbite.lua'))();")
+BrowserBtn("Hub Loader", "Hub Loader", "Load Specific Hubs", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/hubloader.lua'))();")
+BrowserBtn("Telekinesis", "Telekinesis", "Control Unanchored Parts\n~ Controls ~\nE = Push Part Away\nQ = Push Part Closer\n+ = Increase Telekinesis Strength(too much will make the part spaz out)\n- = Decrease Telekinesis Strength\nT = Instant Bring Part\nY = Instant Repulsion(Opposite of Bring)\nR = Makes Part Stiff (Cannot Rotate/Spin)", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/telekinesis.lua'))();")
+BrowserBtn("Smooth Freecam", "Smooth Freecam", "Control your Camera in a Smooth way", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/smoothfreecam.lua'))();")
+BrowserBtn("Shader Mod", "Shader Mod", "Toggle Shaders in your Roblox game (best with max graphics)", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/shadermod.lua'))();")
+BrowserBtn("Chat Spy", "Chat Spy", "Spy on Messages in Chat", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chatspy.lua'))();")
+BrowserBtn("System Chat", "System Chat", "Fake your Chat as System\n\n{System} Your mom has joined the game", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/systemchat.lua'))();")
+BrowserBtn("Lag Server", "Lag Server", "Lag the Server. You will lag for 6 seconds before it works.", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/lagserver.lua'))();")
+BrowserBtn("Chat Translator", "Chat Translator", "Translate Chat and Reply\n\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-1_codes\n\nYou have to look the 639-1 column to get a language", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/chattranslator.lua'))();")
+BrowserBtn("Toon ESP", "Toon ESP", "Load my ESP Script", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/toonesp.lua'))();")
+BrowserBtn("Drag and Resize Chat", "Drag and Resize Chat", "Make the Default ROBLOX Chat Draggable and Resizable", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/dragresizechat.lua'))();")
+BrowserBtn("Fun Gravity", "Fun Gravity", "Have Fun with Unanchored Parts", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/fungravity.lua'))();")
+BrowserBtn("Cyclically Btools", "Cyclically's Custom Btools", "Better Btools with Undo & Identify", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/cycbtools.lua'))();")
+BrowserBtn("Wall Run", "Wall Run", "Walk/Run on Walls!\n\nGravity Controller Originally made by EgoMoose", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/wallrun.lua'))();")
+BrowserBtn("RTX", "RTX: Graphics Enhancer", "Enhance your Graphics\n\nLevels in the Command Name:\n1: Low, not that good\n2: Medium sort of good\n3: Epic", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/rtx.lua'))();")
+BrowserBtn("Empty Server Finder", "Empty Server Finder", "Find the emptiest server of the current game you are playing", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/emptyserverfinder.lua'))();")
+BrowserBtn("Bypass Anticheats", "Bypass Anticheats", "Bypass the Anticheat in Most Games", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/bypassanticheats.lua'))();")
+BrowserBtn("Universal Bhop", "Universal Bhop", "Get the ability to bhop. Make sure to hold Space and then either hold A or D.", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/universalbhop.lua'))();")
+BrowserBtn("Future Lighting", "Future Lighting", "Lets you enable Future Lighting in any game", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/futurelighting.lua'))();")
+BrowserBtn("Head Pet", "Head Pet", "Follow a player as a literal floating head!\n\n;headfollow / headpet [plr]\n > Make your head follow a player\n;unheadfollow / unheadpet\n > Stop making your head follow a player", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/headpet.lua'))();")
+BrowserBtn("Sharkbite", "Sharkbite", "Destroy the lives of Sharkbite Players with this simple plugin", "return loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/daximul/who/main/a/test/what/browserplugins/sharkbite.lua'))();")
 --// End of Setup \\--
 
 
@@ -3778,7 +3778,7 @@ end)
 newCmd("console", {}, "console", "Open the Old Roblox Console", function(args, speaker)
 	notify("Loading", "Hold on a sec")
 	local _, str = pcall(function()
-		return game:HttpGetAsync("https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/rbx_console.lua", true)
+		return game.HttpGetAsync(game, "https://raw.githubusercontent.com/daximul/who/main/a/test/what/others/rbx_console.lua", true)
 	end)
 	local s, e = loadstring(str)
 	if typeof(s) ~= "function" then
@@ -3845,7 +3845,7 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 	else
 		notify("Loading", "Hold on a sec")
 		wait(0.2)
-		loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
+		loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
 	end
 end)
 
@@ -3856,12 +3856,12 @@ end)
 
 newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game:HttpGetAsync(("https://pastebin.com/raw/GmbrsEjM")))();
+	loadstring(game.HttpGetAsync(game, "https://pastebin.com/raw/GmbrsEjM"))();
 end)
 
 newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, speaker)
 	notify("", "Loading CLOVR . . .", 2)
-	loadstring(game:HttpGet('https://ghostbin.co/paste/yb288/raw'))()
+	loadstring(game.HttpGet(game, 'https://ghostbin.co/paste/yb288/raw'))()
 end)
 
 newCmd("jobid", {}, "jobid", "Copy the Server's JobId, this can be put in console on Google to join someone's exact server", function(args, speaker)
@@ -5366,7 +5366,7 @@ newCmd("thawunanchored", {"thawua", "unfreezeua"}, "thawunanchored / thawua / un
 end)
 
 newCmd("flashlight", {}, "flashlight (Client)", "Give yourself a Flashlight", function(args, speaker)
-	loadstring(game:HttpGetAsync(("https://pastebin.com/raw/8K2cTfka")))();
+	loadstring(game.HttpGetAsync(game, "https://pastebin.com/raw/8K2cTfka"))();
 end)
 
 newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value", function(args, speaker)
@@ -5945,7 +5945,7 @@ newCmd("joinplayer", {"jplr"}, "joinplayer / jplr [user / id] [place id]", "Join
 				else
 					notify("Join Player", "Loading servers. Hold on a second.")
 					local URL2 = ("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
-					local Http = JSONDecode(HttpService, game:HttpGet(URL2))
+					local Http = JSONDecode(HttpService, game.HttpGet(game, URL2))
 					local GUID
 
 					tablelength = function(T)
