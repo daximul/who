@@ -231,6 +231,19 @@ HopTbl.GetPublicServers = function(a)
 	end
 	return b
 end
+local RolewatchData = {["Group"]=0,["Role"]="",["Leave"]=false}
+local RolewatchConnection = CConnect(Players.PlayerAdded, function(player)
+	if RolewatchData.Group == 0 then return end
+	if player.IsInGroup(player, RolewatchData.Group) then
+		if tostring(string.lower(player.GetRoleInGroup(player, RolewatchData.Group))) == string.lower(RolewatchData.Role) then
+			if RolewatchData.Leave == true then
+				Players.LocalPlayer.Kick(Players.LocalPlayer, "\n\nRolewatch\nPlayer \"" .. tostring(player.Name) .. "\" has joined with the Role \"" .. RolewatchData.Role .. "\"\n")
+			else
+				notify("Rolewatch", "Player \"" .. tostring(player.Name) .. "\" has joined with the Role \"" .. RolewatchData.Role .. "\"")
+			end
+		end
+	end
+end)
 
 --// End of Command Variables \\--
 
@@ -6389,6 +6402,27 @@ newCmd("volume", {"vol"}, "volume / vol [0 - 10]", "Adjusts your game volume on 
 		local UserSettings = UserSettings()
 		UserSettings.GetService(UserSettings, "UserGameSettings").MasterVolume = tonumber(args[1]) / 10
 	end
+end)
+
+newCmd("rolewatch", {}, "rolewatch [group id] [role name]", "Notify if someone from a watched group joins the server", function(args, speaker)
+	local groupid = args[1] or 0
+	if isNumber(groupid) then
+		if args[2] then
+			local rolename = tostring(getstring(2))
+			RolewatchData.Group = tonumber(groupid)
+			RolewatchData.Role = rolename
+			notify("Rolewatch", "Watching Group ID \"" .. tostring(groupid) .. "\" for Role \"" .. rolename .. "\"")
+		end
+	end
+end)
+
+newCmd("rolewatchstop", {"unrolewatch"}, "rolewatchstop / unrolewatch", "Disable Rolewatch", function(args, speaker)
+	RolewatchData = {["Group"]=0,["Role"]="",["Leave"]=false}
+end)
+
+newCmd("rolewatchleave", {}, "rolewatchleave", "Toggle if you should leave the game if someone from a watched group joins the server", function(args, speaker)
+	RolewatchData.Leave = not RolewatchData.Leave
+	notify("Rolewatch", RolewatchData.Leave and "Leave has been Enabled" or "Leave has been Disabled")
 end)
 
 
