@@ -5186,6 +5186,20 @@ newCmd("fpsboost", {"boostfps"}, "fpsboost / boostfps", "Lowers Game Quality to 
 			v.Enabled = false
 		end
 	end
+	CConnect(workspace.DescendantAdded, function(child)
+		coroutine.wrap(function()
+			if IsA(child, "ForceField") then
+				CWait(Heartbeat)
+				Destroy(child)
+			elseif IsA(child, "Sparkles") then
+				CWait(Heartbeat)
+				Destroy(child)
+			elseif IsA(child, "Smoke") or IsA(child, "Fire") then
+				CWait(Heartbeat)
+				Destroy(child)
+			end
+		end)()
+	end)
 end)
 
 newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args, speaker)
