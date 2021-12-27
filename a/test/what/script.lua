@@ -140,7 +140,6 @@ local ScriptsHolder = loadstring(game.HttpGetAsync(game, "https://raw.githubuser
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
-AdminConnections = {}
 local origsettings = {
 	["Lighting"] = {
 		["abt"] = Lighting.Ambient,
@@ -325,20 +324,6 @@ local Time = function()
 	MINUTE = MINUTE < 10 and "0" .. MINUTE or MINUTE
 	SECOND = SECOND < 10 and "0" .. SECOND or SECOND
 	return HOUR .. ":" .. MINUTE .. ":" .. SECOND .. " " .. AP
-end
-
-BindToConnection = function(name, connection)
-	if AdminConnections[tostring(name)] == nil then
-		AdminConnections[tostring(name)] = connection
-		return AdminConnections[tostring(name)]
-	end
-end
-
-UnbindFromConnection = function(name)
-	if AdminConnections[tostring(name)] ~= nil then
-		Disconnect(AdminConnections[tostring(name)])
-		AdminConnections[tostring(name)] = nil
-	end
 end
 
 local RunCode = function(funcToRun) funcToRun() end
@@ -2798,10 +2783,12 @@ spawn(function()
 	end)
 	spawn(function()
 		while wait(0.05) do
-			if PluginBrowser.Area.Visible == false then
-				PluginBrowser.GoBack.Visible = true
-			else
-				PluginBrowser.GoBack.Visible = false
+			if GUI ~= nil then
+				if PluginBrowser.Area.Visible == false then
+					PluginBrowser.GoBack.Visible = true
+				else
+					PluginBrowser.GoBack.Visible = false
+				end
 			end
 		end
 	end)
@@ -5195,6 +5182,20 @@ newCmd("fpsboost", {"boostfps"}, "fpsboost / boostfps", "Lowers Game Quality to 
 			v.Enabled = false
 		end
 	end
+	CConnect(workspace.DescendantAdded, function(child)
+		coroutine.wrap(function()
+			if IsA(child, "ForceField") then
+				CWait(Heartbeat)
+				Destroy(child)
+			elseif IsA(child, "Sparkles") then
+				CWait(Heartbeat)
+				Destroy(child)
+			elseif IsA(child, "Smoke") or IsA(child, "Fire") then
+				CWait(Heartbeat)
+				Destroy(child)
+			end
+		end)()
+	end)
 end)
 
 newCmd("setfpscap", {}, "setfpscap [number]", "Set your FPS Cap", function(args, speaker)
@@ -6424,7 +6425,6 @@ newCmd("rolewatchleave", {}, "rolewatchleave", "Toggle if you should leave the g
 	RolewatchData.Leave = not RolewatchData.Leave
 	notify("Rolewatch", RolewatchData.Leave and "Leave has been Enabled" or "Leave has been Disabled")
 end)
-
 
 VirtualEnvironment()
 -- if Settings.AutoNet then SetSimulationRadius() end
