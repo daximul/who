@@ -244,6 +244,8 @@ local RolewatchConnection = CConnect(Players.PlayerAdded, function(player)
 		end
 	end
 end)
+local headSitting1 = nil
+local headSitting2 = nil
 
 --// End of Command Variables \\--
 
@@ -2965,6 +2967,11 @@ newCmd("currentprefix", {}, "currentprefix", "Notify the Current Prefix", functi
 	notify("", "Current Prefix is " .. Settings.Prefix)
 end)
 
+newCmd("debug", {}, "debug", "Toggle the admin's debug mode", function(args, speaker)
+	AdminDebug = not AdminDebug
+	notify("Admin Debug", string.format("Debug has been %s", AdminDebug and "Enabled" or "Disabled"))
+end)
+
 newCmd("rejoin", {"rj"}, "rejoin / rj", "Rejoin the server", function(args, speaker)
 	if #GetPlayers(Players) <= 1 then
 		Players.LocalPlayer.Kick(Players.LocalPlayer, "\nRejoining...")
@@ -4258,6 +4265,7 @@ newCmd("droptools", {}, "droptools", "Drop all of your tools", function(args, sp
 		if IsA(v, "Tool") then
 			Prote.SpoofProperty(v, "Parent")
 			v.Parent = Players.LocalPlayer.Character
+			v.Parent = workspace
 		end
 	end
 	wait()
@@ -4721,7 +4729,6 @@ newCmd("invisfling", {}, "invisfling", "Enables Invisible Fling", function(args,
 end)
 
 newCmd("infinitejump", {"infjump"}, "infinitejump / infjump", "Be Able to Keep Jumping", function(args, speaker)
-	notify("Infinite Jump", "Enabled")
 	cmdinfjump = true
 	CConnect(UserInputService.JumpRequest, function()
 		if cmdinfjump then
@@ -4732,11 +4739,12 @@ newCmd("infinitejump", {"infjump"}, "infinitejump / infjump", "Be Able to Keep J
 			end
 		end
 	end)
+	notify("Infinite Jump", "Enabled")
 end)
 
 newCmd("uninfinitejump", {"uninfjump"}, "uninfinitejump / uninfjump", "Disable Infinite Jump", function(args, speaker)
-	notify("Infinite Jump", "Disabled")
 	cmdinfjump = false
+	notify("Infinite Jump", "Disabled")
 end)
 
 newCmd("serverhop", {"shop"}, "serverhop / shop", "Teleports you to a different server", function(args, speaker)
@@ -5091,7 +5099,29 @@ newCmd("restorelighting", {"rlighting"}, "restorelighting / rlighting", "Restore
 	Lighting.GlobalShadows = origsettings.Lighting.gs
 end)
 
-newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for player heads (default is 1)", function(args, speaker)
+newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for a player's HumanoidRootPart (Default is 1)", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		if Players[v] ~= speaker and FindFirstChild(Players[v].Character, "HumanoidRootPart") then
+			if args[2] and isNumber(args[2]) then
+				local sizeArg = tonumber(args[2])
+				local Size = Vector3.new(sizeArg, sizeArg, sizeArg)
+				local Root = FindFirstChild(Players[v].Character, "HumanoidRootPart")
+				if IsA(Root, "BasePart") then
+					if not args[2] or sizeArg == 1 then
+						Root.Size = Vector3.new(2, 1, 1)
+						Root.Transparency = 0.4
+					else
+						Root.Size = Size
+						Root.Transparency = 0.4
+					end
+				end
+			end
+		end
+	end
+end)
+
+newCmd("headsize", {}, "headsize [plr] [size]", "Expands the hitbox for a player's head (Default is 1)", function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
 		if Players[v] ~= speaker and FindFirstChild(Players[v].Character, "Head") then
@@ -5108,6 +5138,37 @@ newCmd("hitbox", {}, "hitbox [plr] [size]", "Expands the hitbox for player heads
 				end
 			end
 		end
+	end
+end)
+
+newCmd("headsit", {"hsit"}, "headsit / hsit [plr]", "Sit on a player's head", function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+	for i,v in pairs(players) do
+		if Players[v] and Players[v].Character and FindFirstChild(Players[v].Character, "Head") and speaker and speaker.Character and findhum() and getRoot() then
+			local Root = getRoot()
+			local Human = gethum()
+			Prote.SpoofProperty(Human, "Sit")
+			Human.Sit = true
+			headSitting1 = CConnect(GetPropertyChangedSignal(Human, "Sit"), function()
+				if Human then Human.Sit = true end
+			end)
+			headSitting2 = CConnect(Heartbeat, function()
+				if Root and Players[v] and Players[v].Character and FindFirstChild(Players[v].Character, "Head") then
+					Root.CFrame = Players[v].Character.Head.CFrame * CFrame.new(0, 0, 1)
+				end
+			end)
+		end
+	end
+end)
+
+newCmd("unheadsit", {"unhsit"}, "unheadsit / unhsit", "Stop sitting on heads bro", function(args, speaker)
+	if headSitting1 ~= nil then
+		Disconnect(headSitting1)
+		headSitting1 = nil
+	end
+	if headSitting2 ~= nil then
+		Disconnect(headSitting2)
+		headSitting2 = nil
 	end
 end)
 
