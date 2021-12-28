@@ -199,6 +199,7 @@ local frozenParts = {}
 local FreezingUnanchored = nil
 local ESPenabled = false
 local swimming = false
+local teleportWalking = false
 local cmdflinging = false
 local flingtbl = {}
 local floatName = randomString()
@@ -267,6 +268,7 @@ CConnect(Players.LocalPlayer.CharacterAdded, function()
 	Floating = false
 	CmdClip = true
 	invisRunning = false
+	teleportWalking = false
 	repeat wait() until getRoot(Players.LocalPlayer.Character)
 	execCmd("clip nonotify")
 	pcall(function()
@@ -6425,6 +6427,28 @@ newCmd("rolewatchleave", {}, "rolewatchleave", "Toggle if you should leave the g
 	RolewatchData.Leave = not RolewatchData.Leave
 	notify("Rolewatch", RolewatchData.Leave and "Leave has been Enabled" or "Leave has been Disabled")
 end)
+
+newCmd("teleportwalk", {"tpwalk"}, "teleportwalk / tpwalk [num]", "Teleports you to your move direction", function(args, speaker)
+	teleportWalking = true
+	local chr = speaker.Character
+	local hum = chr and FindFirstChildWhichIsA(chr, "Humanoid")
+	while teleportWalking and CWait(Heartbeat) and chr and hum and hum.Parent do
+		if hum.MoveDirection.Magnitude > 0 then
+			if args[1] and isNumber(args[1]) then
+				chr.TranslateBy(chr, hum.MoveDirection * tonumber(args[1]))
+			else
+				chr.TranslateBy(chr, hum.MoveDirection)
+			end
+		end
+	end
+end)
+
+newCmd("unteleportwalk", {"untpwalk"}, "unteleportwalk / untpwalk", "Disables Teleportwalk", function(args, speaker)
+	teleportWalking = false
+end)
+
+
+
 
 VirtualEnvironment()
 -- if Settings.AutoNet then SetSimulationRadius() end
