@@ -1226,22 +1226,21 @@ getstring = function(begin)
 end
 
 addcmd = function(name, alias, title, desc, func, plgn, plgnn)
-	cmds[#cmds + 1]=
-		{
-			NAME = name;
-			ALIAS = alias or {};
-			TITLE = title;
-			DESC = desc;
-			FUNC = func;
-			PLUGIN = plgn;
-			PLUGNN = plgnn or "";
-		}
+	cmds[#cmds + 1] = {
+		["NAME"] = name,
+		["ALIAS"] = alias or {},
+		["TITLE"] = title,
+		["DESC"] = desc,
+		["FUNC"] = func,
+		["PLUGIN"] = plgn,
+		["PLUGNN"] = plgnn or ""
+	}
 end
 
 local removecmd_cmdarea = function(cmd)
 	if cmd ~= " " then
 		for i = #cmds,1,-1 do
-			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
+			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS, cmd) then
 				table.remove(cmds, i)
 				for a,c in pairs(GetChildren(DaUi.CmdArea.ScrollingFrame)) do
 					if string.find(c.Text, "^" .. cmd .. "$") or string.find(c.Text, "^" .. cmd .. " ") or string.find(c.Text, " " .. cmd .. "$") or string.find(c.Text, " " .. cmd .. " ") then
@@ -1257,12 +1256,10 @@ local removecmd_cmdarea = function(cmd)
 end
 
 removecmd = function(cmd)
-	spawn(function()
-		removecmd_cmdarea(cmd)
-	end)
+	spawn(function() removecmd_cmdarea(cmd) end)
 	if cmd ~= " " then
 		for i = #cmds,1,-1 do
-			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS,cmd) then
+			if cmds[i].NAME == cmd or FindInTable(cmds[i].ALIAS, cmd) then
 				table.remove(cmds, i)
 				for a,c in pairs(GetChildren(DaUi.Pages.Commands.Results)) do
 					if string.find(c.Text, "^" .. cmd .. "$") or string.find(c.Text, "^" .. cmd .. " ") or string.find(c.Text, " " .. cmd .. "$") or string.find(c.Text, " " .. cmd .. " ") then
@@ -1292,7 +1289,6 @@ end
 
 gethum = function(ch) return (ch and FindFirstChildWhichIsA(ch, "Humanoid")) or (Players.LocalPlayer and FindFirstChildWhichIsA(Players.LocalPlayer.Character, "Humanoid")) end
 getbp = function(ch) return (ch and FindFirstChildWhichIsA(ch, "Backpack")) or (Players.LocalPlayer and FindFirstChildWhichIsA(Players.LocalPlayer, "Backpack")) end
-		
 findhum = function(ch)
 	if ch ~= nil then
 		if ch and FindFirstChildWhichIsA(ch, "Humanoid") then
@@ -1808,7 +1804,7 @@ readfileExploit = function()
 	end
 end
 
-writefileCooldown = function(name,data)
+writefileCooldown = function(name, data)
 	spawn(function()
 		if not wfile_cooldown then
 			wfile_cooldown = true
@@ -1825,6 +1821,7 @@ end
 local Defaults = JSONEncode(HttpService, Settings)
 local nosaves = false
 local loadedEventData = nil
+local LoadSettings = nil
 LoadSettings = function()
 	if writefileExploit() then
 		if pcall(function() readfile(Settings_Path) end) then
@@ -1902,19 +1899,19 @@ LoadSettings()
 updatesaves = function()
 	if not nosaves and writefileExploit() then
 		local update = {
-			Prefix = Settings.Prefix;
-			PluginsTable = Settings.PluginsTable;
-			daflyspeed = Settings.daflyspeed;
-			vehicleflyspeed = Settings.vehicleflyspeed;
-			cframeflyspeed = Settings.cframeflyspeed;
-			gyroflyspeed = Settings.gyroflyspeed;
-			ChatLogs = Settings.ChatLogs;
-			JoinLogs = Settings.JoinLogs;
-			KeepDA = Settings.KeepDA;
-			AutoNet = Settings.AutoNet;
-			cmdautorj = Settings.cmdautorj;
-			disablenotifications = Settings.disablenotifications;
-			undetectedcmdbar = Settings.undetectedcmdbar;
+			["Prefix"] = Settings.Prefix;
+			["PluginsTable"] = Settings.PluginsTable;
+			["daflyspeed"] = Settings.daflyspeed;
+			["vehicleflyspeed"] = Settings.vehicleflyspeed;
+			["cframeflyspeed"] = Settings.cframeflyspeed;
+			["gyroflyspeed"] = Settings.gyroflyspeed;
+			["ChatLogs"] = Settings.ChatLogs;
+			["JoinLogs"] = Settings.JoinLogs;
+			["KeepDA"] = Settings.KeepDA;
+			["AutoNet"] = Settings.AutoNet;
+			["cmdautorj"] = Settings.cmdautorj;
+			["disablenotifications"] = Settings.disablenotifications;
+			["undetectedcmdbar"] = Settings.undetectedcmdbar;
 		}
 		writefileCooldown(Settings_Path, JSONEncode(HttpService, update))
 	end
@@ -2052,7 +2049,7 @@ LoadPlugin = function(val, startup)
 	end
 end
 
-FindPlugins = function()
+local LoadAllPlugins = function()
 	if Settings.PluginsTable ~= nil and type(Settings.PluginsTable) == "table" then
 		for i,v in pairs(Settings.PluginsTable) do
 			LoadPlugin(v, true)
@@ -2060,22 +2057,14 @@ FindPlugins = function()
 	end
 end
 
+local isXrayingObjects = false
 local xrayobjects = function(bool)
-	if bool  then
-		for i, v in next, GetDescendants(workspace) do
-			if IsA(v, "Part") and v.Transparency <= 0.3 then
-				Prote.SpoofProperty(v, "Transparency")
-				Prote.SpoofProperty(v, "LocalTransparencyModifier")
-				v.LocalTransparencyModifier = 0.3
-			end
-		end
-	else
-		for i, v in next, GetDescendants(workspace) do
-			if IsA(v, "Part") and v.Transparency <= 0.3 then
-				Prote.SpoofProperty(v, "Transparency")
-				Prote.SpoofProperty(v, "LocalTransparencyModifier")
-				v.LocalTransparencyModifier = 0
-			end
+	if bool == true then isXrayingObjects = true else isXrayingObjects = false end
+	for i, v in next, GetDescendants(workspace) do
+		if IsA(v, "Part") and v.Transparency <= 0.3 then
+			Prote.SpoofProperty(v, "Transparency")
+			Prote.SpoofProperty(v, "LocalTransparencyModifier")
+			v.LocalTransparencyModifier = bool and 0.3 or 0
 		end
 	end
 end
@@ -2194,11 +2183,6 @@ NOFLY = function()
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 	wait()
 	execCmd("unstun")
-end
-
-local RoundNumber = function(Number, Divider)
-	Divider = Divider or 1
-	return (math.floor((Number/Divider) + 0.5) * Divider)
 end
 
 r15 = function(speaker)
@@ -2537,56 +2521,33 @@ end
 local BrowserList = {}
 local BrowserBtn = function(plugin_name, plugin_name, plugin_description, plugin_source)
 	BrowserList[#BrowserList + 1] = {
-		name = plugin_name,
-		plugname = plugin_name,
-		plugdesc = plugin_description,
-		source = plugin_source,
+		["name"] = plugin_name,
+		["plugname"] = plugin_name,
+		["plugdesc"] = plugin_description,
+		["source"] = plugin_source
 	}
 end
 
 CConnect(Players.LocalPlayer.Chatted, function(message)
 	spawn(function()
 		wait()
-		message = string.lower(message)
-		do_exec(message, Players.LocalPlayer)
+		do_exec(string.lower(tostring(message)), Players.LocalPlayer)
 	end)
 end)
 
-CConnect(DAMouse.KeyDown, function(Key)
-	if Key == Settings.Prefix then
-		spawn(function()
-			CaptureCmdBar()
-		end)
-	end
-end)
+CConnect(DAMouse.KeyDown, function(Key) if Key == Settings.Prefix then spawn(function() CaptureCmdBar() end) end end)
 
 local cmdbarText = string.gsub(Cmdbar.Text, "^" .. "%" .. Settings.Prefix, "")
 
 CConnect(Cmdbar.FocusLost, function(enterPressed)
 	if enterPressed then
 		cmdbarText = string.gsub(Cmdbar.Text, "^" .. "%" .. Settings.Prefix, "") 
-		spawn(function()
-			CmdBarStatus(false)
-		end)
-		spawn(function()
-			execCmd(cmdbarText, Players.LocalPlayer, true)
-		end)
+		spawn(function() CmdBarStatus(false) end)
+		spawn(function() execCmd(cmdbarText, Players.LocalPlayer, true) end)
 	end
 	wait()
-	if not Cmdbar.IsFocused(Cmdbar) then
-		Cmdbar.Text = ""
-	end
+	if not Cmdbar.IsFocused(Cmdbar) then Cmdbar.Text = "" end
 end)
-
-local macroSystem = function()
-	CConnect(DAMouse.KeyDown, function(Key)
-		for i = 1, #DA_Binds do
-			if DA_Binds[i].KEY == string.lower(tostring(Key)) then
-				execCmd(DA_Binds[i].CMD)
-			end
-		end
-	end)
-end
 
 local newCmd = function(name, aliases, title, description, func) addcmd(name, aliases, title, description, func) end
 
@@ -2642,9 +2603,7 @@ end
 
 local AddButton = function(Title, Func)
 	local NewBtn = Clone(Assets.ButtonBox)
-	CConnect(NewBtn.Hitbox.MouseButton1Down, function()
-		Func()
-	end)
+	CConnect(NewBtn.Hitbox.MouseButton1Down, function() Func() end)
 	NewBtn.Title.Text = tostring(Title)
 	NewBtn.Parent = DaUi.Pages.Menu.Results
 	NewBtn.Visible = true
@@ -2692,7 +2651,13 @@ spawn(function()
 		UiDragF.Active = true
 		UiDragF.Draggable = true
 		SmoothScroll(PluginBrowser.Area.ScrollingFrame, 0.14)
-		macroSystem()
+		CConnect(DAMouse.KeyDown, function(Key)
+			for i = 1, #DA_Binds do
+				if DA_Binds[i].KEY == string.lower(tostring(Key)) then
+					execCmd(DA_Binds[i].CMD)
+				end
+			end
+		end)
 	end)
 	spawn(function()
 		PluginBrowser.Area.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, PluginBrowser.Area.ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
@@ -3008,20 +2973,15 @@ newCmd("unfullnet", {}, "unfullnet", "Disable Your Full Network Ownership", func
 end)
 
 newCmd("netcheck", {}, "netcheck", "Notify Who is Using Network Ownership", function(args, speaker)
-	local CheckIfWorks = pcall(function()
-		gethidden(Players.LocalPlayer, "SimulationRadius")
-	end)
-	
+	local CheckIfWorks = pcall(function() gethidden(Players.LocalPlayer, "SimulationRadius") end)
 	local Plrs = {}
 	local Msg = ""
-	
 	if CheckIfWorks then
 		for i, v in pairs(GetPlayers(Players)) do
 			if gethidden(v, "SimulationRadius") >= 5000 then
 				table.insert(Plrs, v.Name)
 			end
 		end
-		
 		if #Plrs <= 0 then
 			Msg = "No Players Found"
 		elseif #Plrs == 1 then
@@ -3029,7 +2989,6 @@ newCmd("netcheck", {}, "netcheck", "Notify Who is Using Network Ownership", func
 		elseif #Plrs > 1 then
 			Msg = table.concat(Plrs, ", ")
 		end
-		
 		return notify("Net Check", Msg)
 	else
 		return notify("Incompatible Exploit", "Missing gethiddenproperty")
@@ -3052,9 +3011,6 @@ end)
 
 newCmd("loopspeed", {"loopws"}, "loopspeed / loopws [num]", "Loops your Walkspeed", function(args, speaker)
 	local speed = args[1] or 16
-	if args[2] then
-		speed = args[2] or 16
-	end
 	if isNumber(speed) then
 		local Char = speaker.Character or FindFirstChild(workspace, speaker.Name)
 		local Human = Char and FindFirstChildWhichIsA(Char, "Humanoid")
@@ -4058,9 +4014,7 @@ end)
 
 newCmd("unspectate", {"unspec", "unview"}, "unspectate / unspec / unview [plr]", "Stop viewing a Player", function(args, speaker)
 	FreecamAPI.Stop()
-	if viewing ~= nil then
-		viewing = nil
-	end
+	if viewing ~= nil then viewing = nil end
 	if viewDied then
 		Disconnect(viewDied)
 		Disconnect(viewChanged)
@@ -4150,8 +4104,13 @@ newCmd("xray", {}, "xray", "Make all parts in Workspace transparent", function(a
 	xrayobjects(true)
 end)
 
-newCmd("unxray", {}, "unxray", "Restore transparency", function(args, speaker)
+newCmd("unxray", {}, "unxray", "Restore Workspace Transparency", function(args, speaker)
 	xrayobjects(false)
+end)
+
+newCmd("togglexray", {}, "togglexray", "Toggle Workspace Transparency", function(args, speaker)
+	isXrayingObjects = not isXrayingObjects
+	xrayobjects(isXrayingObjects)
 end)
 
 newCmd("enableshiftlock", {"enablesl"}, "enableshiftlock / enablesl", "Enable Shiftlock", function(args, speaker)
@@ -6515,7 +6474,7 @@ VirtualEnvironment()
 -- if Settings.AutoNet then SetSimulationRadius() end
 spawn(function()
 	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
-		FindPlugins(Settings.PluginsTable)
+		LoadAllPlugins(Settings.PluginsTable)
 	end
 end)
 wait(0.1)
