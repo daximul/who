@@ -6095,9 +6095,9 @@ end)
 
 newCmd("fireproximityprompts", {"firepp"}, "fireproximityprompts / firepp", "Uses all proximity prompts in a game", function(args, speaker)
 	if fireproximityprompt then
-		for i, v in pairs(GetDescendants(workspace)) do
-			if FindFirstChild(v, "ProximityPrompt") then
-				fireproximityprompt(v.ProximityPrompt)
+		for i,v in pairs(GetDescendants(workspace)) do
+			if IsA(v, "ProximityPrompt") then
+				fireproximityprompt(v)
 			end
 		end
 	else
