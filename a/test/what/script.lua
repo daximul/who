@@ -3762,6 +3762,7 @@ newCmd("console", {}, "console", "Open the Old Roblox Console", function(args, s
 end)
 
 newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", function(args, speaker)
+	--[[
 	if (not is_sirhurt_closure) and syn then
 		notify("Loading", "Hold on a sec")
 		wait(0.2)
@@ -3812,6 +3813,8 @@ newCmd("explorer", {"dex"}, "explorer / dex", "Load a Game Explorer by Moon", fu
 		wait(0.2)
 		loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/Patch-Shack/newLoad/master/dexv2.lua"))();
 	end
+	]]--
+	Import("v3_fork.lua")
 end)
 
 newCmd("remotespy", {"rspy"}, "remotespy / rspy", "Load a Remote Spy (SimpleSpy)", function(args, speaker)
