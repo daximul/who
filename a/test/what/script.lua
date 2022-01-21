@@ -332,12 +332,25 @@ end
 
 local RunCode = function(funcToRun) funcToRun() end
 
+local CleanFileName = function(str)
+	str = tostring(str)
+	str = str:gsub("*", "")
+	str = str:gsub("\"", "")
+	str = str:gsub("\\", "")
+	str = str:gsub("?", "")
+	str = str:gsub(":", "")
+	str = str:gsub("<", "")
+	str = str:gsub(">", "")
+	str = str:gsub("|", "")
+	return str
+end
+
 ChatlogAPI.loggedTable = {}
 ChatlogAPI.folderPath = ("Dark Admin/Logs/")
 ChatlogAPI.Scroll = DaUi.Pages.ChatLogs.LogResults
 ChatlogAPI.BUD = UDim2.new(0, 0, 0, 0)
 ChatlogAPI.TotalNum = 0
-ChatlogAPI.gameName = tostring(MarketplaceService.GetProductInfo(MarketplaceService, game.PlaceId).Name)
+ChatlogAPI.gameName = CleanFileName(MarketplaceService.GetProductInfo(MarketplaceService, game.PlaceId).Name)
 
 ChatlogAPI.getTotalSize = function()
 	local totalSize = UDim2.new(0, 0, 0, 0)
@@ -450,7 +463,7 @@ JoinlogAPI.folderPath = ("Dark Admin/Logs/")
 JoinlogAPI.Scroll = DaUi.Pages.JoinLogs.LogResults
 JoinlogAPI.BUD = UDim2.new(0, 0, 0, 0)
 JoinlogAPI.TotalNum = 0
-JoinlogAPI.gameName = tostring(MarketplaceService.GetProductInfo(MarketplaceService, game.PlaceId).Name)
+JoinlogAPI.gameName = CleanFileName(MarketplaceService.GetProductInfo(MarketplaceService, game.PlaceId).Name)
 
 JoinlogAPI.getTotalSize = function()
 	local totalSize = UDim2.new(0, 0, 0, 0)
