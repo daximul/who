@@ -334,14 +334,15 @@ local RunCode = function(funcToRun) funcToRun() end
 
 local CleanFileName = function(str)
 	str = tostring(str)
-	str = str:gsub("*", "")
-	str = str:gsub("\"", "")
-	str = str:gsub("\\", "")
-	str = str:gsub("?", "")
-	str = str:gsub(":", "")
-	str = str:gsub("<", "")
-	str = str:gsub(">", "")
-	str = str:gsub("|", "")
+	local gSub = string.gsub
+	str = gSub(str, "*", "")
+	str = gSub(str, "\"", "")
+	str = gSub(str, "\\", "")
+	str = gSub(str, "?", "")
+	str = gSub(str, ":", "")
+	str = gSub(str, "<", "")
+	str = gSub(str, ">", "")
+	str = gSub(str, "|", "")
 	return str
 end
 
