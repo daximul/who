@@ -15,6 +15,7 @@ local MarketplaceService = GetService(game, "MarketplaceService")
 local MemStorageService = GetService(game, "MemStorageService")
 local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
+local MessagingService = game:GetService("MessagingService")
 local GroupService = GetService(game, "GroupService")
 
 local GetPlayers, InstanceNew, IsA =
@@ -2793,6 +2794,10 @@ spawn(function()
 			end
 		end
 	end)
+	if Settings.Widebar == true then
+		Main.Position = UDim2.new(0.5, -200, 1, 5)
+		Main.Size = UDim2.new(0, 400, 0, 35)
+	end
 	for _, plr in pairs(GetChildren(Players)) do
 		if plr.ClassName == "Player" then
 			ChatlogAPI.LogUser(plr)
@@ -2846,7 +2851,10 @@ AddSetting("Undetected CommandBar", Settings.undetectedcmdbar, function(Callback
 end)
 AddSetting("Widebar", Settings.Widebar, function(Callback)
 	Settings.Widebar = Callback
-	TweenObj(Main, "Quint", "Out", .5, {
+	TweenObj(Main, "Quint", "Out", 0.5, {
+		["Position"] = UDim2.new(0.5, Settings.Widebar and -200 or -100, 1, 5)
+	})
+	TweenObj(Main, "Quint", "Out", 0.5, {
         ["Size"] = UDim2.new(0, Settings.Widebar and 400 or 200, 0, 35)
     })
 	updatesaves()
