@@ -15,7 +15,6 @@ local MarketplaceService = GetService(game, "MarketplaceService")
 local MemStorageService = GetService(game, "MemStorageService")
 local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
-local MessagingService = game:GetService("MessagingService")
 local GroupService = GetService(game, "GroupService")
 
 local GetPlayers, InstanceNew, IsA =
