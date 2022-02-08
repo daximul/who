@@ -83,6 +83,7 @@ Prote = Import("prote.lua")
 
 local GUI = Import("interface.lua")
 local Main = GUI.CommandBar
+local cmdbarclone = Main:Clone()
 local Cmdbar = Main.Input
 Prote.ProtectInstance(Cmdbar, true)
 local Assets = GUI.Assets
@@ -707,7 +708,10 @@ end
 CaptureCmdBar = function()
 	Prote.Misc.SpoofCommandBar()
 	Cmdbar.CaptureFocus(Cmdbar)
-	spawn(function() repeat Cmdbar.Text = "" until Cmdbar.Text == "" end)
+	spawn(function()
+		CWait(RenderStepped)
+		Cmdbar.Text = ""
+	end)
 	spawn(function() CmdBarStatus(true) end)
 	Prote.Misc.UnSpoofCommandBar()
 end
@@ -880,11 +884,11 @@ end
 CmdBarStatus = function(bool)
 	if bool then
 		TweenObj(Main, "Quint", "Out", 0.5, {
-			Position = UDim2.new(0.5, -100, 1, -60)
+			["Position"] = UDim2.new(0.5, -100, 1, -110)
 		})
 	else
 		TweenObj(Main, "Quint", "Out", 0.5, {
-			Position = UDim2.new(0.5, -100, 1, 5)
+			["Position"] = UDim2.new(0.5, -100, 1, 5)
 		})
 	end
 end
@@ -2533,7 +2537,7 @@ local teleport = function(speaker, target, target2, fast)
 end
 
 local BrowserList = {}
-local BrowserBtn = function(plugin_name, plugin_name, plugin_description, plugin_source)
+local BrowserBtn = function(plugin_name, plugin_description, plugin_source)
 	BrowserList[#BrowserList + 1] = {
 		["name"] = plugin_name,
 		["plugname"] = plugin_name,
@@ -2549,14 +2553,24 @@ CConnect(Players.LocalPlayer.Chatted, function(message)
 	end)
 end)
 
-CConnect(DAMouse.KeyDown, function(Key) if Key == Settings.Prefix then spawn(function() CaptureCmdBar() end) end end)
+CConnect(DAMouse.KeyDown, function(Key)
+	if Key == Settings.Prefix then
+		spawn(function()
+			CaptureCmdBar()
+			TweenAllTransToObject(Main, 0.5, cmdbarclone)
+		end)
+	end
+end)
 
 local cmdbarText = string.gsub(Cmdbar.Text, "^" .. "%" .. Settings.Prefix, "")
 
 CConnect(Cmdbar.FocusLost, function(enterPressed)
 	if enterPressed then
 		cmdbarText = string.gsub(Cmdbar.Text, "^" .. "%" .. Settings.Prefix, "") 
-		spawn(function() CmdBarStatus(false) end)
+		spawn(function()
+			CmdBarStatus(false)
+			TweenAllTrans(Main, 0.5)
+		end)
 		spawn(function() execCmd(cmdbarText, Players.LocalPlayer, true) end)
 	end
 	wait()
