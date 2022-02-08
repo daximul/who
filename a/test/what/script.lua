@@ -124,6 +124,7 @@ local Settings = {
 	["cmdautorj"] = false,
 	["disablenotifications"] = false,
 	["undetectedcmdbar"] = false,
+	["Widebar"] = false,
 }
 
 local cmds = {}
@@ -884,11 +885,11 @@ end
 CmdBarStatus = function(bool)
 	if bool then
 		TweenObj(Main, "Quint", "Out", 0.5, {
-			["Position"] = UDim2.new(0.5, -100, 1, -110)
+			["Position"] = UDim2.new(0.5, Settings.Widebar and -200 or -100, 1, -110)
 		})
 	else
 		TweenObj(Main, "Quint", "Out", 0.5, {
-			["Position"] = UDim2.new(0.5, -100, 1, 5)
+			["Position"] = UDim2.new(0.5, Settings.Widebar and -200 or -100, 1, 5)
 		})
 	end
 end
@@ -1859,6 +1860,7 @@ LoadSettings = function()
 					if json.cmdautorj ~= nil then Settings.cmdautorj = json.cmdautorj else Settings.cmdautorj = false end
 					if json.disablenotifications ~= nil then Settings.disablenotifications = json.disablenotifications else Settings.disablenotifications = false end
 					if json.undetectedcmdbar ~= nil then Settings.undetectedcmdbar = json.undetectedcmdbar else Settings.undetectedcmdbar = false end
+					if json.Widebar ~= nil then Settings.Widebar = json.Widebar else Settings.Widebar = false end
 				end)
 				if not success then
 					warn("Save Json Error:", response)
@@ -1892,7 +1894,7 @@ LoadSettings = function()
 				Settings.cmdautorj = false
 				Settings.disablenotifications = false
 				Settings.undetectedcmdbar = false
-				
+				Settings.Widebar = false
 				notify("", "There was a problem writing a save file to your PC")
 			end
 		end
@@ -1910,6 +1912,7 @@ LoadSettings = function()
 		Settings.cmdautorj = false
 		Settings.disablenotifications = false
 		Settings.undetectedcmdbar = false
+		Settings.Widebar = false
 	end
 end
 LoadSettings()
@@ -1930,6 +1933,7 @@ updatesaves = function()
 			["cmdautorj"] = Settings.cmdautorj;
 			["disablenotifications"] = Settings.disablenotifications;
 			["undetectedcmdbar"] = Settings.undetectedcmdbar;
+			["Widebar"] = Settings.Widebar;
 		}
 		writefileCooldown(Settings_Path, JSONEncode(HttpService, update))
 	end
@@ -2838,6 +2842,13 @@ AddSetting("No Notifications", Settings.disablenotifications, function(Callback)
 end)
 AddSetting("Undetected CommandBar", Settings.undetectedcmdbar, function(Callback)
 	Settings.undetectedcmdbar = Callback
+	updatesaves()
+end)
+AddSetting("Widebar", Settings.Widebar, function(Callback)
+	Settings.Widebar = Callback
+	TweenObj(Main, "Quint", "Out", .5, {
+        ["Size"] = UDim2.new(0, Settings.Widebar and 400 or 200, 0, 35)
+    })
 	updatesaves()
 end)
 AddSetting("Auto Net", Settings.AutoNet, function(Callback)
