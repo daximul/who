@@ -84,6 +84,7 @@ Prote = Import("prote.lua")
 local GUI = Import("interface.lua")
 local Main = GUI.CommandBar
 local cmdbarclone = Main:Clone()
+cmdbarclone.Name = "CommandBarClone"
 local Cmdbar = Main.Input
 Prote.ProtectInstance(Cmdbar, true)
 local Assets = GUI.Assets
