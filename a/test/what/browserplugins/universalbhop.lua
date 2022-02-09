@@ -7,14 +7,14 @@ local ScriptEnabled = false
 local RolvePatch = false
 
 local BhopInfo = {
-	CurrentVel = 0,
-	VelCap = 3,
-	JumpBoostAmt = 0.1
+	["CurrentVel"] = 0,
+	["VelCap"] = 3,
+	["JumpBoostAmt"] = 0.1
 }
 
 if game.CreatorType == Enum.CreatorType.Group then
 	local Group = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId)
-	if Group.Name == "ROLVe Community" then
+	if Group.Id == 2613928 then
 		RolvePatch = true
 	end
 end
@@ -89,7 +89,7 @@ local Plugin = {
 			["Aliases"] = {},
 			["Function"] = function(args, speaker)
 				if BunnyHop == "Waiting" then
-          BunnyHop = "Loaded"
+          				BunnyHop = "Loaded"
 					BHOP:Start()
 				else
 					BHOP:Start()
@@ -103,6 +103,40 @@ local Plugin = {
 			["Function"] = function(args, speaker)
 				if BunnyHop == "Waiting" then return end
 				BHOP:Stop()
+			end,
+		},
+		["currentvel"] = {
+			["ListName"] = "currentvel [num]",
+			["Description"] = "Set your current bhop velocity",
+			["Aliases"] = {},
+			["Function"] = function(args, speaker)
+				if args[1] and isNumber(args[1]) then
+					BhopInfo.CurrentVel = tonumber(args[1])
+				end
+			end,
+		},
+		["velcap"] = {
+			["ListName"] = "velcap [num]",
+			["Description"] = "Set your bhop velocity cap",
+			["Aliases"] = {},
+			["Function"] = function(args, speaker)
+				if args[1] and isNumber(args[1]) then
+					BhopInfo.VelCap = tonumber(args[1])
+				else
+					BhopInfo.VelCap = 3
+				end
+			end,
+		},
+		["jumpboostamount"] = {
+			["ListName"] = "jumpboostamount / jumpboostamt [num]",
+			["Description"] = "Set your bhop jump boost amount",
+			["Aliases"] = {"jumpboostamt"},
+			["Function"] = function(args, speaker)
+				if args[1] and isNumber(args[1]) then
+					BhopInfo.JumpBoostAmt = tonumber(args[1])
+				else
+					BhopInfo.JumpBoostAmt = 0.1
+				end
 			end,
 		},
 	},
