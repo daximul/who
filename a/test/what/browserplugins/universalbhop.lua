@@ -11,6 +11,8 @@ local BhopInfo = {
 	["VelCap"] = 3,
 	["JumpBoostAmt"] = 0.1
 }
+local ContainedVelCap = 3
+local canMaxBhop = false
 
 if game.CreatorType == Enum.CreatorType.Group then
 	local Group = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId)
@@ -38,7 +40,11 @@ end
 UserInputService.JumpRequest:Connect(function()
 	if ScriptEnabled == true then
 		if (UserInputService:IsKeyDown(Enum.KeyCode.W) == false) and (UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.D)) == true and BhopInfo.CurrentVel < BhopInfo.VelCap then
-			BhopInfo.CurrentVel = BhopInfo.CurrentVel + BhopInfo.JumpBoostAmt
+			if canMaxBhop == true then
+				BhopInfo.CurrentVel = ContainedVelCap
+			else
+				BhopInfo.CurrentVel = BhopInfo.CurrentVel + BhopInfo.JumpBoostAmt
+			end
 		end
 	end
 end)
@@ -61,7 +67,11 @@ spawn(function()
 			if UserInputService:IsKeyDown(Enum.KeyCode.Space) == false then
 				BhopInfo.CurrentVel = 0
 			elseif UserInputService:IsKeyDown(Enum.KeyCode.Space) == true and UserInputService:IsKeyDown(Enum.KeyCode.W) then
-				BhopInfo.CurrentVel = math.clamp(BhopInfo.CurrentVel - 0.01,0,BhopInfo.VelCap)
+				if canMaxBhop == true then
+					BhopInfo.CurrentVel = ContainedVelCap
+				else
+					BhopInfo.CurrentVel = math.clamp(BhopInfo.CurrentVel - 0.01, 0, BhopInfo.VelCap)
+				end
 			elseif UserInputService:IsKeyDown(Enum.KeyCode.Space) == true then
 				if RolvePatch == true then Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Jump = true end
 			end
@@ -122,8 +132,10 @@ local Plugin = {
 			["Function"] = function(args, speaker)
 				if args[1] and isNumber(args[1]) then
 					BhopInfo.VelCap = tonumber(args[1])
+					ContainedVelCap = tonumber(args[1])
 				else
 					BhopInfo.VelCap = 3
+					ContainedVelCap = 3
 				end
 			end,
 		},
@@ -137,6 +149,14 @@ local Plugin = {
 				else
 					BhopInfo.JumpBoostAmt = 0.1
 				end
+			end,
+		},
+		["togglemaxbhop"] = {
+			["ListName"] = "togglemaxbhop",
+			["Description"] = "Toggle loop your bhop velocity to your velocity cap",
+			["Aliases"] = {"jumpboostamt"},
+			["Function"] = function(args, speaker)
+				canMaxBhop = not canMaxBhop
 			end,
 		},
 	},
