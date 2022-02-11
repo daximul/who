@@ -2,8 +2,10 @@ local BHOP = {}
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local GroupService = game:GetService("GroupService")
 
 local ScriptEnabled = false
+local isChatting = false
 local RolvePatch = false
 
 local BhopInfo = {
@@ -11,20 +13,23 @@ local BhopInfo = {
 	["VelCap"] = 3,
 	["JumpBoostAmt"] = 0.1
 }
+local DefaultInfo = {
+    ["VelCap"] = 3,
+    ["JumpBoostAmt"] = 0.1
+}
 local ContainedVelCap = 3
 local canMaxBhop = false
 
 if game.CreatorType == Enum.CreatorType.Group then
-	local Group = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId)
+	local Group = GroupService:GetGroupInfoAsync(game.CreatorId)
 	if Group.Id == 2613928 then
 		RolvePatch = true
 	end
 end
 
-local function CheckOnGround(char)
-	local ray = Ray.new(char.HumanoidRootPart.Position,-(char.HumanoidRootPart.CFrame.UpVector * 100))
-	local part, pos = workspace:FindPartOnRay(ray,char)
-	
+local CheckOnGround = function(char)
+	local ray = Ray.new(char.HumanoidRootPart.Position, -(char.HumanoidRootPart.CFrame.UpVector * 100))
+	local part, pos = workspace:FindPartOnRay(ray, char)
 	if part then
 		if pos then
 			local farness = math.ceil((char.HumanoidRootPart.Position - pos).Magnitude)
@@ -37,8 +42,16 @@ local function CheckOnGround(char)
 	end
 end
 
+UserInputService.InputBegan:Connect(function(Input, IsChat)
+    if IsChat then
+        isChatting = true
+    else
+        isChatting = false
+    end
+end)
+
 UserInputService.JumpRequest:Connect(function()
-	if ScriptEnabled == true then
+	if ScriptEnabled and not isChatting then
 		if (UserInputService:IsKeyDown(Enum.KeyCode.W) == false) and (UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.D)) == true and BhopInfo.CurrentVel < BhopInfo.VelCap then
 			if canMaxBhop == true then
 				BhopInfo.CurrentVel = ContainedVelCap
@@ -50,7 +63,7 @@ UserInputService.JumpRequest:Connect(function()
 end)
 
 Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").StateChanged:Connect(function(oldstate, newstate)
-	if ScriptEnabled == true then
+	if ScriptEnabled and not isChatting then
 		if newstate == Enum.HumanoidStateType.Landed then
 			Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 		end
@@ -59,11 +72,10 @@ end)
 
 spawn(function()
 	while true do
-		if ScriptEnabled == true then
+		if ScriptEnabled and not isChatting then
 			if CheckOnGround(Players.LocalPlayer.Character) == false and BhopInfo.CurrentVel ~= 0 then
 				Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Players.LocalPlayer.Character.HumanoidRootPart.CFrame + (Players.LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector * BhopInfo.CurrentVel/6)
 			end
-			
 			if UserInputService:IsKeyDown(Enum.KeyCode.Space) == false then
 				BhopInfo.CurrentVel = 0
 			elseif UserInputService:IsKeyDown(Enum.KeyCode.Space) == true and UserInputService:IsKeyDown(Enum.KeyCode.W) then
@@ -80,11 +92,11 @@ spawn(function()
 	end
 end)
 
-function BHOP:Start()
+BHOP.Start = function()
 	ScriptEnabled = true
 end
 
-function BHOP:Stop()
+BHOP.Stop = function()
 	ScriptEnabled = false
 end
 
@@ -100,9 +112,9 @@ local Plugin = {
 			["Function"] = function(args, speaker)
 				if BunnyHop == "Waiting" then
           				BunnyHop = "Loaded"
-					BHOP:Start()
+					BHOP.Start()
 				else
-					BHOP:Start()
+					BHOP.Start()
 				end
 			end,
 		},
@@ -112,7 +124,7 @@ local Plugin = {
 			["Aliases"] = {},
 			["Function"] = function(args, speaker)
 				if BunnyHop == "Waiting" then return end
-				BHOP:Stop()
+				BHOP.Stop()
 			end,
 		},
 		["currentvel"] = {
@@ -134,8 +146,8 @@ local Plugin = {
 					BhopInfo.VelCap = tonumber(args[1])
 					ContainedVelCap = tonumber(args[1])
 				else
-					BhopInfo.VelCap = 3
-					ContainedVelCap = 3
+					BhopInfo.VelCap = DefaultInfo.VelCap
+					ContainedVelCap = DefaultInfo.VelCap
 				end
 			end,
 		},
@@ -147,7 +159,7 @@ local Plugin = {
 				if args[1] and isNumber(args[1]) then
 					BhopInfo.JumpBoostAmt = tonumber(args[1])
 				else
-					BhopInfo.JumpBoostAmt = 0.1
+					BhopInfo.JumpBoostAmt = DefaultInfo.JumpBoostAmt
 				end
 			end,
 		},
