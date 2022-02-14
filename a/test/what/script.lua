@@ -16,6 +16,7 @@ local MemStorageService = GetService(game, "MemStorageService")
 local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
 local GroupService = GetService(game, "GroupService")
+local ChatService = GetService(game, "Chat")
 
 local GetPlayers, InstanceNew, IsA =
 	Players.GetPlayers,
@@ -83,7 +84,7 @@ Prote = Import("prote.lua")
 
 local GUI = Import("interface.lua")
 local Main = GUI.CommandBar
-local cmdbarclone = Main:Clone()
+local cmdbarclone = Clone(Main)
 cmdbarclone.Name = "CommandBarClone"
 cmdbarclone.Parent = GUI
 local Cmdbar = Main.Input
@@ -6518,6 +6519,14 @@ newCmd("unteleportwalk", {"untpwalk"}, "unteleportwalk / untpwalk", "Disables Te
 	teleportWalking = false
 end)
 
+newCmd("bubblechat", {}, "bubblechat", "Enables bubble chat for your client", function(args, speaker)
+	ChatService.BubbleChatEnabled = true
+end)
+
+newCmd("unbubblechat", {"nobubblechat"}, "unbubblechat / nobubblechat", "Disables bubble chat for your client", function(args, speaker)
+	ChatService.BubbleChatEnabled = false
+end)
+
 
 
 
@@ -6529,7 +6538,7 @@ spawn(function()
 	end
 end)
 spawn(function()
-	wait(0.1)
+	wait(0.05)
 	notify("Loaded", string.format("Loaded in %.3f Seconds", tick() - StarterTick))
 	notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
 end)
