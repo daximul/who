@@ -710,14 +710,12 @@ SmoothScroll = function(content, SmoothingFactor)
 end
 
 CaptureCmdBar = function()
-	Prote.Misc.SpoofCommandBar()
 	Cmdbar.CaptureFocus(Cmdbar)
 	spawn(function()
 		CWait(RenderStepped)
 		Cmdbar.Text = ""
 	end)
 	spawn(function() CmdBarStatus(true) end)
-	Prote.Misc.UnSpoofCommandBar()
 end
 
 local SetSimulationRadius = function()
@@ -1942,6 +1940,8 @@ updatesaves = function()
 	end
 end
 
+if Settings.undetectedcmdbar == true then Prote.UndetectedCommandbar(true) end
+
 addPlugin = function(name)
 	if string.lower(name) == "plugin file name" or string.lower(name) == "dark admin" or name == "settings" then
 		notify("Plugin Error", "Please enter a valid plugin")
@@ -2849,6 +2849,7 @@ AddSetting("No Notifications", Settings.disablenotifications, function(Callback)
 end)
 AddSetting("Undetected CommandBar", Settings.undetectedcmdbar, function(Callback)
 	Settings.undetectedcmdbar = Callback
+	Prote.UndetectedCommandbar(callback)
 	updatesaves()
 end)
 AddSetting("Widebar", Settings.Widebar, function(Callback)
@@ -3776,7 +3777,6 @@ newCmd("btools", {}, "btools", "Building Tools", function(args, speaker)
 		local Backpack = getbp()
 		for i = 1, 4 do
 			local Bin = InstanceNew("HopperBin")
-			Prote.ProtectInstance(Bin)
 			Bin.BinType = i
 			Bin.Parent = Backpack
 		end
