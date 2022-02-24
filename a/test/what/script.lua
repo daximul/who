@@ -2251,7 +2251,6 @@ end
 local attach = function(speaker, target)
 	if tools(speaker) then
 		local chara = speaker.Character
-		local tchar = target.Character
 		local hum = gethum(speaker.Character)
 		local hrp = speaker.Character.HumanoidRootPart
 		local hrp2 = target.Character.HumanoidRootPart
@@ -2480,15 +2479,15 @@ local kill = function(speaker, target, fast)
 			if not fast then
 				refresh(speaker)
 				wait()
-				repeat wait() until speaker.Character ~= nil and FindFirstChild(speaker.Character, "HumanoidRootPart")
+				repeat wait() until speaker.Character ~= nil and getRoot(speaker.Character)
 				wait(0.3)
 			end
 			local hrp = speaker.Character.HumanoidRootPart
-			attach(speaker,target)
+			attach(speaker, target)
 			repeat
 				wait()
-				hrp.CFrame = CFrame.new(999999, workspace.FallenPartsDestroyHeight + 5,999999)
-			until not FindFirstChild(target.Character, "HumanoidRootPart") or not FindFirstChild(speaker.Character, "HumanoidRootPart")
+				hrp.CFrame = CFrame.new(999999, workspace.FallenPartsDestroyHeight + 5, 999999)
+			until not getRoot(target.Character) or not getRoot(speaker.Character)
 			wait(3)
 			CWait(speaker.CharacterAdded)
 			WaitForChild(speaker.Character, "HumanoidRootPart").CFrame = NormPos
@@ -3479,7 +3478,8 @@ end)
 
 newCmd("kill", {}, "kill [plr]", "Try to Kill a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
+	for i, player in pairs(users) do
+		local Target = Players[player]
 		if Target and Target.Character then
 			kill(speaker, Target)
 		end
@@ -3488,7 +3488,8 @@ end)
 
 newCmd("fastkill", {}, "fastkill [plr]", "Try to Kill a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
+	for i, player in pairs(users) do
+		local Target = Players[player]
 		if Target and Target.Character then
 			kill(speaker, Target, true)
 		end
