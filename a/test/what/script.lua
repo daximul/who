@@ -3149,7 +3149,7 @@ newCmd("goto", {"to"}, "goto / to [plr]", "Teleport to a Player", function(args,
 				getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame + Vector3.new(3, 1, 0)
 			end
 		end
-		execCmd("breakvelocity")
+		-- execCmd("breakvelocity")
 	else
 		local users = getPlayer(args[1], speaker)
 		for i,v in pairs(users) do
@@ -3185,7 +3185,7 @@ newCmd("pulseto", {"pto"}, "pulseto / pto [plr] [seconds]", "Teleports you to a 
 				getRoot(speaker.Character).CFrame = startPos
 			end
 		end
-		execCmd("breakvelocity")
+		-- execCmd("breakvelocity")
 	else
 		local users = getPlayer(args[1], speaker)
 		for i,v in pairs(users) do
