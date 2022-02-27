@@ -3478,8 +3478,8 @@ end)
 
 newCmd("kill", {}, "kill [plr]", "Try to Kill a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i, player in pairs(users) do
-		local Target = Players[player]
+	for i,v in pairs(users) do
+		local Target = Players[v]
 		if Target and Target.Character then
 			kill(speaker, Target)
 		end
@@ -3488,8 +3488,8 @@ end)
 
 newCmd("fastkill", {}, "fastkill [plr]", "Try to Kill a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i, player in pairs(users) do
-		local Target = Players[player]
+	for i,v in pairs(users) do
+		local Target = Players[v]
 		if Target and Target.Character then
 			kill(speaker, Target, true)
 		end
@@ -3520,7 +3520,8 @@ end)
 
 newCmd("clientkill", {"ckill"}, "clientkill / ckill [plr]", "Kill a User on your Client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
+	for i,v in pairs(users) do
+		local Target = Players[v]
 		if Target and Target.Character and findhum(Target.Character) then
 			gethum(Target.Character).Health = 0
 		end
@@ -3529,7 +3530,8 @@ end)
 
 newCmd("bring", {}, "bring [plr]", "Try to Bring a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
+	for i,v in pairs(users) do
+		local Target = Players[v]
 		if Target and Target.Character then
 			bring(speaker, Target)
 		end
@@ -3538,7 +3540,8 @@ end)
 
 newCmd("fastbring", {}, "fastbring [plr]", "Try to Bring a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,Target in pairs(users) do
+	for i,v in pairs(users) do
+		local Target = Players[v]
 		if Target and Target.Character then
 			bring(speaker, Target, true)
 		end
