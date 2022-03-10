@@ -3478,8 +3478,8 @@ end)
 
 newCmd("kill", {}, "kill [plr]", "Try to Kill a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		local Target = Players[v]
+	for i, player in pairs(users) do
+		local Target = Players[player]
 		if Target and Target.Character then
 			kill(speaker, Target)
 		end
@@ -3488,8 +3488,8 @@ end)
 
 newCmd("fastkill", {}, "fastkill [plr]", "Try to Kill a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		local Target = Players[v]
+	for i, player in pairs(users) do
+		local Target = Players[player]
 		if Target and Target.Character then
 			kill(speaker, Target, true)
 		end
@@ -3520,8 +3520,7 @@ end)
 
 newCmd("clientkill", {"ckill"}, "clientkill / ckill [plr]", "Kill a User on your Client", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		local Target = Players[v]
+	for i,Target in pairs(users) do
 		if Target and Target.Character and findhum(Target.Character) then
 			gethum(Target.Character).Health = 0
 		end
@@ -3530,8 +3529,7 @@ end)
 
 newCmd("bring", {}, "bring [plr]", "Try to Bring a User", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		local Target = Players[v]
+	for i,Target in pairs(users) do
 		if Target and Target.Character then
 			bring(speaker, Target)
 		end
@@ -3540,8 +3538,7 @@ end)
 
 newCmd("fastbring", {}, "fastbring [plr]", "Try to Bring a User Fast", function(args, speaker)
 	local users = getPlayer(args[1], speaker)
-	for i,v in pairs(users) do
-		local Target = Players[v]
+	for i,Target in pairs(users) do
 		if Target and Target.Character then
 			bring(speaker, Target, true)
 		end
@@ -4194,9 +4191,16 @@ newCmd("noprompts", {}, "noprompts", "Stop Receiving Purchase Prompts", function
 end)
 
 newCmd("deletehats", {"nohats"}, "deletehats / nohats", "Delete your Hats", function(args, speaker)
-	if Players.LocalPlayer and Players.LocalPlayer.Character and findhum() then
-		local Human = gethum()
-		Human.RemoveAccessories(Human)
+	if speaker and speaker.Character then
+		for i, v in next, GetDescendants(speaker.Character) do
+			if IsA(v, "Accessory") then
+				for i2, v2 in next, GetDescendants(v) do
+					if IsA(v2, "Weld") then
+						Destroy(v2)
+					end
+				end
+			end
+		end
 	end
 end)
 
@@ -6529,6 +6533,28 @@ end)
 
 newCmd("unbubblechat", {"nobubblechat"}, "unbubblechat / nobubblechat", "Disables bubble chat for your client", function(args, speaker)
 	ChatService.BubbleChatEnabled = false
+end)
+
+newCmd("netlag", {}, "netlag [plr]", "Completely screw with a player's netless script", function(args, speaker)
+	if sethidden then
+		local users = getPlayer(args[1], speaker)
+		for list, player in pairs(users) do
+			local Target = Players[player]
+			if Target and Target.Character then
+				for i, v in next, GetDescendants(Target.Character) do
+					if IsA(v, "BasePart") then
+						sethidden(v, "NetworkIsSleeping", true)
+					end
+				end
+			end
+		end
+	else
+		notify("Incompatible Exploit", "Missing sethiddenproperty")
+	end
+end)
+
+newCmd("novoid", {"voidzero"}, "novoid / voidzero", "Set workspace's fallen part height to NAN (You can't fall in it and die)", function(args, speaker)
+	workspace.FallenPartsDestroyHeight = 0/1/0
 end)
 
 
