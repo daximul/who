@@ -11,7 +11,6 @@ local UserInputService = GetService(game, "UserInputService")
 local TeleportService = GetService(game, "TeleportService")
 local TweenService = GetService(game, "TweenService")
 local StarterGui = GetService(game, "StarterGui")
-local MarketplaceService = GetService(game, "MarketplaceService")
 local MemStorageService = GetService(game, "MemStorageService")
 local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
@@ -5519,7 +5518,6 @@ newCmd("clickteleport", {"teleporttool", "clicktp", "tptool"}, "clickteleport / 
 	if findbp() then
 		local Backpack = getbp()
 		local TpTool = InstanceNew("Tool")
-		Prote.ProtectInstance(TpTool)
 		TpTool.Name = "Teleport Tool"
 		TpTool.RequiresHandle = false
 		TpTool.Parent = Backpack
@@ -5533,7 +5531,6 @@ newCmd("clickteleport", {"teleporttool", "clicktp", "tptool"}, "clickteleport / 
 			Root.CFrame = Hit * CFrame.new(0, 3, 0)
 		end)
 		local TpToolTween = InstanceNew("Tool")
-		Prote.ProtectInstance(TpToolTween)
 		TpToolTween.Name = "Teleport Tool (Tween)"
 		TpToolTween.RequiresHandle = false
 		TpToolTween.Parent = Backpack
