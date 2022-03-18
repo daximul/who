@@ -6558,6 +6558,17 @@ newCmd("novoid", {"voidzero"}, "novoid / voidzero", "Set workspace's fallen part
 	workspace.FallenPartsDestroyHeight = 0/1/0
 end)
 
+newCmd("fakeout", {}, "fakeout", "Teleport into the void and teleport back up (good for dodging ;bang users)", function(args, speaker)
+	workspace.FallenPartsDestroyHeight = 0/1/0
+	local Root = getRoot()
+	if Root then
+		local OldPosition = Root.CFrame
+		Root.CFrame = CFrame.new(Vector3.new(0, -42069, 0))
+		wait(0.75)
+		Root.CFrame = OldPosition
+	end
+end)
+
 
 
 
