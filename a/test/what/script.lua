@@ -1365,7 +1365,9 @@ local SpecialPlayerCases = {
 		return returns
 	end,
 	["random"] = function(speaker, args, currentList)
-		local players = currentList
+		local players = GetPlayers(Players)
+		local localplayer = Players.LocalPlayer
+		table.remove(players, table.find(players, localplayer))
 		return {players[math.random(1, #players)]}
 	end,
 	["%%(.+)"] = function(speaker, args)
