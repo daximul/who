@@ -1995,7 +1995,10 @@ end
 
 LoadPlugin = function(val, startup)
 	local plugin
-	CatchedPluginLoad = function() plugin = coroutine.wrap(loadfile("Dark Admin/Plugins/" .. val))() end
+
+	CatchedPluginLoad = function()
+		plugin = loadfile("Dark Admin/Plugins/" .. val)()
+	end
 
 	handlePluginError = function(plerror)
 		notify("Plugin Error", val)
@@ -2007,9 +2010,12 @@ LoadPlugin = function(val, startup)
 			end
 		end
 		updatesaves()
+
 		print("Original Error: " .. tostring(plerror))
 		print("Plugin Error, stack traceback: " .. tostring(debug.traceback()))
+
 		plugin = nil
+
 		return false
 	end
 
