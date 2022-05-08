@@ -209,7 +209,7 @@ do
             end)
             if (not Tfind(Properties, Property)) then
                 SpoofedProperties[Instance_][#SpoofedPropertiesForInstance + 1] = {
-                    SpoofedProperty = SpoofedPropertiesForInstance.SpoofedProperty,
+                    SpoofedProperty = SpoofedPropertiesForInstance[1].SpoofedProperty,
                     Property = Property,
                 };
             end
@@ -684,9 +684,7 @@ _PROTECTIONSERVICERETURNEDTABLE = {
     ["SpoofInstance"] = SpoofInstance,
     ["SpoofProperty"] = SpoofProperty,
     ["UnSpoofInstance"] = UnSpoofInstance,
-    ["UndetectedCommandbar"] = function(value)
-        UndetectedCmdBar = value
-    end
+    ["UndetectedCommandbar"] = function(value) UndetectedCmdBar = value end
 }
 end
 return _PROTECTIONSERVICERETURNEDTABLE
