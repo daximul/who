@@ -3718,15 +3718,11 @@ newCmd("reloadplugin", {}, "reloadplugin [string]", "Reload a Plugin", function(
 	addPlugin(pluginName)
 end)
 
-local stringJoin = function(delimiter, iterable)
-	local is_string = typeof(iterable) == "string"
-	return is_string and table.concat(string.split(iterable, ""), delimiter) or table.concat(iterable, delimiter)
-end
 newCmd("pluginlist", {}, "pluginlist", "List all your plugins that are enabled", function(args, speaker)
-	if not next(Settings.PluginsTable) == nil then
-		notify("Plugin List: " .. #Settings.PluginsTable, stringJoin(", ", Settings.PluginsTable))
-    else
-        notify("Plugin Error", "Zero Plugins Enabled")
+	if #Settings.PluginsTable == 0 then
+		notify("Plugin Error", "Zero Plugins Enabled")
+	else
+		notify("Plugin List: " .. #Settings.PluginsTable, tostring(table.concat(Settings.PluginsTable, ", ")))
 	end
 end)
 
