@@ -185,57 +185,65 @@ do
     Hooks.SpoofedProperties = SpoofedProperties
 
     ProtectInstance = function(Instance_)
-        if (not Tfind(ProtectedInstances, Instance_)) then
-            ProtectedInstances[#ProtectedInstances + 1] = Instance_
-            pInstanceCount += 1 + #Instance_:GetDescendants()
-            Instance_.DescendantAdded:Connect(function()
-                pInstanceCount += 1
-            end);
-            Instance_.DescendantRemoving:Connect(function()
-                pInstanceCount = math.max(pInstanceCount - 1, 0);
-            end);
-        end
+        pcall(function()
+            if (not Tfind(ProtectedInstances, Instance_)) then
+                ProtectedInstances[#ProtectedInstances + 1] = Instance_
+                pInstanceCount += 1 + #Instance_:GetDescendants()
+                Instance_.DescendantAdded:Connect(function()
+                    pInstanceCount += 1
+                end);
+                Instance_.DescendantRemoving:Connect(function()
+                    pInstanceCount = math.max(pInstanceCount - 1, 0);
+                end);
+            end
+        end)
     end
     
     SpoofInstance = function(Instance_, Instance2)
-        if (not SpoofedInstances[Instance_]) then
-            SpoofedInstances[Instance_] = Instance2 and Instance2 or Clone(Instance_);
-        end
+        pcall(function()
+            if (not SpoofedInstances[Instance_]) then
+                SpoofedInstances[Instance_] = Instance2 and Instance2 or Clone(Instance_);
+            end
+        end)
     end
 
     UnSpoofInstance = function(Instance_)
-        if (SpoofedInstances[Instance_]) then
-            SpoofedInstances[Instance_] = nil
-        end
+        pcall(function()
+            if (SpoofedInstances[Instance_]) then
+                SpoofedInstances[Instance_] = nil
+            end
+        end)
     end
     
     local ChangedSpoofedProperties = {}
     SpoofProperty = function(Instance_, Property, NoClone)
-        if (SpoofedProperties[Instance_]) then
-            local SpoofedPropertiesForInstance = SpoofedProperties[Instance_]
-            local Properties = map(SpoofedPropertiesForInstance, function(i, v)
-                return v.Property
-            end)
-            if (not Tfind(Properties, Property)) then
-                SpoofedProperties[Instance_][#SpoofedPropertiesForInstance + 1] = {
-                    SpoofedProperty = SpoofedPropertiesForInstance[1].SpoofedProperty,
-                    Property = Property,
-                };
-            end
-        else
-            local Cloned;
-            if (not NoClone and IsA(Instance_, "Instance") and not Services[tostring(Instance_)] and Instance_.Archivable) then
-                local Success, Ret = pcall(Clone, Instance_);
-                if (Success) then
-                    Cloned = Ret
+        pcall(function()
+            if (SpoofedProperties[Instance_]) then
+                local SpoofedPropertiesForInstance = SpoofedProperties[Instance_]
+                local Properties = map(SpoofedPropertiesForInstance, function(i, v)
+                    return v.Property
+                end)
+                if (not Tfind(Properties, Property)) then
+                    SpoofedProperties[Instance_][#SpoofedPropertiesForInstance + 1] = {
+                        SpoofedProperty = SpoofedPropertiesForInstance[1].SpoofedProperty,
+                        Property = Property,
+                    };
                 end
+            else
+                local Cloned;
+                if (not NoClone and IsA(Instance_, "Instance") and not Services[tostring(Instance_)] and Instance_.Archivable) then
+                    local Success, Ret = pcall(Clone, Instance_);
+                    if (Success) then
+                        Cloned = Ret
+                    end
+                end
+                SpoofedProperties[Instance_] = {{
+                    SpoofedProperty = Cloned and Cloned or {[Property]=Instance_[Property]},
+                    Property = Property,
+                }}
+                ChangedSpoofedProperties[Instance_] = {}
             end
-            SpoofedProperties[Instance_] = {{
-                SpoofedProperty = Cloned and Cloned or {[Property]=Instance_[Property]},
-                Property = Property,
-            }}
-            ChangedSpoofedProperties[Instance_] = {}
-        end
+        end)
     end
 
     local GetAllParents = function(Instance_, NIV)
