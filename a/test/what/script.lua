@@ -88,7 +88,7 @@ local cmdbarclone = Clone(Main)
 cmdbarclone.Name = "CommandBarClone"
 cmdbarclone.Parent = GUI
 local Cmdbar = Main.Input
-Prote.ProtectInstance(Cmdbar, true)
+-- Prote.ProtectInstance(Cmdbar, true)
 local Assets = GUI.Assets
 local CommandsGui = GUI.CMDS
 local NotificationTemplate = GUI.NotificationTemplate
