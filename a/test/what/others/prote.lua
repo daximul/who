@@ -1,5 +1,5 @@
 local _PROTECTIONSERVICERETURNEDTABLE = {}
-do
+pcall(function()
 local Tfind; do
     local table = table
     Tfind = table.find
@@ -185,7 +185,6 @@ do
     Hooks.SpoofedProperties = SpoofedProperties
 
     ProtectInstance = function(Instance_)
-        pcall(function()
             if (not Tfind(ProtectedInstances, Instance_)) then
                 ProtectedInstances[#ProtectedInstances + 1] = Instance_
                 pInstanceCount += 1 + #Instance_:GetDescendants()
@@ -196,28 +195,22 @@ do
                     pInstanceCount = math.max(pInstanceCount - 1, 0);
                 end);
             end
-        end)
     end
     
     SpoofInstance = function(Instance_, Instance2)
-        pcall(function()
             if (not SpoofedInstances[Instance_]) then
                 SpoofedInstances[Instance_] = Instance2 and Instance2 or Clone(Instance_);
             end
-        end)
     end
 
     UnSpoofInstance = function(Instance_)
-        pcall(function()
             if (SpoofedInstances[Instance_]) then
                 SpoofedInstances[Instance_] = nil
             end
-        end)
     end
     
     local ChangedSpoofedProperties = {}
     SpoofProperty = function(Instance_, Property, NoClone)
-        pcall(function()
             if (SpoofedProperties[Instance_]) then
                 local SpoofedPropertiesForInstance = SpoofedProperties[Instance_]
                 local Properties = map(SpoofedPropertiesForInstance, function(i, v)
@@ -243,7 +236,6 @@ do
                 }}
                 ChangedSpoofedProperties[Instance_] = {}
             end
-        end)
     end
 
     local GetAllParents = function(Instance_, NIV)
@@ -720,5 +712,5 @@ _PROTECTIONSERVICERETURNEDTABLE = {
     ["UnSpoofInstance"] = UnSpoofInstance,
     ["UndetectedCommandbar"] = function(value) UndetectedCmdBar = value end
 }
-end
+end)
 return _PROTECTIONSERVICERETURNEDTABLE
