@@ -2684,8 +2684,8 @@ end
 spawn(function()
 	pcall(function() ParentGui(GUI) end)
 	spawn(function()
-		SmoothDrag(CommandsGui)
-		SmoothDrag(PluginBrowser)
+		PluginBrowser.Active = true
+		PluginBrowser.Draggable = true
 		UiDragF.Active = true
 		UiDragF.Draggable = true
 		SmoothScroll(PluginBrowser.Area.ScrollingFrame, 0.14)
