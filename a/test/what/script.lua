@@ -2922,7 +2922,6 @@ newCmd("browser", {}, "browser", "Open the Plugin Browser", function(args, speak
 		BrowserLoaded = true
 		for _, v in next, BrowserList do
 			local name = v["name"]
-			local plugname = v["plugdesc"]
 			local plugdesc = v["plugdesc"]
 			local source = v["source"]
 			local PlugAreaTemplate = Clone(Assets.PlugAreaTemplate)
