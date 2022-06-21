@@ -88,7 +88,7 @@ local cmdbarclone = Clone(Main)
 cmdbarclone.Name = "CommandBarClone"
 cmdbarclone.Parent = GUI
 local Cmdbar = Main.Input
--- Prote.ProtectInstance(Cmdbar, true)
+pcall(function() Prote.ProtectInstance(Cmdbar, true) end)
 local Assets = GUI.Assets
 local CommandsGui = GUI.CMDS
 local NotificationTemplate = GUI.NotificationTemplate
@@ -107,7 +107,7 @@ for superindx, objct in pairs(GetDescendants(DaUi)) do
 		end
 	end
 	if objct.Name == "SearchBar" then
-		Prote.ProtectInstance(objct.SearchFrame.Search, true)
+		pcall(function() Prote.ProtectInstance(objct.SearchFrame.Search, true) end)
 	end
 end
 
