@@ -82,7 +82,60 @@ end
 
 Prote = Import("prote.lua")
 
-local GUI = Import("interface.lua")
+local GUI = game.GetObjects(game, "rbxassetid://7841745482")[1]
+GUI.CommandBar.Position = UDim2.new(0.5, -100, 1, 5)
+GUI.CMDS.Position = UDim2.new(0.694, -75, 10, -105)
+GUI.PluginBrowser.Position = UDim2.new(0.42, -75, 2, -105)
+GUI.MainDragFrame.Position = UDim2.new(0.5, -200, 1.8, -125)
+GUI.MainDragFrame.Main.Pages.Menu.Profile.Image = ("https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(Players.LocalPlayer.UserId) .. "&width=420&height=420&format=png")
+GUI.MainDragFrame.Main.Pages.Server.Game.Id.Text = tostring(game.PlaceId)
+GUI.MainDragFrame.Main.Pages.Server.Game.By.Text = ("By " .. '<font color="rgb(140, 144, 150)"><b>' .. tostring(Players.GetNameFromUserIdAsync(Players, game.CreatorId)) .. "</b></font>")
+GUI.MainDragFrame.Main.Pages.Server.Game.Title.Text = tostring(MarketplaceService:GetProductInfo(game.PlaceId).Name)
+GUI.MainDragFrame.Main.Pages.Server.Game.Description.DescriptionFrame.Description.Text = tostring(MarketplaceService.GetProductInfo(MarketplaceService, game.PlaceId).Description)
+GUI.MainDragFrame.Main.Pages.Server.Game.Thumbnail.Image = ("https://www.roblox.com/asset-thumbnail/image?assetId=" .. tostring(game.PlaceId) .. "&width=768&height=432&format=png")
+local messageFound, randomMessage = pcall(function() return loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/daximul/u9yh45/main/m/p.lua"))() end)
+if messageFound and randomMessage then
+	if string.len(randomMessage) >= 70 then GUI.MainDragFrame.Main.Pages.Menu.Message.Title.TextScaled = true end
+	GUI.MainDragFrame.Main.Pages.Menu.Message.Title.Text = randomMessage
+else
+	GUI.MainDragFrame.Main.Pages.Menu.Message.Title.Text = "not available"
+end
+CConnect(RenderStepped, function()
+	if GUI ~= nil then
+		GUI.MainDragFrame.Main.Pages.Server.Players.PlayersFrame.Players.Text = ('<font color="rgb(140, 144, 150)">' .. tostring(#GetPlayers(Players)) .. '</font>/<font color="rgb(140, 144, 150)">' .. tostring(Players.MaxPlayers) .. '</font>')
+		GUI.MainDragFrame.Main.Pages.Server.ClientAge.ClientAgeFrame.ClientAge.Text = ('<font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60 / 60)) .. '</font> hr, <font color="rgb(140, 144, 150)">' .. tostring(math.floor(workspace.DistributedGameTime / 60)) .. '</font> m')
+	end
+end)
+local InterfaceTweeningDebounce = false
+local tweenColor = function(instance, rgb, t1me)
+	local tweenGoals = {TextColor3 = rgb}
+	local tweenInfo = TweenInfo.new(t1me, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+	local tween = TweenService.Create(TweenService, instance, tweenInfo, tweenGoals)
+	tween.Play(tween)
+end
+local tweenImageColor = function(instance, rgb, t1me)
+	local tweenGoals = {ImageColor3 = rgb}
+	local tweenInfo = TweenInfo.new(t1me, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+	local tween = TweenService.Create(TweenService, instance, tweenInfo, tweenGoals)
+	tween.Play(tween)
+end
+for _, v in next, GetChildren(GUI.MainDragFrame.Main.Menu) do
+	if IsA(v, "TextButton") then
+		CConnect(v.MouseButton1Down, function()
+			if InterfaceTweeningDebounce == true then return end
+			InterfaceTweeningDebounce = true
+			tweenColor(v.PageName, Color3.fromRGB(255, 255, 255), 0.2)
+			tweenImageColor(v.Image, Color3.fromRGB(255, 255, 255), 0.2)
+			for i2, v2 in next, GetChildren(GUI.MainDragFrame.Main.Menu) do
+				if (IsA(v2, "TextButton")) and (v2 ~= v) then
+					tweenColor(v2.PageName, Color3.fromRGB(208, 205, 201), 0.2)
+					tweenImageColor(v2.Image, Color3.fromRGB(208, 205, 201), 0.2)
+				end
+			end
+			InterfaceTweeningDebounce = false
+		end)
+	end
+end
 local Main = GUI.CommandBar
 local cmdbarclone = Clone(Main)
 cmdbarclone.Name = "CommandBarClone"
@@ -97,7 +150,7 @@ local PluginBrowser = GUI.PluginBrowser
 local UiDragF = GUI.MainDragFrame
 local DaUi = UiDragF.Main
 
-for superindx, objct in pairs(GetDescendants(DaUi)) do
+for superindx, objct in next, GetDescendants(DaUi) do
 	if objct.Name == "Results" then
 		if IsA(objct, "ScrollingFrame") then
 			objct.CanvasSize = UDim2.new(0, 0, 0, objct.UIListLayout.AbsoluteContentSize.Y)
@@ -141,7 +194,7 @@ local ScriptTabLoaded = false
 local IsDaUi = false
 local PluginCache = nil
 local Loaded_Title = Import("osdate.lua")
-local ScriptsHolder = loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/daximul/u9yh45/main/m/s.lua"))();
+local ScriptsHolder = loadstring(game.HttpGetAsync(game, "https://raw.githubusercontent.com/daximul/u9yh45/main/m/s.lua"))()
 local wfile_cooldown = false
 local topCommand = nil
 local tabComplete = nil
@@ -263,7 +316,7 @@ end)
 CConnect(Players.LocalPlayer.OnTeleport, function(State)
 	if State == Enum.TeleportState.Started then
 		if Settings.KeepDA then
-			syn.queue_on_teleport("loadstring(game.HttpGetAsync(game, \"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))();")
+			syn.queue_on_teleport("loadstring(game.HttpGetAsync(game, \"https://raw.githubusercontent.com/daximul/who/main/a/test/what/script.lua\"))()")
 		end
 	end
 end)
@@ -417,7 +470,7 @@ ChatlogAPI.SaveAllLogsToFile = function()
 	
 	ChatlogAPI.ChatData = ""
 	
-	for i, v in pairs(GetChildren(ChatlogAPI.Scroll)) do
+	for i, v in next, GetChildren(ChatlogAPI.Scroll) do
 		ChatlogAPI.ChatData = (ChatlogAPI.ChatData .. v.TimeVal.Value .. " - " .. v.Text .. "\n")
 	end
 
@@ -430,7 +483,7 @@ ChatlogAPI.ClearAllChatLogs = function()
 	ChatlogAPI.loggedTable = {}
 	ChatlogAPI.ChatData = ""
 	ChatlogAPI.Scroll.CanvasPosition = Vector2.new(0, 0)
-	for i, v in pairs(GetChildren(ChatlogAPI.Scroll)) do
+	for i, v in next, GetChildren(ChatlogAPI.Scroll) do
 		Destroy(v)
 	end
 	ChatlogAPI.Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -530,7 +583,7 @@ JoinlogAPI.SaveAllLogsToFile = function()
 	
 	JoinlogAPI.ChatData = ""
 	
-	for i, v in pairs(GetChildren(JoinlogAPI.Scroll)) do
+	for i, v in next, GetChildren(JoinlogAPI.Scroll) do
 		JoinlogAPI.ChatData = (JoinlogAPI.ChatData .. v.TimeVal.Value .. " - " .. v.Text .. "\n")
 	end
 
@@ -543,7 +596,7 @@ JoinlogAPI.ClearAllLogs = function()
 	JoinlogAPI.loggedTable = {}
 	JoinlogAPI.ChatData = ""
 	JoinlogAPI.Scroll.CanvasPosition = Vector2.new(0, 0)
-	for i, v in pairs(GetChildren(JoinlogAPI.Scroll)) do
+	for i, v in next, GetChildren(JoinlogAPI.Scroll) do
 		Destroy(v)
 	end
 	JoinlogAPI.Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -2787,14 +2840,12 @@ spawn(function()
 	CConnect(DaUi.Pages.JoinLogs.ClearJoinLogs.MouseButton1Down, function()
 		JoinlogAPI.ClearAllLogs()
 	end)
-	spawn(function()
-		while wait(0.05) do
-			if GUI ~= nil then
-				if PluginBrowser.Area.Visible == false then
-					PluginBrowser.GoBack.Visible = true
-				else
-					PluginBrowser.GoBack.Visible = false
-				end
+	CConnect(RenderStepped, function()
+		if GUI ~= nil then
+			if PluginBrowser.Area.Visible == false then
+				PluginBrowser.GoBack.Visible = true
+			else
+				PluginBrowser.GoBack.Visible = false
 			end
 		end
 	end)
@@ -2894,6 +2945,17 @@ BrowserBtn("Sharkbite", "Destroy the lives of Sharkbite Players with this simple
 --// Commands
 
 newCmd("commands", {"cmds"}, "commands / cmds", "View the Command List", function(args, speaker)
+	if InterfaceTweeningDebounce == true then return end
+	InterfaceTweeningDebounce = true
+	tweenColor(GUI.MainDragFrame.Main.Menu.Commands.PageName, Color3.fromRGB(255, 255, 255), 0.2)
+	tweenImageColor(GUI.MainDragFrame.Main.Menu.Commands.Image, Color3.fromRGB(255, 255, 255), 0.2)
+	for i2, v2 in next, GetChildren(GUI.MainDragFrame.Main.Menu) do
+		if (IsA(v2, "TextButton")) and (v2 ~= GUI.MainDragFrame.Main.Menu.Commands) then
+			tweenColor(v2.PageName, Color3.fromRGB(208, 205, 201), 0.2)
+			tweenImageColor(v2.Image, Color3.fromRGB(208, 205, 201), 0.2)
+		end
+	end
+	InterfaceTweeningDebounce = false
 	if not IsDaUi then
 		DaUiStatus(true)
 		DaUi.Pages.UIPageLayout.JumpTo(DaUi.Pages.UIPageLayout, DaUi.Pages.Commands)
@@ -3875,7 +3937,7 @@ end)
 
 newCmd("audiologger", {}, "audiologger", "Audio Logger by Edge", function(args, speaker)
 	notify("Loading", "Hold on a sec", 2)
-	loadstring(game.HttpGetAsync(game, "https://pastebin.com/raw/GmbrsEjM"))();
+	loadstring(game.HttpGetAsync(game, "https://pastebin.com/raw/GmbrsEjM"))()
 end)
 
 newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, speaker)
@@ -5463,7 +5525,7 @@ newCmd("thawunanchored", {"thawua", "unfreezeua"}, "thawunanchored / thawua / un
 end)
 
 newCmd("flashlight", {}, "flashlight (Client)", "Give yourself a Flashlight", function(args, speaker)
-	loadstring(game.HttpGetAsync(game, "https://pastebin.com/raw/8K2cTfka"))();
+	Import("flashlight.lua")
 end)
 
 newCmd("metahook", {}, "metahook [name] [value]", "Hook an Argument with a Value", function(args, speaker)
