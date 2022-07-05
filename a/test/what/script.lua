@@ -18,7 +18,8 @@ local GuiService = GetService(game, "GuiService")
 local GroupService = GetService(game, "GroupService")
 local ChatService = GetService(game, "Chat")
 
-local GetPlayers, InstanceNew, IsA =
+local spawn, GetPlayers, InstanceNew, IsA =
+	task.spawn,
 	Players.GetPlayers,
 	Instance.new,
 	game.IsA
@@ -6650,7 +6651,7 @@ spawn(function()
 		LoadAllPlugins(Settings.PluginsTable)
 	end
 end)
-task.spawn(function()
+spawn(function()
 	CWait(RenderStepped)
 	notify("Loaded", string.format("Loaded in %.3f Seconds", tick() - StarterTick))
 	notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
