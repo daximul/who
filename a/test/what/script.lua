@@ -6645,14 +6645,10 @@ end)
 
 
 VirtualEnvironment()
--- if Settings.AutoNet then SetSimulationRadius() end
 spawn(function()
 	if Settings.PluginsTable ~= nil or Settings.PluginsTable ~= {} then
 		LoadAllPlugins(Settings.PluginsTable)
 	end
 end)
-spawn(function()
-	CWait(RenderStepped)
-	notify("Loaded", string.format("Loaded in %.3f Seconds", tick() - StarterTick))
-	notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
-end)
+notify("Loaded", string.format("Loaded in %.3f Seconds", tick() - StarterTick))
+notify(Loaded_Title, "Prefix is " .. Settings.Prefix)
