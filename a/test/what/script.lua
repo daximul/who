@@ -3943,7 +3943,7 @@ end)
 
 newCmd("vr", {}, "vr", "Load the CLOVR VR Script by Abacaxl", function(args, speaker)
 	notify("", "Loading CLOVR . . .", 2)
-	loadstring(game.HttpGet(game, 'https://ghostbin.co/paste/yb288/raw'))()
+	loadstring(game.HttpGet(game, "https://gist.githubusercontent.com/Toon-arch/9b118500cc792514a3048ffa723b7666/raw/bed5f399b252c75e58a9eec70634f6636ac8ac78/vr"))()
 end)
 
 newCmd("jobid", {}, "jobid", "Copy the Server's JobId, this can be put in console on Google to join someone's exact server", function(args, speaker)
