@@ -4040,6 +4040,8 @@ end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
 	if invisRunning then return end
+	local hum = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	if hum.RigType == Enum.HumanoidRigType.R6 then
 	local Root = getRoot()
 	local OldPos = Root.CFrame
 	InvisSeat = InstanceNew("Seat")
@@ -4071,6 +4073,17 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 		end
 	end
 	invisRunning = true
+	else
+	local char = speaker.Character
+	local lt = char.LowerTorso.Root:Clone()
+	local hrp = getRoot()
+	local old = hrp.CFrame
+	hrp.Parent = workspace
+	char.PrimaryPart = hrp
+	character:MoveTo(Vector3.new(old.X,9e9,old.Z))
+	lt.Parent = hrp
+	hrp.CFrame = old
+	end
 	notify("Invisibility", "You are invisible to players!")
 end)
 
