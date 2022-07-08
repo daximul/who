@@ -4076,7 +4076,7 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	else
 	local char = speaker.Character
 	local lt = char.LowerTorso.Root:Clone()
-	local hrp = getRoot()
+	local hrp = char.HumanoidRootPart
 	local old = hrp.CFrame
 	char.PrimaryPart = hrp
 	hrp.Parent = workspace
