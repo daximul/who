@@ -4040,53 +4040,66 @@ end)
 
 newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other players", function(args, speaker)
 	if invisRunning then return end
-	local hum = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	local hum = FindFirstChildWhichIsA(speaker.Character, "Humanoid")
 	if hum.RigType == Enum.HumanoidRigType.R6 then
-	local Root = getRoot()
-	local OldPos = Root.CFrame
-	InvisSeat = InstanceNew("Seat")
-	InvisWeld = InstanceNew("Weld")
-	Prote.ProtectInstance(InvisSeat)
-	Prote.ProtectInstance(InvisWeld)
-	Root.CFrame = CFrame.new(9e9, 9e9, 9e9)
-	wait(0.2)
-	Root.Anchored = true
-	InvisSeat.Transparency = 1
-	InvisSeat.Parent = workspace
-	InvisSeat.CFrame = Root.CFrame
-	InvisSeat.Anchored = false
-	InvisWeld.Parent = InvisSeat
-	InvisWeld.Part0 = InvisSeat
-	InvisWeld.Part1 = Root
-	Root.Anchored = false
-	InvisSeat.CFrame = OldPos
-	for i, v in next, GetChildren(Root.Parent) do
-		if IsA(v, "BasePart") or IsA(v, "MeshPart") or IsA(v, "Part") then
-			beforeInvisTransparency[v] = v.Transparency
-			v.Transparency = v.Transparency <= 0.3 and 0.4 or v.Transparency
-		elseif IsA(v, "Accessory") then
-			local Handle = FindFirstChildWhichIsA(v, "MeshPart") or FindFirstChildWhichIsA(v, "Part")
-			if Handle then
-				beforeInvisTransparency[Handle] = Handle.Transparency
-				Handle.Transparency = Handle.Transparency <= 0.3 and 0.4 or Handle.Transparency    
+		local Root = getRoot()
+		local OldPos = Root.CFrame
+		InvisSeat = InstanceNew("Seat")
+		InvisWeld = InstanceNew("Weld")
+		Prote.ProtectInstance(InvisSeat)
+		Prote.ProtectInstance(InvisWeld)
+		Root.CFrame = CFrame.new(9e9, 9e9, 9e9)
+		wait(0.2)
+		Root.Anchored = true
+		InvisSeat.Transparency = 1
+		InvisSeat.Parent = workspace
+		InvisSeat.CFrame = Root.CFrame
+		InvisSeat.Anchored = false
+		InvisWeld.Parent = InvisSeat
+		InvisWeld.Part0 = InvisSeat
+		InvisWeld.Part1 = Root
+		Root.Anchored = false
+		InvisSeat.CFrame = OldPos
+		for i, v in next, GetChildren(Root.Parent) do
+			if IsA(v, "BasePart") or IsA(v, "MeshPart") or IsA(v, "Part") then
+				beforeInvisTransparency[v] = v.Transparency
+				v.Transparency = v.Transparency <= 0.3 and 0.4 or v.Transparency
+			elseif IsA(v, "Accessory") then
+				local Handle = FindFirstChildWhichIsA(v, "MeshPart") or FindFirstChildWhichIsA(v, "Part")
+				if Handle then
+					beforeInvisTransparency[Handle] = Handle.Transparency
+					Handle.Transparency = Handle.Transparency <= 0.3 and 0.4 or Handle.Transparency    
+				end
 			end
 		end
-	end
-	invisRunning = true
+		invisRunning = true
 	else
-local plr = speaker
-local character = plr.Character
-local hrp = getRoot() or character.HumanoidRootPart
-local old = hrp.CFrame
-
-local newroot = character.LowerTorso.Root:Clone()
-hrp.Parent = workspace
-character.PrimaryPart = hrp
-character:MoveTo(Vector3.new(old.X,9e9,old.Z))
-hrp.Parent = character
-task.wait(0.5)
-newroot.Parent = hrp
-hrp.CFrame = old
+		local plr = speaker
+		local character = plr.Character
+		local hrp = getRoot() or character.HumanoidRootPart
+		local old = hrp.CFrame
+		local newroot = Clone(character.LowerTorso.Root)
+		Prote.ProtectInstance(newroot)
+		hrp.Parent = workspace
+		character.PrimaryPart = hrp
+		character.MoveTo(character, Vector3.new(old.X, 9e9, old.Z))
+		hrp.Parent = character
+		task.wait(0.5)
+		newroot.Parent = hrp
+		hrp.CFrame = old
+		for i, v in next, GetChildren(Root.Parent) do
+			if IsA(v, "BasePart") or IsA(v, "MeshPart") or IsA(v, "Part") then
+				beforeInvisTransparency[v] = v.Transparency
+				v.Transparency = v.Transparency <= 0.3 and 0.4 or v.Transparency
+			elseif IsA(v, "Accessory") then
+				local Handle = FindFirstChildWhichIsA(v, "MeshPart") or FindFirstChildWhichIsA(v, "Part")
+				if Handle then
+					beforeInvisTransparency[Handle] = Handle.Transparency
+					Handle.Transparency = Handle.Transparency <= 0.3 and 0.4 or Handle.Transparency    
+				end
+			end
+		end
+		invisRunning = true
 	end
 	notify("Invisibility", "You are invisible to players!")
 end)
@@ -4102,13 +4115,13 @@ newCmd("visible", {"vis"}, "visible / vis", "Disable Invisibility", function(arg
 			InvisSeat = false
 			InvisWeld = false
 		end)
-		for i, v in next, beforeInvisTransparency do
-			if type(v) == "number" then
-				i.Transparency = v
-			end
-		end
-		notify("Invisibility", "You are now visible!")
 	end
+	for i, v in next, beforeInvisTransparency do
+		if type(v) == "number" then
+			i.Transparency = v
+		end
+	end
+	notify("Invisibility", "You are now visible!")
 end)
 
 newCmd("tinvisible", {"tinvis"}, "tinvisible / tinvis", "Invisibility but no godmode but some tools work", function(args, speaker)
