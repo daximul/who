@@ -4078,9 +4078,11 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	local lt = char.LowerTorso.Root:Clone()
 	local hrp = getRoot()
 	local old = hrp.CFrame
-	hrp.Parent = workspace
 	char.PrimaryPart = hrp
+	hrp.Parent = workspace
 	character:MoveTo(Vector3.new(old.X,9e9,old.Z))
+	hrp.Parent = char
+	task.wait(0.5)
 	lt.Parent = hrp
 	hrp.CFrame = old
 	end
