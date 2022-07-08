@@ -4074,16 +4074,16 @@ newCmd("invisible", {"invis"}, "invisible / invis", "Become invisible to other p
 	end
 	invisRunning = true
 	else
-	local char = speaker.Character
-	local lt = char.LowerTorso.Root:Clone()
-	local hrp = char.HumanoidRootPart
+	local character = speaker.Character
+	local hrp = getRoot()
 	local old = hrp.CFrame
-	char.PrimaryPart = hrp
+	local newroot = character.LowerTorso.Root:Clone()
 	hrp.Parent = workspace
+	character.PrimaryPart = hrp
 	character:MoveTo(Vector3.new(old.X,9e9,old.Z))
-	hrp.Parent = char
+	hrp.Parent = character
 	task.wait(0.5)
-	lt.Parent = hrp
+	newroot.Parent = hrp
 	hrp.CFrame = old
 	end
 	notify("Invisibility", "You are invisible to players!")
