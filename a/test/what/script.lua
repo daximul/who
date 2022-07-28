@@ -6685,7 +6685,7 @@ newCmd("crashservers", {"crashgame"}, "crashservers / crashgame", "Crash Roblox 
 end)
 
 newCmd("botcmd", {"sendcmd"}, "botcmd / sendcmd", "Send a websocket command to all bots currently connected", function(args, speaker)
-	WebSocket:Send(table.unpack(args))
+	ws:Send(table.unpack(args))
 end)
 
 
