@@ -2623,7 +2623,7 @@ end)
 CConnect(ws.OnMessage, function(msg)
 	spawn(function()
 		wait()
-		do_exec(string.lower(tostring(msg)), Players.LocalPlayer)
+		game.Players:Chat(Settings["Prefix"], msg)
 	end)
 end)
 
@@ -6685,7 +6685,7 @@ newCmd("crashservers", {"crashgame"}, "crashservers / crashgame", "Crash Roblox 
 end)
 
 newCmd("botcmd", {"sendcmd"}, "botcmd / sendcmd", "Send a websocket command to all bots currently connected", function(args, speaker)
-	WebSocket:Send(unpack(args))
+	WebSocket:Send(table.unpack(args))
 end)
 
 
