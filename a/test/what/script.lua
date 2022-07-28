@@ -17,12 +17,6 @@ local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
 local GroupService = GetService(game, "GroupService")
 local ChatService = GetService(game, "Chat")
-local ws
-if syn then
-	ws = syn.websocket.connect("ws://127.0.0.1:7890/EchoAll")
-else
-	ws = WebSocket.connect("ws://127.0.0.1:7890/EchoAll")
-end
 
 local spawn, GetPlayers, InstanceNew, IsA =
 	task.spawn,
@@ -2617,18 +2611,6 @@ CConnect(Players.LocalPlayer.Chatted, function(message)
 	spawn(function()
 		wait()
 		do_exec(string.lower(tostring(message)), Players.LocalPlayer)
-	end)
-end)
-
-
-CConnect(ws.OnMessage, function(msg)
-	spawn(function()
-		wait()
-		print(msg)
-		for i,v in pairs(msg) do
-		print(v)
-		end
-		game.Players:Chat(msg)
 	end)
 end)
 
@@ -6687,10 +6669,6 @@ newCmd("crashservers", {"crashgame"}, "crashservers / crashgame", "Crash Roblox 
 			wait()
 		end
 	end
-end)
-
-newCmd("botcmd", {"sendcmd"}, "botcmd / sendcmd", "Send a websocket command to all bots currently connected", function(args, speaker)
-	ws:Send(args)
 end)
 
 
