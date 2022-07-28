@@ -2619,7 +2619,7 @@ CConnect(Players.LocalPlayer.Chatted, function(message)
 	end)
 end)
 
-		HttpService
+
 CConnect(ws.OnMessage, function(msg)
 	spawn(function()
 		wait()
