@@ -2623,7 +2623,7 @@ end)
 CConnect(ws.OnMessage, function(msg)
 	spawn(function()
 		wait()
-		do_exec(string.lower(tostring(message)), Players.LocalPlayer)
+		do_exec(string.lower(tostring(msg)), Players.LocalPlayer)
 	end)
 end)
 
