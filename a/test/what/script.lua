@@ -2623,7 +2623,7 @@ end)
 CConnect(ws.OnMessage, function(msg)
 	spawn(function()
 		wait()
-		game.Players:Chat(Settings["Prefix"], msg)
+		game.Players:Chat(msg)
 	end)
 end)
 
