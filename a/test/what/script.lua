@@ -17,6 +17,7 @@ local VirtualInputManager = GetService(game, "VirtualInputManager")
 local GuiService = GetService(game, "GuiService")
 local GroupService = GetService(game, "GroupService")
 local ChatService = GetService(game, "Chat")
+local ws
 if syn then
 	ws = syn.websocket.connect("ws://127.0.0.1:7890/EchoAll")
 else
