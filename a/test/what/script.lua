@@ -2623,6 +2623,10 @@ end)
 CConnect(ws.OnMessage, function(msg)
 	spawn(function()
 		wait()
+		print(msg)
+		for i,v in pairs(msg) do
+		print(v)
+		end
 		game.Players:Chat(msg)
 	end)
 end)
