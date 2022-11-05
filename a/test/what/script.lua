@@ -41,6 +41,7 @@ local Heartbeat, Stepped, RenderStepped =
 	RunService.Heartbeat,
 	RunService.Stepped,
 	RunService.RenderStepped
+local gmatch = string.gmatch
 local Connection = game.Loaded
 local CWait = Connection.Wait
 local CConnect = Connection.Connect
@@ -1194,7 +1195,7 @@ end
 splitString = function(str, delim)
 	local broken = {}
 	if not delim then delim = "," end
-	for w in string.gmatch(str, "[^" .. delim .. "]+") do
+	for w in gmatch(str, "[^" .. delim .. "]+") do
 		table.insert(broken, w)
 	end
 	return broken
@@ -1598,7 +1599,7 @@ local SpecialPlayerCases = {
 
 toTokens = function(str)
 	local tokens = {}
-	for op,name in string.gmatch(str, "([+-])([^+-]+)") do table.insert(tokens, {Operator = op, Name = name}) end
+	for op,name in gmatch(str, "([+-])([^+-]+)") do table.insert(tokens, {Operator = op, Name = name}) end
 	return tokens
 end
 
